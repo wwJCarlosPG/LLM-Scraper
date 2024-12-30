@@ -9,6 +9,10 @@ SERVICE = Service('/opt/homebrew/Caskroom/chromedriver/131.0.6778.69/chromedrive
 def config_driver(url):
     chrome_options = Options()
     chrome_options.add_argument("--headless=new")
+    chrome_options.add_argument("--disable-web-security")
+    chrome_options.add_argument("--allow-file-access-from-files")
+    chrome_options.add_argument("--allow-file-access")
+    chrome_options.add_argument("--allow-cross-origin-auth-prompt")
     driver = webdriver.Chrome(service=SERVICE, options=chrome_options)
     driver.get(url)
     return driver
