@@ -12,6 +12,19 @@ CENTURY_MINUS_TEST = [2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009
 ALL_MONTHS_MINUS_TEST = [2,3,4,6,7,9,10,11]
 ROOT = 'pages'
 DEST_PATH = 'pages/pages_without_noise'
+AUG_PAGES = 'pages/augmented_pages'
+TEXT_LABELS = [
+    'div',
+    'strong',
+    'h1',
+    'h2',
+    'li',
+    'span',
+    'p',
+    'title',
+    'a'
+]
+
 
 seed = [
     'bing.com',

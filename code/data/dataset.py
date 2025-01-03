@@ -1,9 +1,9 @@
-from waybackpy import WaybackMachineCDXServerAPI, WaybackMachineSaveAPI
-from requests.adapters import HTTPAdapter
-from urllib3.util.retry import Retry
-from consts import * 
-import os, sys, re
 import requests
+import os, sys, re
+from consts import * 
+from urllib3.util.retry import Retry
+from requests.adapters import HTTPAdapter
+from waybackpy import WaybackMachineCDXServerAPI
 
 USER_AGENT = "my new app's user agent"
 retry_strategy = Retry(
