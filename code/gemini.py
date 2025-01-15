@@ -8,11 +8,11 @@ from google.generativeai.types import *
 class Gemini(LLM):
     def __init__(self) -> None:        
         load_dotenv()
-        key = os.getenv("GEMINI_KEY")
+        key = os.getenv("GEMINI_API_KEY")
         print(key)
         genai.configure(api_key=key)
 
-        self.model = genai.GenerativeModel('gemini-pro')
+        self.model = genai.GenerativeModel('gemini-1.5-pro')
 
 
     def __call__(self, query: str, temperature=1.0) -> str:

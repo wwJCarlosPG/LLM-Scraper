@@ -54,3 +54,5 @@ def clean_name(name: str):
         print(f'{e} --> {name}')
 
 
+def save_html(file_name, path):
+    pass

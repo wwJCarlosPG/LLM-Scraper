@@ -1,7 +1,9 @@
-from charset_normalizer import detect
-from consts import ROOT, DEST_PATH
+import os, requests
 from bs4 import BeautifulSoup
-import os
+from dataset_work.consts import ROOT, DEST_PATH
+from urllib3.util.retry import Retry
+from charset_normalizer import detect
+from requests.adapters import HTTPAdapter
 
 class HTML_Cleaner:
     
@@ -27,7 +29,7 @@ class HTML_Cleaner:
 
 
     @staticmethod
-    def clean_html(html_path: str, file_name: str, tags: list, dest_path: str = DEST_PATH):
+    def clean_and_save(html_path: str, file_name: str, tags: list, dest_path: str = DEST_PATH):
         """Remove the given tags from a html file and save the cleaned html in a given path (this method is auxiliar)
 
         Args:
@@ -48,14 +50,9 @@ class HTML_Cleaner:
             
             with open(html_path, 'r', encoding=encoding) as file:
                 html_content = file.read()
-            soup = BeautifulSoup(html_content, 'html.parser')
-
-            for tag in tags:
-                for t in soup.find_all(tag):
-                    t.decompose()
-
-            cleaned_html = str(soup)
-
+            
+            cleaned_html = HTML_Cleaner.clean_by_tag(html_content, tags)
+            
             dest = os.path.join(dest_path, f'cleaned_{file_name}.html')
             with open(dest, 'w', encoding='utf-8') as file:
                 file.write(cleaned_html)
@@ -63,6 +60,46 @@ class HTML_Cleaner:
         except Exception as e:
             print(e)
 
+    @staticmethod
+    def clean_without_download(url: str, tags: list[str], is_local: bool = False) -> str:
+        """_summary_
+
+        Args:
+            url (str): _description_
+            tags (list[str]): _description_
+            is_local (bool, optional): _description_. Defaults to False.
+
+        Returns:
+            str: _description_
+        """
+        
+        USER_AGENT = "my new app's user agent"
+        retry_strategy = Retry(
+            total=5,
+            backoff_factor=1,
+            connect= 3
+
+        )
+        adapter = HTTPAdapter(max_retries = retry_strategy)
+
+
+        session = requests.Session()
+        session.mount('http://', adapter)
+        session.mount('https://', adapter)
+
+        try:
+            if not is_local:
+                response = session.get(url, timeout=10)
+            else:
+                with open(url, 'r') as file:
+                    response = file.read()
+            return HTML_Cleaner.clean_by_tag(response, tags)
+            
+        except Exception as e:
+            print(f"Request failed: {e}")
+
+
+    @staticmethod
     def clean_by_size(size_limit: int = 11000, path: str = DEST_PATH):
         files = os.listdir(path)
         print(f'before: {len(files)}')
@@ -88,7 +125,19 @@ class HTML_Cleaner:
             new_file_name = new_file_name.replace('#','')
             os.rename(f'{root_path}/{file}', f'{root_path}/{new_file_name}')
 
-                
+    @staticmethod         
+    def clean_by_tag(html_content: str, tags: list[str]):
+        soup = BeautifulSoup(html_content, 'html.parser')
+
+        for tag in tags:
+            for t in soup.find_all(tag):
+                t.decompose()
+
+        cleaned_html = str(soup)
+        return cleaned_html
+
+
+
 
             
 if __name__ == '__main__':
