@@ -1,19 +1,13 @@
 from abc import ABC
 from abc import abstractmethod
-from scraper.model import Model
 from pydantic_ai import Agent, Tool
 from dataset_work.html_cleaner import HTML_Cleaner
-from scraper.prompts import SIMPLE_SYSTEM_PROMPT
+# from code.scraper.prompts.prompts import SIMPLE_SYSTEM_PROMPT
 
 class AdaptativeScraper(ABC):
-    def __init__(self, model: Model):
+    def __init__(self, model_name: str):
         super().__init__()
-        self.model = model
-        self.agent = Agent(
-            model = None,
-            system_prompt=SIMPLE_SYSTEM_PROMPT
-        )
-        self.agent.tools = []
+        self.model = model_name
 
     @abstractmethod
     def run(self, input: str, html: str):
