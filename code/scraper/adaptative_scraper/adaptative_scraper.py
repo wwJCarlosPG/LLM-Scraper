@@ -3,6 +3,7 @@ from pydantic_ai.agent import Agent
 from dataset_work.html_cleaner import HTML_Cleaner
 from pydantic_ai.tools import ToolFuncContext, Tool
 from scraper.external_models.external import ExternalModel, ExternalAgentModel, ExternalResponse
+from scraper.adaptative_scraper.validators import external_validator
 from httpx import AsyncClient
 from scraper.prompts.prompts import SIMPLE_SYSTEM_PROMPT
 class AdaptativeScraper:
@@ -20,6 +21,7 @@ class AdaptativeScraper:
             api_key (str | None, optional): _description_. Defaults to None.
             env_alias (str | None, optional): _description_. Defaults to None.
         """
+
         async_client = AsyncClient()
         self.model_name = model_name
         if endpoint is None:
@@ -30,10 +32,10 @@ class AdaptativeScraper:
             self.agent: Agent = Agent(
                 model = ExternalModel(api_key = api_key,endpoint=endpoint, model_name=model_name, env_alias = env_alias, http_client=async_client),
                 system_prompt = SIMPLE_SYSTEM_PROMPT,
-                
             )
+            self.agent.result_validator(external_validator)
         
-            
+    @staticmethod     
     def clean_html(path: str, tags: list[str], is_local: bool):
         """
         Cleans the specified HTML by removing the provided tags.
@@ -54,7 +56,7 @@ class AdaptativeScraper:
         return HTML_Cleaner.clean_without_download(path, tags, is_local)
     
     
-    async def run(self, query: str, html: str):
+    async def run(self, query: str, html: str) -> dict:
         """ 
         Use an agent to perform scraping on the provided static HTML based on a natural language query.
         This method sends a query and a static HTML document to an agent, which processes the input and extracts the requested information. 
@@ -67,7 +69,7 @@ class AdaptativeScraper:
             _type_: NO SE TODAVIA
         """
         response = await self.agent.run(f'{query}:\n{html}') 
-        return response
+        return response.data.scraped_data  # this is the final_result
     
   
     

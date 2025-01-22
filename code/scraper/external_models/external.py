@@ -13,42 +13,42 @@ from contextlib import asynccontextmanager
 from pydantic_ai.tools import ToolDefinition
 from pydantic_ai.settings import ModelSettings
 from pydantic_ai.models import Model, AgentModel
+from pydantic_ai.exceptions import UnexpectedModelBehavior
 from pydantic_ai.messages import ModelMessage, ModelResponse
-from scraper.external_models.exceptions import UnexpectedModelBehavior
 from httpx import AsyncClient as AsyncHTTPClient, Response as HTTPResponse
 
 @dataclass
 class ApiKeyAuth:
     api_key: str
-# class ExternalContent(BaseModel):
-#     attribute_name: str = Field(description="The name of the extracted data, such as 'product', 'news', 'news title', 'product name', etc.")
-#     data: str = Field(description="The extracted content corresponding to the specified attribute, such as a product name or a news headline.")
 
-# class ExternalResponse(TypedDict):
-#     explanation: str = Field(description="A description or justification of the data extraction process, providing context on how the information was obtained.")
-#     scraped_data: list[dict[str, str]] = Field(description="A list of extracted data, where each item contains an attribute and its corresponding value.", validation_alias='final_answer')
+class ExternalResponse(BaseModel):
+    explanation: str = Field(
+        description="Detailed reasoning or context provided by the system explaining the extracted data or process."
+    )
+    scraped_data: list[dict[str, str]] = Field(
+        description="A list of extracted key-value pairs from the provided source, representing structured data such as product details, article information, or other relevant content.",
+        alias='final_answer'
+    )
 
-class ExternalMessage(TypedDict):
+class ExternalAPIMessage(TypedDict):
     role: str
     content: str
 
-class ExternalChoice(TypedDict):
-    message: ExternalMessage
+class ExternalAPIChoice(TypedDict):
+    message: ExternalAPIMessage
+    # text: ExternalAPIMessage
     # aqui poner text tambien y hacerlos los dos opcionales, porque algunas API tienen message y otras tienen text
 
-class ExternalResponse(TypedDict):
+class ExternalAPIResponse(TypedDict):
     choices: list[dict]
     usage: dict[str, int]
-    choices: list[ExternalChoice]
+    choices: list[ExternalAPIChoice]
 
-_external_response_type_adapter = TypeAdapter(ExternalResponse)
+_external_response_type_adapter = TypeAdapter(ExternalAPIResponse)
 
-def get_content_and_usage(response: ExternalResponse):
+def get_content_and_usage(response: ExternalAPIResponse):
     content = response['choices'][0]['message']['content']
     usage = response['usage']
-    
-    print(f'----CONTENT: {content}')
-    print(f'----USAGE: {usage}')
     return content, usage
 
 
@@ -179,20 +179,8 @@ class ExternalAgentModel(AgentModel):
             timeout=60.0
         ) as response:
             if response.status_code != 200:
+                print("STATUS CODE != 200")
                 await response.aread()
                 raise UnexpectedModelBehavior(f'Unexpected response from {self.endpoint} {response.status_code}: {response.text}')
             yield response
         
-        pass
-
-
-
-
-
-
-
-# def external_validator(text: str):
-#     print(f'xxxxxxxxxxxxxxxxxxxxEXTERNAL_VALIDATORxxxxxxxxxxxxxxxxxxxx')
-#     json_response = json.loads(text)
-#     x = ExternalResponse.model_validate_json(json_response)
-#     return x
