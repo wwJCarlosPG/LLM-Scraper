@@ -61,7 +61,7 @@ class HTML_Cleaner:
             print(e)
 
     @staticmethod
-    def clean_without_download(url: str, tags: list[str], is_local: bool = False) -> str:
+    def clean_without_download(url: str, tags: list[str], html_content: str = None, is_local: bool = False) -> str:
         """_summary_
 
         Args:
@@ -72,7 +72,9 @@ class HTML_Cleaner:
         Returns:
             str: _description_
         """
-        
+        if html_content is not None:
+            return HTML_Cleaner.clean_by_tag(html_content, tags)
+
         USER_AGENT = "my new app's user agent"
         retry_strategy = Retry(
             total=5,

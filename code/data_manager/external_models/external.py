@@ -21,15 +21,6 @@ from httpx import AsyncClient as AsyncHTTPClient, Response as HTTPResponse
 class ApiKeyAuth:
     api_key: str
 
-class ExternalResponse(BaseModel):
-    explanation: str = Field(
-        description="Detailed reasoning or context provided by the system explaining the extracted data or process."
-    )
-    scraped_data: list[dict[str, str]] = Field(
-        description="A list of extracted key-value pairs from the provided source, representing structured data such as product details, article information, or other relevant content.",
-        alias='final_answer'
-    )
-
 class ExternalAPIMessage(TypedDict):
     role: str
     content: str

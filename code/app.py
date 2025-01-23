@@ -1,16 +1,17 @@
-from fireworks.client import Fireworks
-from pydantic_ai import Agent, Tool, RunContext
-from dotenv import load_dotenv
-from scraper.adaptative_scraper.adaptative_scraper import AdaptativeScraper
 import asyncio
 from pydantic_ai.exceptions import UnexpectedModelBehavior
+from data_manager.data_extractor.data_extractor import DataExtractor
+from data_manager.validators.default_validators import BasedAgentValidator
 
 async def main():
-    api_key = "fw_3ZKL6bqRbTf3SGtNKBLc9LGM"
-    endpoint = "https://api.fireworks.ai/inference/v1/chat/completions"
+    api_key1 = 'lm-studio'
+    api_key2 = "fw_3ZKL6bqRbTf3SGtNKBLc9LGM"
+    endpoint1 = 'http://localhost:1234/v1/chat/completions'
+    endpoint2 = "https://api.fireworks.ai/inference/v1/chat/completions"
     model_name = "accounts/fireworks/models/llama-v3p3-70b-instruct"
+    # x = BasedAgentValidator(model_name=model_name, endpoint=endpoint2, api_key=api_key2)
 
-    b = AdaptativeScraper(model_name, '', endpoint, api_key)
+    # b = DataExtractor(model_name=model_name,endpoint=endpoint2, api_key=api_key2, validator=x)
     html = """
     <!DOCTYPE html>
     <html lang="en">
@@ -56,10 +57,12 @@ async def main():
 
 
     """
-    try:
-        x = await b.run("Extract for the following HTML each news title", html)
-    except UnexpectedModelBehavior:
-        raise
+    # try:
+    #     x = await b.extract("Extract for the following HTML each news title", html_content=html)
+    # except UnexpectedModelBehavior:
+    #     raise
+    # print(x)
+    x = BasedAgentValidator(model_name=model_name, endpoint=endpoint2, api_key=api_key2)
+    x = await x.validate(f"Extract for the following HTML each news title \n {html}", "[{'news_title': 'Tech Industry Booms in 2025'}]")
     print(x)
-
 asyncio.run(main())
