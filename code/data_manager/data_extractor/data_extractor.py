@@ -89,19 +89,18 @@ class DataExtractor:
                 print(extracted_data)
                 ```
         """
-
         cleaned_html = HTML_Cleaner.clean_without_download(url=html_path, tags=['script', 'style'], html_content=html_content, is_local=is_local)
         response = None
         retries = 0
         while response is None or isinstance(response, ValidatorResponse) and retries < 3:
-            response = await self.agent.run(f'{query}:\n{cleaned_html}') 
+            response = await self.agent.run(f'{query}:\n{cleaned_html}', model_settings={}) 
             if isinstance(response, ValidatorResponse):
                 augmented_query = response.explanation
                 query = query + '\n' + augmented_query
             retries += 1
         
         if isinstance(response, ValidatorResponse):
-            return "ALGO QUE DIGA QUE NO SE PUDIERON VALIDAR LOS DATOS EXTRAIDOS..."
+            raise 
         
         return response.data.scraped_data
     

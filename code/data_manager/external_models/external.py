@@ -1,8 +1,6 @@
 import os
 import json
 from typing import Literal
-from typing import Annotated
-from dotenv import load_dotenv
 from pydantic import TypeAdapter
 from dataclasses import dataclass
 from pydantic_ai.usage import Usage
@@ -19,18 +17,38 @@ from httpx import AsyncClient as AsyncHTTPClient, Response as HTTPResponse
 
 @dataclass
 class ApiKeyAuth:
+    """Handles API authentication by storing an API key.
+
+    Attributes:
+        api_key (str): The API key used for authenticating requests.
+    """
     api_key: str
 
 class ExternalAPIMessage(TypedDict):
+    """Represents a message structure in the external API response.
+
+    Attributes:
+        role (str): The role of the message (e.g., 'user', 'system').
+        content (str): The content of the message.
+    """
     role: str
     content: str
 
 class ExternalAPIChoice(TypedDict):
+    """Represents a choice object in the external API response.
+
+    Attributes:
+        message (ExternalAPIMessage): A message dictionary containing role and content.
+    """
     message: ExternalAPIMessage
-    # text: ExternalAPIMessage
-    # aqui poner text tambien y hacerlos los dos opcionales, porque algunas API tienen message y otras tienen text
 
 class ExternalAPIResponse(TypedDict):
+    """Defines the overall structure of an external API response.
+
+    Attributes:
+        choices (list[ExternalAPIChoice]): A list of possible response choices.
+        usage (dict[str, int]): Token usage statistics in the response.
+    """
     choices: list[dict]
     usage: dict[str, int]
     choices: list[ExternalAPIChoice]
@@ -38,17 +56,42 @@ class ExternalAPIResponse(TypedDict):
 _external_response_type_adapter = TypeAdapter(ExternalAPIResponse)
 
 def get_content_and_usage(response: ExternalAPIResponse):
+    """Extracts the message content and token usage from the API response.
+
+    Args:
+        response (ExternalAPIResponse): The response received from the external API.
+
+    Returns:
+        tuple[str, dict]: The extracted message content and usage statistics.
+
+    Example:
+        content, usage = get_content_and_usage(api_response)
+    """
     content = response['choices'][0]['message']['content']
     usage = response['usage']
     return content, usage
 
 
 class MessageRequest(BaseModel):
+    """Represents a request message to the external API.
+
+    Attributes:
+        role (str): The role of the message (either 'user' or 'system').
+        content (str): The content of the message.
+    """
     role: str = Literal['user','system']
     content: str
 
 
 class ExternalRequest(BaseModel):
+    """Defines the structure for requests to the external API.
+
+    Attributes:
+        model_name (str): The name of the model to use.
+        temperature (float): Sampling temperature for response generation.
+        max_tokens (int): Maximum number of tokens to generate.
+        messages (list[MessageRequest]): A list of conversation messages.
+    """
     model_name: str = Field(alias='model', default='custom_model')
     temperature: float = 0.7
     max_tokens: int = 1000
@@ -57,6 +100,24 @@ class ExternalRequest(BaseModel):
 
 
 class ExternalModel(Model):
+    """Represents an external model that interacts with an API.
+
+    Args:
+        api_key (str | None): API key for authentication.
+        model_name (str): The name of the model to be used.
+        endpoint (str): The API endpoint URL.
+        env_alias (str): The environment variable alias to retrieve the API key.
+        http_client (AsyncHTTPClient | None): HTTP client for async requests.
+
+    Raises:
+        Exception: If the API key is not provided or set in the environment variable.
+
+    Attributes:
+        auth (ApiKeyAuth): API authentication instance.
+        model_name (str): The name of the model.
+        endpoint (str): The API endpoint URL.
+        http_client (AsyncHTTPClient): HTTP client for handling API requests.
+    """
     def __init__(self, *,
                  api_key: str | None,  
                  model_name: str,
@@ -82,6 +143,16 @@ class ExternalModel(Model):
     function_tools: list[ToolDefinition],
     allow_text_result: bool,
     result_tools: list[ToolDefinition]) -> AgentModel:
+        """Creates an instance of the ExternalAgentModel.
+
+        Args:
+            function_tools (list[ToolDefinition]): A list of function tools.
+            allow_text_result (bool): Flag to allow text-based responses.
+            result_tools (list[ToolDefinition]): Tools used to process results.
+
+        Returns:
+            AgentModel: An instance of ExternalAgentModel.
+        """
         return ExternalAgentModel(
             function_tools = function_tools,
             allow_text_result = allow_text_result,
@@ -93,9 +164,27 @@ class ExternalModel(Model):
         )
     
     def name(self):
+        """Returns the model name."""
         return self.model_name
 
 class ExternalAgentModel(AgentModel):
+    """Handles interactions with the external AI model.
+
+    Args:
+        http_client (AsyncHTTPClient): The asynchronous HTTP client for requests.
+        model_name (str): The name of the AI model.
+        endpoint (str): The API endpoint URL.
+        auth (ApiKeyAuth): API authentication details.
+        function_tools (list[ToolDefinition]): List of function tools.
+        allow_text_result (bool): Whether text results are allowed.
+        result_tools (list[ToolDefinition]): List of tools for processing results.
+
+    Attributes:
+        http_client (AsyncHTTPClient): The HTTP client.
+        model_name (str): The AI model name.
+        endpoint (str): The API endpoint.
+        auth (ApiKeyAuth): Authentication details.
+    """
 
     def __init__(self,*,
                  http_client: AsyncHTTPClient,   # pa que yo quiero el AsyncHTTPClient
@@ -120,6 +209,15 @@ class ExternalAgentModel(AgentModel):
     messages: list[ModelMessage],
     model_settings: ModelSettings | None,
 ) -> tuple[ModelResponse, Usage]:
+        """Sends a request to the external AI model and retrieves the response.
+
+        Args:
+            messages (list[ModelMessage]): Messages to send.
+            model_settings (ModelSettings | None): Model configuration settings.
+
+        Returns:
+            tuple[ModelResponse, Usage]: The model response and token usage statistics.
+        """
         async with self._make_request(messages, model_settings) as http_response:
             response = _external_response_type_adapter.validate_json(await http_response.aread(), strict=False)
         
@@ -139,11 +237,14 @@ class ExternalAgentModel(AgentModel):
             messages: list[ModelMessage],
             model_settings: ModelSettings
     ) -> AsyncIterator[HTTPResponse]:
-        """_summary_
+        """Performs an asynchronous request to the external API.
 
         Args:
-            message (list[ModelMessage]): _description_
-            model_settings (ModelSettings): _description_
+            messages (list[ModelMessage]): List of messages to send.
+            model_settings (ModelSettings): Model configuration settings.
+
+        Yields:
+            HTTPResponse: The response from the API.
         """
         request: ExternalRequest = ExternalRequest()
         for message in messages:
@@ -154,7 +255,8 @@ class ExternalAgentModel(AgentModel):
                     request.messages.append(MessageRequest(role='user',content=part.content))
 
         request.model_name = self.model_name
-        request.temperature = 0.7
+        request.temperature = model_settings['temperature']
+        request.max_tokens = model_settings['max_tokens']
         request_json = request.model_dump_json(by_alias=True)
 
         headers = {
@@ -167,7 +269,7 @@ class ExternalAgentModel(AgentModel):
             self.endpoint,
             content=request_json,
             headers=headers,
-            timeout=60.0
+            timeout=30.0
         ) as response:
             if response.status_code != 200:
                 print("STATUS CODE != 200")

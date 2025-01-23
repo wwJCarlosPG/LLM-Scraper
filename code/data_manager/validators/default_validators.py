@@ -30,25 +30,106 @@ class ValidatorResponse(BaseModel):
     )
 
 class BaseValidator(ABC):
+    """
+    Abstract base class for validators that assess the accuracy of extracted data 
+    against a user-provided query.
+
+    Methods:
+        validate(user_query: str, html_content: str, response_to_validate: str) -> Union[ValidatorResponse, ScrapedResponse]:
+            Abstract method to validate extracted data against a query.
+    """
+
     @abstractmethod
-    def validate(self, user_query: str, html_content: str, response_to_validate: str) -> Union[ValidatorResponse, ScrapedResponse]:
+    def validate(self, response_to_validate) -> Union[ValidatorResponse, ScrapedResponse]:
+        """
+        Validate the extracted data against the provided user query.
+        
+        Args:
+            response_to_validate (str): The data to be validated, typically in JSON format.
+
+        Returns:
+            Union[ValidatorResponse, ScrapedResponse]: 
+            - `ValidatorResponse`: Contains validation status and an explanation.
+            - `ScrapedResponse`: Represents a successful extraction result.
+        """
         raise NotImplementedError()
+    
+    def self_validator(self, data: str):
+        """
+        Validates the provided JSON string by converting it to a `ValidatorResponse` object.
+
+        Args:
+            data (str): JSON formatted string containing validation data.
+
+        Returns:
+            ValidatorResponse: A validated response object.
+        """
+        response = ValidatorResponse.model_validate_json(data)
+        return response
      
 class DefaultValidator(BaseValidator):
+    """
+    Default implementation of `BaseValidator` that validates scraped data 
+    using the `ScrapedResponse` model.
+
+    Methods:
+        validate(data: str) -> Union[ValidatorResponse, ScrapedResponse]:
+            Validates the given data and returns a `ScrapedResponse` object.
+    """
     def __init__(self):
+        """
+        Initializes the DefaultValidator instance.
+        """
         super().__init__()
 
     def validate(self, data: str) -> Union[ValidatorResponse, ScrapedResponse]:
+        """
+        Validate the extracted data by parsing it into a `ScrapedResponse` object.
+
+        Args:
+            data (str): JSON formatted string containing the scraped response.
+
+        Returns:
+            ScrapedResponse: The parsed and validated scraped data.
+        """
         validated_response = ScrapedResponse.model_validate_json(data)
         return validated_response
     
 
 class BasedAgentValidator(BaseValidator):
+    """
+    An AI-based validator that uses an external model to assess data accuracy 
+    against the user query and HTML content.
+
+    Attributes:
+        model_name (str): The name of the model to be used for validation.
+        endpoint (str, optional): API endpoint for external model calls.
+        api_key (str, optional): API key for authentication.
+        env_alias (str, optional): Environment variable alias for the API key.
+        agent (Agent): The agent responsible for running validation queries.
+
+    Methods:
+        validate(run_context: RunContext, response_to_validate: str) -> Union[ValidatorResponse, ScrapedResponse]:
+            Performs validation using an AI model based on the given user query.
+    """
+
     def __init__(self, *,
                  model_name:str,
                  endpoint: str | None = None,
                  api_key: str | None = None,
                  env_alias: str | None = None):
+        """
+        Initializes the BasedAgentValidator with the provided parameters.
+
+        Args:
+            model_name (str): The name of the AI model used for validation.
+            endpoint (str, optional): The API endpoint of the validation service.
+            api_key (str, optional): API key for authentication.
+            env_alias (str, optional): Environment variable alias for retrieving API keys.
+
+        Raises:
+            ValueError: If no valid API key is provided or found in environment variables.
+        """
         
         async_client = AsyncClient()
         self.model_name = model_name
@@ -63,11 +144,20 @@ class BasedAgentValidator(BaseValidator):
             )
             self.agent.result_validator(self.self_validator)
         
-    def self_validator(self, data: str):
-        response = ValidatorResponse.model_validate_json(data)
-        return response
-
     async def validate(self, run_context: RunContext, response_to_validate: str) -> Union[ValidatorResponse, ScrapedResponse]:
+        """
+        Validates the extracted data using an AI-based agent.
+
+        Args:
+            run_context (RunContext): The context of the current run, containing user messages.
+            response_to_validate (str): JSON formatted response to be validated.
+
+        Returns:
+            Union[ValidatorResponse, ScrapedResponse]: 
+            - A valid scraped response if validation is successful.
+            - A validation response with an explanation if validation fails.
+        """
+
         messages = run_context.messages
         request_parts = [m.parts for m in messages if m.kind == 'request']
         user_query = [request.content for request in request_parts[len(request_parts) - 1] if request.part_kind == 'user-prompt']
