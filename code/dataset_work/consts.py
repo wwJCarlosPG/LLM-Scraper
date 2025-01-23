@@ -22,7 +22,9 @@ TEXT_LABELS = [
     'span',
     'p',
     'title',
-    'a'
+    'a',
+    'option',
+    'input'
 ]
 
 

@@ -7,11 +7,6 @@ from bs4 import BeautifulSoup
 from dataset_work.consts import DEST_PATH
 from dataset_work.consts import AUG_PAGES, TEXT_LABELS
 from dataset_work.augmentation_prompts import generate_div
-from dataset_work.data_augmenter import Site, Data_Augmenter
-
-
-
-
 
 class Site:
     def __init__(self, web_name: str):
@@ -91,13 +86,22 @@ class Data_Augmenter:
                 with open(f'{path}', 'r') as file:
                     content = file.read()
 
-                with open(f'{AUG_PAGES}/{file_name}', 'w') as file:
-                    file.write(content)
-
+                    if not os.path.exists(f'{AUG_PAGES}/{file_name}'):
+                        with open(f'{AUG_PAGES}/{file_name}', 'w') as file:
+                            file.write(content)
+                    
+                    if os.path.exists(f'{AUG_PAGES}/div_{file_name}'):
+                        continue
+                    
+                    without_text = False
                     soup: BeautifulSoup = BeautifulSoup(content, 'html.parser')
                     aux_labels = TEXT_LABELS.copy()
                     while True:
-                        tag_to_find = random.choice(aux_labels)
+                        
+                        try:
+                            tag_to_find = random.choice(aux_labels)
+                        except Exception as e:
+                            without_text = True
                         tags = soup.find_all(tag_to_find) # tirar el random aqui para que sea cualquier tag.
                         if len(tags) > 1:
                             selected_tag = tags[random.randint(0,len(tags)-1)]
@@ -108,14 +112,43 @@ class Data_Augmenter:
                                 break
                             except Exception as e:
                                 pass
-                                # print(f'{attributes}')
-                                # print(f'{e} <-----> {(attributes[site])}')
                         else:
-                            aux_labels.remove(tag_to_find)
+                            if not without_text:
+                                aux_labels.remove(tag_to_find)
+                 
+                if not os.path.exists(f'{AUG_PAGES}/div_{file_name}') and not without_text:
+                    with open(f'{AUG_PAGES}/div_{file_name}', 'w') as file:
+                        file.write(str(soup))
+    
+    @staticmethod        
+    def change_attribute_name(sites: list[Site]):
+        all_text_tags = []
+        for site in sites:
+            for path, file_name in site.get_all():
+                with open(f'{path}', 'r') as file:
+                    content = file.read()
+                    soup = BeautifulSoup(content, 'html.parser')
+                    for label in TEXT_LABELS:
+                        tags = soup.find_all(label)
+                        all_text_tags.extend(tags)
 
-                with open(f'{AUG_PAGES}/{file_name}', 'w') as file:
+                    for text_tag in all_text_tags:
+                        for attr in ['name', 'id']:
+                            if attr in text_tag.attrs:
+                                value = text_tag.attrs[attr]
+                                
+                                if '-' in value:
+                                    parts = value.split('-')
+                                    new_value = '-'.join(parts[::-1])  
+                                else:
+                                    suffix = '_x' if attr == 'name' else '_id'
+                                    new_value = value + suffix
+
+                                text_tag.attrs[attr] = new_value
+                with open(f'{AUG_PAGES}/attr_{file_name}', 'w') as file:
                     file.write(str(soup))
-            
+
+
 
 
 
@@ -134,13 +167,34 @@ if __name__ == "__main__":
         index = sites.index(Site(web_name))
         sites[index].append(file_name=file_name, path=path)
 
+    Data_Augmenter.change_attribute_name(sites)
+    
 
+    # llm = Gemini()
+    # data_augmenter = Data_Augmenter(llm, sites)
+
+    pass
+
+
+def main():
+    sites: list[Site] = []
+    files = os.listdir(DEST_PATH)
+    for file in files:
+        if file[len(file)-4: len(file)] != 'html':
+            continue
+        path = os.path.join(DEST_PATH, file)
+        file_name, web_name = clean_name(file)
+        
+        aux_site = Site(web_name)
+        if aux_site not in sites:
+            sites.append(Site(web_name))
+        index = sites.index(Site(web_name))
+        sites[index].append(file_name=file_name, path=path)
 
 
     llm = Gemini()
-    data_augmenter = Data_Augmenter(llm, sites)
-
-    pass
+    d = Data_Augmenter(llm,sites)
+    # Data_Augmenter.change_attrxibute_name(sites)
 
 
 

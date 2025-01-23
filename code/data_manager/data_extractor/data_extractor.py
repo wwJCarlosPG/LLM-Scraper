@@ -35,7 +35,8 @@ class DataExtractor:
         self.model_name = model_name
         if endpoint is None:
             self.agent: Agent = Agent(
-                model=model_name
+                model=model_name,
+                system_prompt=get_extractor_system_prompt()
             )
         else:
             self.agent: Agent = Agent(
