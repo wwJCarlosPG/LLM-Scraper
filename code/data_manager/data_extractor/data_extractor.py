@@ -1,10 +1,33 @@
+from typing import TypedDict
 from httpx import AsyncClient
 from pydantic_ai.agent import Agent
 from dataset_work.html_cleaner import HTML_Cleaner
-from data_manager.prompts.prompts import get_extractor_system_prompt
 from data_manager.external_models.external import ExternalModel
+from data_manager.data_extractor.responses import ScrapedResponse
 from data_manager.validators.default_validators import BaseValidator
-from data_manager.validators.default_validators import DefaultValidator, ValidatorResponse
+from data_manager.prompts.prompts import get_extractor_system_prompt
+from data_manager.validators.default_validators import DefaultValidator
+from data_manager.exceptions import InvalidResultDuringValidation
+
+class DataExtractorSettings(TypedDict):
+    """
+    A type definition for the settings used in the DataExtractor.
+
+    Attributes:
+        temperature (float): 
+            The degree of randomness or creativity in the model's response.
+            - A higher value (e.g., 0.9) results in more creative and diverse outputs.
+            - A lower value (e.g., 0.2) makes the output more focused and deterministic.
+
+        max_tokens (int): 
+            The maximum number of tokens (words or characters, depending on the model) 
+            that the model is allowed to generate in response.
+            - Higher values allow for longer responses.
+            - Lower values restrict the response length to be more concise.
+    """
+    temperature: float
+    max_tokens: int
+
 
 class DataExtractor:
     """
@@ -23,15 +46,18 @@ class DataExtractor:
             api_key (str, optional): The API key for authentication. Defaults to None.
             env_alias (str, optional): The environment alias for the external model. Defaults to None.
             validator (BaseValidator, optional): An optional validator to verify extracted data.
+            settings (DataExtractor): 
      """
     def __init__(self, *, 
                  model_name: str, 
                  endpoint: str | None = None, 
                  api_key: str | None = None, 
                  env_alias: str | None = None,
-                 validator: BaseValidator | None = None):
+                 validator: BaseValidator | None = None,
+                 settings: DataExtractorSettings = None):
      
         async_client = AsyncClient()
+        self.settings = settings
         self.model_name = model_name
         if endpoint is None:
             self.agent: Agent = Agent(
@@ -50,7 +76,8 @@ class DataExtractor:
     async def extract(self, query: str, *,
                         html_content: str,
                         html_path: str = None,
-                        is_local: bool = False) -> dict:
+                        is_local: bool = False,
+                        refinement: bool = True) -> ScrapedResponse:
         """ 
             Extract structured data from an HTML document using a natural language query.
 
@@ -78,6 +105,7 @@ class DataExtractor:
             Raises:
                 ValueError: If both `html_content` and `html_path` are missing.
                 Exception: If an issue occurs during data extraction.
+                InvalidResultDuringValidation: If an error ocurred during validation.
 
             Example:
                 ```python
@@ -90,19 +118,28 @@ class DataExtractor:
                 ```
         """
         cleaned_html = HTML_Cleaner.clean_without_download(url=html_path, tags=['script', 'style'], html_content=html_content, is_local=is_local)
-        response = None
         retries = 0
-        while response is None or isinstance(response, ValidatorResponse) and retries < 3:
-            response = await self.agent.run(f'{query}:\n{cleaned_html}', model_settings={}) 
-            if isinstance(response, ValidatorResponse):
-                augmented_query = response.explanation
-                query = query + '\n' + augmented_query
+        is_valid = False
+        while not is_valid and retries < 3:
+            
+            try:
+                scraped_data = await self.agent.run(f'{query}:\n{cleaned_html}', model_settings=self.settings) # creo que esto vale porque es un diccionario. 
+            except InvalidResultDuringValidation as e:
+                return ScrapedResponse(is_valid=False, explanation=e.message, feedback=e.message, scraped_data=[])
+            
+            is_valid = scraped_data.data.is_valid
+            
+            if not refinement:
+                break
+
+            if not is_valid:
+                feedback = scraped_data.data.feedback
+                query = query + '\n' + feedback
             retries += 1
         
-        if isinstance(response, ValidatorResponse):
-            raise 
-        
-        return response.data.scraped_data
+        return scraped_data.data
+
+       
     
   
     

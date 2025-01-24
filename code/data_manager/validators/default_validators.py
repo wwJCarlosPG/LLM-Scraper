@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Union, Tuple
 from httpx import AsyncClient
 from pydantic_ai.agent import Agent
 from abc import ABC, abstractmethod
@@ -7,8 +7,7 @@ from pydantic_ai import RunContext
 from data_manager.external_models.external import ExternalModel
 from data_manager.data_extractor.responses import ScrapedResponse
 from data_manager.prompts.prompts import get_validator_system_prompt, structure_query_to_validate
-
-
+from data_manager.exceptions import InvalidResultDuringValidation
 class ValidatorResponse(BaseModel):
     """
     Represents the response of a validation process that evaluates 
@@ -40,7 +39,7 @@ class BaseValidator(ABC):
     """
 
     @abstractmethod
-    def validate(self, response_to_validate) -> Union[ValidatorResponse, ScrapedResponse]:
+    def validate(self, response_to_validate) -> ScrapedResponse:
         """
         Validate the extracted data against the provided user query.
         
@@ -82,7 +81,7 @@ class DefaultValidator(BaseValidator):
         """
         super().__init__()
 
-    def validate(self, data: str) -> Union[ValidatorResponse, ScrapedResponse]:
+    def validate(self, data: str) -> ScrapedResponse:
         """
         Validate the extracted data by parsing it into a `ScrapedResponse` object.
 
@@ -144,7 +143,7 @@ class BasedAgentValidator(BaseValidator):
             )
             self.agent.result_validator(self.self_validator)
         
-    async def validate(self, run_context: RunContext, response_to_validate: str) -> Union[ValidatorResponse, ScrapedResponse]:
+    async def validate(self, run_context: RunContext, response_to_validate: str) -> ScrapedResponse:
         """
         Validates the extracted data using an AI-based agent.
 
@@ -153,18 +152,20 @@ class BasedAgentValidator(BaseValidator):
             response_to_validate (str): JSON formatted response to be validated.
 
         Returns:
-            Union[ValidatorResponse, ScrapedResponse]: 
+            ScrapedResponse: 
             - A valid scraped response if validation is successful.
-            - A validation response with an explanation if validation fails.
-        """
 
-        messages = run_context.messages
-        request_parts = [m.parts for m in messages if m.kind == 'request']
-        user_query = [request.content for request in request_parts[len(request_parts) - 1] if request.part_kind == 'user-prompt']
-         
-        query = structure_query_to_validate(user_query, response_to_validate)
-        validator_response = await self.agent.run(query)
-        if validator_response.data.is_valid == True:
-            return ScrapedResponse.model_validate_json(response_to_validate)
-        else:
-            return validator_response
+        """
+        try:
+            scraped_response = ScrapedResponse.model_validate_json(response_to_validate,strict=False)
+            messages = run_context.messages
+            request_parts = [m.parts for m in messages if m.kind == 'request']
+            user_query = [request.content for request in request_parts[len(request_parts) - 1] if request.part_kind == 'user-prompt']
+            query = structure_query_to_validate(user_query, response_to_validate)
+            validator_response = await self.agent.run(query) 
+            scraped_response.feedback = validator_response.data.explanation
+            scraped_response.is_valid = validator_response.data.is_valid
+            return scraped_response
+        except Exception:
+            raise InvalidResultDuringValidation("An error ocurred during validation process.")
+

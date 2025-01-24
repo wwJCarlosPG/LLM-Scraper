@@ -1,5 +1,4 @@
 import os
-import json
 from typing import Literal
 from pydantic import TypeAdapter
 from dataclasses import dataclass
@@ -131,7 +130,7 @@ class ExternalModel(Model):
             if env_api_key := os.getenv(env_alias):
                 api_key = env_api_key
             else:
-                raise(f'API key must be provided or set in the {env_alias} environment variable')
+                raise ValueError(f'API key must be provided or set in the {env_alias} environment variable')
         
         self.auth = ApiKeyAuth(api_key=api_key)
         self.model_name = model_name
@@ -255,8 +254,9 @@ class ExternalAgentModel(AgentModel):
                     request.messages.append(MessageRequest(role='user',content=part.content))
 
         request.model_name = self.model_name
-        request.temperature = model_settings['temperature']
-        request.max_tokens = model_settings['max_tokens']
+        if model_settings:
+            request.temperature = model_settings['temperature']
+            request.max_tokens = model_settings['max_tokens']
         request_json = request.model_dump_json(by_alias=True)
 
         headers = {

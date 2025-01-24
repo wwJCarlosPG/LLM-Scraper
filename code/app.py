@@ -11,9 +11,10 @@ async def main():
     endpoint1 = 'http://localhost:1234/v1/chat/completions'
     endpoint2 = "https://api.fireworks.ai/inference/v1/chat/completions"
     model_name = "accounts/fireworks/models/llama-v3p3-70b-instruct"
-    # x = BasedAgentValidator(model_name=model_name, endpoint=endpoint2, api_key=api_key2)
+    d = {"temperature": 0.6, "max_tokens":1000}
+    x = BasedAgentValidator(model_name=model_name, endpoint=endpoint2, api_key=api_key2)
 
-    # b = DataExtractor(model_name=model_name,endpoint=endpoint2, api_key=api_key2, validator=x)
+    b = DataExtractor(model_name=model_name,endpoint=endpoint2, api_key=api_key2, validator=x, settings = d)
     html = """
     <!DOCTYPE html>
     <html lang="en">
@@ -59,12 +60,12 @@ async def main():
 
 
     """
-    # try:
-    #     x = await b.extract("Extract for the following HTML each news title", html_content=html)
-    # except UnexpectedModelBehavior:
-    #     raise
-    # print(x)
-    x = BasedAgentValidator(model_name=model_name, endpoint=endpoint2, api_key=api_key2)
-    x = await x.validate(f"Extract for the following HTML each news title \n {html}", "[{'news_title': 'Tech Industry Booms in 2025'}]")
+    try:
+        x = await b.extract("Extract for the following HTML each news title", html_content=html)
+    except UnexpectedModelBehavior:
+        raise
     print(x)
+    # x = BasedAgentValidator(model_name=model_name, endpoint=endpoint2, api_key=api_key2)
+    # x = await x.validate(f"Extract for the following HTML each news title \n {html}", "[{'news_title': 'Tech Industry Booms in 2025'}]")
+    # print(x)
 asyncio.run(main())
