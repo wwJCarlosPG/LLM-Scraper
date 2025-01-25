@@ -70,7 +70,6 @@ def get_system_prompt_with_COT():
 
 # No.3
 def get_system_prompt_with_selfconsistency():
-    def get_system_prompt_with_selfconsistency():
     system_prompt = """  
     You are an expert in web scraping, specialized in extracting information from static HTML documents based on natural language queries.  
 

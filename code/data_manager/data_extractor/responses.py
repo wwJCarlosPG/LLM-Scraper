@@ -46,11 +46,22 @@ class ScrapedResponse(BaseModel):
 
 
 class Response(BaseModel):
-    """_summary_
+    """
+    Represents the response containing extracted data from a web scraping task.
+
+    This class can hold either a single `ScrapedResponse` or a list of multiple `ScrapedResponse` objects. 
+    It is designed to structure the results of the web scraping process and make it easier to manage multiple 
+    potential outputs based on different interpretations or extractions.
+
+    Attributes:
+        responses (Union[ScrapedResponse, list[ScrapedResponse]]): 
+            A single `ScrapedResponse` or a list of `ScrapedResponse` objects that represent the extracted data 
+            from the web scraping process. Each `ScrapedResponse` object contains details about the data, such as 
+            the extracted attributes and their values.
 
     """
     responses: Union[ScrapedResponse, list[ScrapedResponse]] = Field(
-        description='A list of posible responses.'
+        description='A list or a single instance of ScrapedResponse that contains the extracted data from a web scraping task.'
     )
 
  

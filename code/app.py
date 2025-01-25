@@ -61,7 +61,7 @@ async def main():
 
     """
     try:
-        x = await b.extract("Extract for the following HTML each news title", html_content=html)
+        x = await b.extract("Extract for the following HTML each news title", html_content=html, selfconsistency = True, cot=False)
     except UnexpectedModelBehavior:
         raise
     print(x)

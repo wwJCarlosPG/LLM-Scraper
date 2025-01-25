@@ -61,13 +61,11 @@ class DataExtractor:
         self.model_name = model_name
         if endpoint is None:
             self.agent: Agent = Agent(
-                model=model_name,
-                system_prompt= get_full_system_prompt
+                model=model_name
             )
         else:
             self.agent: Agent = Agent(
-                model = ExternalModel(api_key = api_key,endpoint=endpoint, model_name=model_name, env_alias = env_alias, http_client=async_client),
-                system_prompt = get_full_system_prompt(),
+                model = ExternalModel(api_key = api_key,endpoint=endpoint, model_name=model_name, env_alias = env_alias, http_client=async_client)
             )
         if validator is None:
             validator = DefaultValidator()
@@ -119,8 +117,11 @@ class DataExtractor:
                 print(extracted_data)
                 ```
         """
-        system_prompt = DataExtractor.select_system_prompt(selfconsistency, cot)
-        self.agent.system_prompt = system_prompt
+        
+        @self.agent.system_prompt
+        def set_system_prompt():
+            return DataExtractor.select_system_prompt(selfconsistency, cot)
+        
         cleaned_html = HTML_Cleaner.clean_without_download(url=html_path, tags=['script', 'style'], html_content=html_content, is_local=is_local)
         retries = 0
         is_valid = False
@@ -151,8 +152,8 @@ class DataExtractor:
             system_prompt = get_full_system_prompt()
         elif cot and not selfconsistency:
             system_prompt = get_system_prompt_with_COT()
-
-        system_prompt = get_simple_system_prompt()
+        else:
+            system_prompt = get_simple_system_prompt()
 
         return system_prompt
 
