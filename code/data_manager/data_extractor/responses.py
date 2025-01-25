@@ -1,4 +1,5 @@
 from pydantic import BaseModel, Field
+from typing import Union, Annotated
 
 class ScrapedResponse(BaseModel):
     """
@@ -27,7 +28,8 @@ class ScrapedResponse(BaseModel):
             - False if the extracted data does not meet the query requirements.
     """
     explanation: str = Field(
-        description="Detailed reasoning or context provided by the system explaining the extracted data or process."
+        description="Detailed reasoning or context provided by the system explaining the extracted data or process.",
+        default="No explanation"
     )
     scraped_data: list[dict[str, str]] = Field(
         description="A list of extracted key-value pairs from the provided source, representing structured data such as product details, article information, or other relevant content.",
@@ -42,4 +44,13 @@ class ScrapedResponse(BaseModel):
         default=True
     )
 
-    
+
+class Response(BaseModel):
+    """_summary_
+
+    """
+    responses: Union[ScrapedResponse, list[ScrapedResponse]] = Field(
+        description='A list of posible responses.'
+    )
+
+ 

@@ -1,11 +1,11 @@
 from typing import TypedDict
 from httpx import AsyncClient
-from pydantic_ai.agent import Agent
+from pydantic_ai.agent import Agent, RunContext
 from dataset_work.html_cleaner import HTML_Cleaner
 from data_manager.external_models.external import ExternalModel
 from data_manager.data_extractor.responses import ScrapedResponse
 from data_manager.validators.default_validators import BaseValidator
-from data_manager.prompts.prompts import get_extractor_system_prompt
+from data_manager.prompts.prompts import get_full_system_prompt, get_simple_system_prompt, get_system_prompt_with_COT, get_system_prompt_with_selfconsistency, get_system_prompt_without_COT, get_validator_system_prompt
 from data_manager.validators.default_validators import DefaultValidator
 from data_manager.exceptions import InvalidResultDuringValidation
 
@@ -62,12 +62,12 @@ class DataExtractor:
         if endpoint is None:
             self.agent: Agent = Agent(
                 model=model_name,
-                system_prompt=get_extractor_system_prompt()
+                system_prompt= get_full_system_prompt
             )
         else:
             self.agent: Agent = Agent(
                 model = ExternalModel(api_key = api_key,endpoint=endpoint, model_name=model_name, env_alias = env_alias, http_client=async_client),
-                system_prompt = get_extractor_system_prompt(),
+                system_prompt = get_full_system_prompt(),
             )
         if validator is None:
             validator = DefaultValidator()
@@ -77,7 +77,9 @@ class DataExtractor:
                         html_content: str,
                         html_path: str = None,
                         is_local: bool = False,
-                        refinement: bool = True) -> ScrapedResponse:
+                        refinement: bool = True,
+                        selfconsistency: bool = True,
+                        cot: bool = True) -> ScrapedResponse:
         """ 
             Extract structured data from an HTML document using a natural language query.
 
@@ -117,15 +119,17 @@ class DataExtractor:
                 print(extracted_data)
                 ```
         """
+        system_prompt = DataExtractor.select_system_prompt(selfconsistency, cot)
+        self.agent.system_prompt = system_prompt
         cleaned_html = HTML_Cleaner.clean_without_download(url=html_path, tags=['script', 'style'], html_content=html_content, is_local=is_local)
         retries = 0
         is_valid = False
         while not is_valid and retries < 3:
             
             try:
-                scraped_data = await self.agent.run(f'{query}:\n{cleaned_html}', model_settings=self.settings) # creo que esto vale porque es un diccionario. 
+                scraped_data = await self.agent.run(f'{query}:\n{cleaned_html}', model_settings=self.settings, deps=selfconsistency) # creo que esto vale porque es un diccionario. 
             except InvalidResultDuringValidation as e:
-                return ScrapedResponse(is_valid=False, explanation=e.message, feedback=e.message, scraped_data=[])
+                return ScrapedResponse(is_valid=False, explanation=e.message, feedback=e.message, final_answer=[])
             
             is_valid = scraped_data.data.is_valid
             
@@ -139,7 +143,19 @@ class DataExtractor:
         
         return scraped_data.data
 
-       
+    @staticmethod
+    def select_system_prompt(selfconsistency: bool, cot: bool):
+        if selfconsistency and not cot:
+            system_prompt = get_system_prompt_with_selfconsistency()
+        elif selfconsistency and cot:
+            system_prompt = get_full_system_prompt()
+        elif cot and not selfconsistency:
+            system_prompt = get_system_prompt_with_COT()
+
+        system_prompt = get_simple_system_prompt()
+
+        return system_prompt
+
     
   
     

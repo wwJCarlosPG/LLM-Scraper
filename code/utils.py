@@ -28,7 +28,6 @@ def clean_name(name: str):
         
         start_web_name_index: int = name.find('http-') + 5
         if start_web_name_index == 4:
-            print("HIZO ESTO")
             start_web_name_index = name.find('https-', 13) + 6
         end_web_name_index: int = name.find('.com')
         if end_web_name_index == -1:
@@ -43,12 +42,8 @@ def clean_name(name: str):
         start_date_index = name.index('___')
         end_date_index = name.index('___', start_date_index + 1)
         date = name[start_date_index: end_date_index + 7]   
-        print(f'Name: {name}')
-        print(f'Web_name {web_name}')
-        print(f'Date {date}')
 
         result = web_name+date+'.html'
-        print(f'Result: {result}')
         return result,web_name
     except Exception as e:
         print(f'{e} --> {name}')

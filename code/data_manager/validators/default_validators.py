@@ -5,9 +5,10 @@ from abc import ABC, abstractmethod
 from pydantic import BaseModel, Field
 from pydantic_ai import RunContext
 from data_manager.external_models.external import ExternalModel
-from data_manager.data_extractor.responses import ScrapedResponse
+from data_manager.data_extractor.responses import ScrapedResponse, Response
 from data_manager.prompts.prompts import get_validator_system_prompt, structure_query_to_validate
 from data_manager.exceptions import InvalidResultDuringValidation
+from data_manager.utils import find_majority
 class ValidatorResponse(BaseModel):
     """
     Represents the response of a validation process that evaluates 
@@ -91,7 +92,9 @@ class DefaultValidator(BaseValidator):
         Returns:
             ScrapedResponse: The parsed and validated scraped data.
         """
-        validated_response = ScrapedResponse.model_validate_json(data)
+        validated_response = Response.model_validate_json(data)
+        # return validated_response
+        # validated_response = ScrapedResponse.model_validate_json(data)
         return validated_response
     
 
@@ -156,16 +159,21 @@ class BasedAgentValidator(BaseValidator):
             - A valid scraped response if validation is successful.
 
         """
-        try:
+        # try:
+        selfconsistency = run_context.deps
+        if selfconsistency:
+            scraped_response_collection = Response.model_validate_json(response_to_validate, strict=False)
+            scraped_response = find_majority(scraped_response_collection.responses)
+        else:
             scraped_response = ScrapedResponse.model_validate_json(response_to_validate,strict=False)
-            messages = run_context.messages
-            request_parts = [m.parts for m in messages if m.kind == 'request']
-            user_query = [request.content for request in request_parts[len(request_parts) - 1] if request.part_kind == 'user-prompt']
-            query = structure_query_to_validate(user_query, response_to_validate)
-            validator_response = await self.agent.run(query) 
-            scraped_response.feedback = validator_response.data.explanation
-            scraped_response.is_valid = validator_response.data.is_valid
-            return scraped_response
-        except Exception:
-            raise InvalidResultDuringValidation("An error ocurred during validation process.")
+        messages = run_context.messages
+        request_parts = [m.parts for m in messages if m.kind == 'request']
+        user_query = [request.content for request in request_parts[len(request_parts) - 1] if request.part_kind == 'user-prompt']
+        query = structure_query_to_validate(user_query, response_to_validate)
+        validator_response = await self.agent.run(query) 
+        scraped_response.feedback = validator_response.data.explanation
+        scraped_response.is_valid = validator_response.data.is_valid
+        return scraped_response
+        # except Exception:
+            # raise InvalidResultDuringValidation(message="An error ocurred during validation process.")
 
