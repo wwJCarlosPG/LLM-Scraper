@@ -2,3 +2,8 @@ pages
 __pycache__
 divs_output.json
 .env
+code/tester/taged_dataset.txt
+code/tester/labeled_dataset.json
+code/tester/.DS_Store
+code/.DS_Store
+.DS_Store

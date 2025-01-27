@@ -1,7 +1,7 @@
 import asyncio
 from pydantic_ai.exceptions import UnexpectedModelBehavior
-from data_manager.data_extractor.data_extractor import DataExtractor
-from data_manager.validators.default_validators import BasedAgentValidator
+from scraper_manager.application.extraction.extractor import DataExtractor
+from scraper_manager.application.validation.validators import BasedAgentValidator
 from dataset_work.data_augmenter import main
 # main()
 

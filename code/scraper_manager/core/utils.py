@@ -1,4 +1,4 @@
-from data_manager.data_extractor.responses import ScrapedResponse
+from scraper_manager.application.extraction.responses import ScrapedResponse
 import math
 
 def find_majority(responses: list[ScrapedResponse]) -> ScrapedResponse:

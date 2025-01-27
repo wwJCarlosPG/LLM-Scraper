@@ -1,14 +1,14 @@
-from typing import Union, Tuple
 from httpx import AsyncClient
+from pydantic_ai import RunContext
 from pydantic_ai.agent import Agent
 from abc import ABC, abstractmethod
 from pydantic import BaseModel, Field
-from pydantic_ai import RunContext
-from data_manager.external_models.external import ExternalModel
-from data_manager.data_extractor.responses import ScrapedResponse, Response
-from data_manager.prompts.prompts import get_validator_system_prompt, structure_query_to_validate
-from data_manager.exceptions import InvalidResultDuringValidation
-from data_manager.utils import find_majority
+from scraper_manager.core.utils import find_majority
+from scraper_manager.core.exceptions import InvalidResultDuringValidation
+from scraper_manager.infrastructure.integration.external_models import ExternalModel
+from scraper_manager.application.extraction.responses import ScrapedResponse, Response
+from scraper_manager.infrastructure.prompts.prompts import get_validator_system_prompt, structure_query_to_validate
+
 class ValidatorResponse(BaseModel):
     """
     Represents the response of a validation process that evaluates 
