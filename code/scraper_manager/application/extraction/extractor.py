@@ -6,7 +6,7 @@ from scraper_manager.core.exceptions import InvalidResultDuringValidation
 from scraper_manager.application.extraction.responses import ScrapedResponse
 from scraper_manager.infrastructure.integration.external_models import ExternalModel
 from scraper_manager.application.validation.validators import BaseValidator, DefaultValidator
-from scraper_manager.infrastructure.prompts.prompts import get_full_system_prompt, get_simple_system_prompt, get_system_prompt_with_COT, get_system_prompt_with_selfconsistency, get_system_prompt_without_COT, get_validator_system_prompt
+from scraper_manager.application.prompts.prompts import get_full_system_prompt, get_simple_system_prompt, get_system_prompt_with_COT, get_system_prompt_with_selfconsistency, get_system_prompt_without_COT, get_validator_system_prompt
 
 class DataExtractorSettings(TypedDict):
     """

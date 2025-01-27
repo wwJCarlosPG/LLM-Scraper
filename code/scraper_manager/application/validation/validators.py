@@ -7,7 +7,7 @@ from scraper_manager.core.utils import find_majority
 from scraper_manager.core.exceptions import InvalidResultDuringValidation
 from scraper_manager.infrastructure.integration.external_models import ExternalModel
 from scraper_manager.application.extraction.responses import ScrapedResponse, Response
-from scraper_manager.infrastructure.prompts.prompts import get_validator_system_prompt, structure_query_to_validate
+from scraper_manager.application.prompts.prompts import get_validator_system_prompt, structure_query_to_validate
 
 class ValidatorResponse(BaseModel):
     """
