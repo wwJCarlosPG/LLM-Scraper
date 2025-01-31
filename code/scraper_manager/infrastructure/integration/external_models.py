@@ -41,6 +41,7 @@ class ExternalAPIChoice(TypedDict):
     """
     message: ExternalAPIMessage
 
+
 class ExternalAPIResponse(TypedDict):
     """Defines the overall structure of an external API response.
 
@@ -95,6 +96,7 @@ class ExternalRequest(BaseModel):
     temperature: float = 0.7
     max_tokens: int = 1000
     messages: list[MessageRequest] = []
+    # response_format: dict = {}
 
 
 
@@ -252,28 +254,33 @@ class ExternalAgentModel(AgentModel):
                     request.messages.append(MessageRequest(role='system',content=part.content))
                 elif part.part_kind == 'user-prompt':
                     request.messages.append(MessageRequest(role='user',content=part.content))
-
         request.model_name = self.model_name
+        timeout = 30.0
         if model_settings:
             request.temperature = model_settings['temperature']
             request.max_tokens = model_settings['max_tokens']
+            timeout = model_settings['timeout']
         request_json = request.model_dump_json(by_alias=True)
 
         headers = {
             "Authorization": f"Bearer {self.auth.api_key}",
             "Content-Type": "application/json",
         }
-
+        
         async with self.http_client.stream(
             'POST',
             self.endpoint,
             content=request_json,
             headers=headers,
-            timeout=30.0
+            timeout=timeout
         ) as response:
             if response.status_code != 200:
                 print("STATUS CODE != 200")
-                await response.aread()
-                raise UnexpectedModelBehavior(f'Unexpected response from {self.endpoint} {response.status_code}: {response.text}')
+                error_text = ""
+                async for chunk in response.aiter_bytes():
+                    error_text += chunk.decode("utf-8")  # Decodifica en UTF-8
+                raise UnexpectedModelBehavior(f'Unexpected response from {self.endpoint} {response.status_code}: {error_text}')
+                # await response.aread()
+                # raise UnexpectedModelBehavior(f'Unexpected response from {self.endpoint} {response.status_code}: {response.text}')
             yield response
         

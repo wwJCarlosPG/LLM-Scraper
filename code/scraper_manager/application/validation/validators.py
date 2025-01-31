@@ -4,7 +4,7 @@ from pydantic_ai.agent import Agent
 from abc import ABC, abstractmethod
 from pydantic import BaseModel, Field
 from scraper_manager.core.utils import find_majority
-from scraper_manager.core.exceptions import InvalidResultDuringValidation
+from scraper_manager.core.exceptions import InvalidResultDuringValidation, InvalidValidationFormat
 from scraper_manager.infrastructure.integration.external_models import ExternalModel
 from scraper_manager.application.extraction.responses import ScrapedResponse, Response
 from scraper_manager.application.prompts.prompts import get_validator_system_prompt, structure_query_to_validate
@@ -54,7 +54,7 @@ class BaseValidator(ABC):
         """
         raise NotImplementedError()
     
-    def self_validator(self, data: str):
+    def self_validator(self, response_to_validate: str):
         """
         Validates the provided JSON string by converting it to a `ValidatorResponse` object.
 
@@ -64,7 +64,19 @@ class BaseValidator(ABC):
         Returns:
             ValidatorResponse: A validated response object.
         """
-        response = ValidatorResponse.model_validate_json(data)
+        print(response_to_validate)
+        try:
+            json = json.loads(response_to_validate)
+        except Exception:
+            response_to_validate = response_to_validate.strip("\n\t")
+            response_to_validate = response_to_validate.encode('utf-8').decode('unicode_escape')
+            if not response_to_validate.startswith('{'):
+                response_to_validate = '{' + response_to_validate
+            if not response_to_validate.endswith('}'):
+                response_to_validate = response_to_validate + '}'
+            if response_to_validate.count('"') % 2 != 0:
+                response_to_validate = response_to_validate.rstrip('"')
+        response = ValidatorResponse.model_validate_json(response_to_validate)
         return response
      
 class DefaultValidator(BaseValidator):
@@ -159,6 +171,28 @@ class BasedAgentValidator(BaseValidator):
             - A valid scraped response if validation is successful.
 
         """
+        print(response_to_validate)
+        start = response_to_validate.find('{')
+        current_index = start
+        reversed_response = response_to_validate[::-1]
+        reversed_end = reversed_response.find('}')
+        end = len(response_to_validate) - reversed_end - 1 
+        response_to_validate[start:end+1]
+
+        response_to_validate = response_to_validate[start:end+1]
+        print(response_to_validate)
+        try:
+            json = json.loads(response_to_validate)
+        except Exception:
+            response_to_validate = response_to_validate.strip("\n\t")
+            response_to_validate = response_to_validate.encode('utf-8').decode('unicode_escape')
+            if not response_to_validate.startswith('{'):
+                response_to_validate = '{' + response_to_validate
+            if not response_to_validate.endswith('}'):
+                response_to_validate = response_to_validate + '}'
+            if response_to_validate.count('"') % 2 != 0:
+                response_to_validate = response_to_validate.rstrip('"')
+            
         try:
             selfconsistency = run_context.deps
             if selfconsistency:
@@ -170,10 +204,16 @@ class BasedAgentValidator(BaseValidator):
             request_parts = [m.parts for m in messages if m.kind == 'request']
             user_query = [request.content for request in request_parts[len(request_parts) - 1] if request.part_kind == 'user-prompt']
             query = structure_query_to_validate(user_query, response_to_validate)
-            validator_response = await self.agent.run(query) 
+            try:
+                validator_response = await self.agent.run(query) 
+            except Exception as e:
+                try:
+                    validator_response = await self.agent.run(query)
+                except Exception as e:
+                    raise InvalidValidationFormat(message=f'An error ocurred cause the validation format is invalid: {e}.')
             scraped_response.feedback = validator_response.data.explanation
             scraped_response.is_valid = validator_response.data.is_valid
             return scraped_response
-        except Exception:
-            raise InvalidResultDuringValidation(message="An error ocurred during validation process.")
+        except Exception as e:
+            raise InvalidResultDuringValidation(message=f"An error ocurred during validation process: {e}.")
 

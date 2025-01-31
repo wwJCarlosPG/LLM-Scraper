@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import Union, Annotated
+from typing import Union, Annotated, Any
 
 class ScrapedResponse(BaseModel):
     """
@@ -31,7 +31,7 @@ class ScrapedResponse(BaseModel):
         description="Detailed reasoning or context provided by the system explaining the extracted data or process.",
         default="No explanation"
     )
-    scraped_data: list[dict[str, str]] = Field(
+    scraped_data: list[dict[str, Any]] = Field(
         description="A list of extracted key-value pairs from the provided source, representing structured data such as product details, article information, or other relevant content.",
         alias='final_answer'
     )
@@ -42,6 +42,10 @@ class ScrapedResponse(BaseModel):
     is_valid: bool = Field(
         description="A boolean indicating whether the extracted data is correct (True) or incorrect (False) based on the validation.",
         default=True
+    )
+    refinement_count: int = Field(
+        description="The number of times the extracted data has been refined to improve accuracy.",
+        default = 0
     )
 
 

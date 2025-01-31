@@ -1,13 +1,14 @@
 from typing import TypedDict
 from httpx import AsyncClient
 from pydantic_ai.agent import Agent
+from pydantic_ai.usage import Usage
 from dataset_work.html_cleaner import HTML_Cleaner
 from scraper_manager.core.exceptions import InvalidResultDuringValidation
 from scraper_manager.application.extraction.responses import ScrapedResponse
 from scraper_manager.infrastructure.integration.external_models import ExternalModel
 from scraper_manager.application.validation.validators import BaseValidator, DefaultValidator
 from scraper_manager.application.prompts.prompts import get_full_system_prompt, get_simple_system_prompt, get_system_prompt_with_COT, get_system_prompt_with_selfconsistency, get_system_prompt_without_COT, get_validator_system_prompt
-
+from typing import Tuple
 class DataExtractorSettings(TypedDict):
     """
     A type definition for the settings used in the DataExtractor.
@@ -26,6 +27,7 @@ class DataExtractorSettings(TypedDict):
     """
     temperature: float
     max_tokens: int
+    timeout: float
 
 
 class DataExtractor:
@@ -76,7 +78,7 @@ class DataExtractor:
                         is_local: bool = False,
                         refinement: bool = True,
                         selfconsistency: bool = True,
-                        cot: bool = True) -> ScrapedResponse:
+                        cot: bool = True) -> Tuple[ScrapedResponse, Usage]:
         """ 
             Extract structured data from an HTML document using a natural language query.
 
@@ -128,8 +130,8 @@ class DataExtractor:
             
             try:
                 scraped_data = await self.agent.run(f'{query}:\n{cleaned_html}', model_settings=self.settings, deps=selfconsistency) # creo que esto vale porque es un diccionario. 
-            except InvalidResultDuringValidation as e:
-                return ScrapedResponse(is_valid=False, explanation=e.message, feedback=e.message, final_answer=[])
+            except Exception as e:
+                return ScrapedResponse(is_valid=False, explanation=e.message, feedback=e.message, final_answer=[], refinement_count=retries), Usage(request_tokens=len(query), response_tokens=0, total_tokens=len(query))
             
             is_valid = scraped_data.data.is_valid
             
@@ -140,8 +142,9 @@ class DataExtractor:
                 feedback = scraped_data.data.feedback
                 query = query + '\n' + feedback
             retries += 1
-        
-        return scraped_data.data
+
+        scraped_data.data.refinement_count = retries
+        return (scraped_data.data, scraped_data.usage())
 
     @staticmethod
     def select_system_prompt(selfconsistency: bool, cot: bool):

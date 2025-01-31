@@ -1,5 +1,5 @@
 from fireworks.client import Fireworks
-from prompts import labeled_news_data_generator
+from tester.prompts import labeled_news_data_generator
 class FireworksLLMLabeler:
     def __init__(self, api_key: str):
         self.api_key = api_key
