@@ -32,7 +32,7 @@ class HTML_Data:
         years (list[int]): A list of years to retrieve versions from. If empty, defaults to `TEST_YEARS`.
         months (list[int]): A list of months to retrieve versions from. If empty, defaults to `MONTHS`.
     """
-    def __init__(self, url: str, years: list[int], months: list[int]):
+    def __init__(self, url: str, years: list[int], months: list[int], days: list[int]):
         """
         Initializes the HTML_Data object and retrieves historical HTML versions based on provided years and months.
 
@@ -99,12 +99,13 @@ class HTML_Data:
 
         for y in years:
             for m in months:
-                try:
-                    near = self.cdx_api.near(year=y, month=m)
-                    self.get_html(near.archive_url, m, y)
-                    print(near.archive_url)
-                except Exception as e:
-                    print(f"Something is bad: {e}")
+                for d in days:
+                    try:
+                        near = self.cdx_api.near(year=y, month=m, day=d)
+                        self.get_html(near.archive_url, m, y)
+                        print(near.archive_url)
+                    except Exception as e:
+                        print(f"Something is bad: {e}")
     
     
     def save_html(self, url: str, content: str, month: int, year: int):
@@ -133,14 +134,13 @@ class HTML_Data:
 if __name__=="__main__":
     index = 0
     sites = []
-    while True:
-        index += 1
-        try:
-            sites.append(sys.argv[index])
-        except:
-            break
+    site = 'https://www.amazon.com/gp/bestsellers/fashion/'
+    years = [2022]
+    months = MONTHS
+    days = [1, 15, 28]
+    # for site in sites:
+    html_data = HTML_Data(site, years, months, days)
     
-    for site in sites:
-        html_data = HTML_Data(site, [], [])
+    # HTML_Data(site,[2022],[])
 
     

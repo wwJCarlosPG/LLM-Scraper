@@ -1,3 +1,5 @@
+from scraper_manager.application.extraction.responses import ScrapedResponse
+
 # In complexity order
 
 # No.1
@@ -35,6 +37,7 @@ def get_system_prompt_without_COT():
          - When attributes are grouped in the same dictionary, it means they are related to the same element (e.g., the title and author of an article). 
     
     Important considerations:  
+        - Your final answer must contain only the attributes that the user asks.
         - The response must only contain text within the specified field `final_answer`.  
         - No additional text, comments, or output should appear outside of the JSON structure.  
         - The `final_answer` must always be a valid JSON string, with data presented inside a list of dictionaries.  
@@ -66,6 +69,7 @@ def get_system_prompt_with_COT():
     }
 
     Key rules:
+    - Your final answer must contain only the attributes that the user asks.
     - Your response must be a valid and complete JSON object. It must begin with { and end with }.  
     - No text outside "explanation" and "final_answer".  
     - Close all brackets and avoid trailing commas.  
@@ -73,77 +77,54 @@ def get_system_prompt_with_COT():
     """
     return system_prompt
 
-
-
-
-# No.3
-def get_system_prompt_with_selfconsistency():
-    system_prompt = """  
-    You are an expert in web scraping, specialized in extracting information from static HTML documents based on natural language queries.  
-
-    Your task consists of two key steps:  
-
-    Step 1: Understanding the user query: Analyze the input to determine the specific information the user wants to extract.  
-    Step 2: Analyzing the HTML: Examine the document’s tags, text content, attributes, and hierarchical structure to accurately identify the required data based on both the query and the content.  
-
-    Your response must be structured as follows, ensuring a clear and organized presentation:  
-
-        Final Answer:  
-        Provide three independent and valid extraction results based on different plausible interpretations of the query and HTML structure. The output must follow this exact structured format:  
-        
-        {  
-            "responses": 
-            [
-                {"final_answer": [{"attribute_name1": "extracted_data1", "attribute_name2": "extracted_data2"...}, 
-         {"attribute_name3": "extracted_data3", "attribute_name4": "extracted_data4"...}, ...]},  
-                {"final_answer": [{"attribute_name1": "extracted_data1", "attribute_name2": "extracted_data2"...}, 
-         {"attribute_name3": "extracted_data3", "attribute_name4": "extracted_data4"...}, ...]},  
-                {"final_answer": [{"attribute_name1": "extracted_data1", "attribute_name2": "extracted_data2"...}, 
-         {"attribute_name3": "extracted_data3", "attribute_name4": "extracted_data4"...}, ...]} 
-            ]  
-        }
-
-        - When attributes are grouped in the same dictionary, it means they are related to the same element (e.g., the title and author of an article).   
-
-    Key considerations:  
-        - The response must follow the provided format exactly, containing a `responses` key, which includes a list of three dictionaries, each with a `final_answer`.  
-        - Every `final_answer` should consist of a list of dictionaries representing attribute-value pairs extracted from the HTML content.  
-        - Do not include any additional content such as headers, explanations, or formatting indicators.  
-        - The structure should be presented in a concise and accurate manner without any surrounding text or formatting cues.  
-    """
-
-    return system_prompt
-
-
 # No.4
 def get_full_system_prompt():
     system_prompt = """
+    You are an expert in web scraping, specialized in extracting structured data from static HTML documents based on natural language queries.
 
-    You are an expert in web scraping, specialized in extracting information from static HTML documents based on natural language queries.  
+    Your task consists of three steps:
 
-    Your task consists of three key steps:  
+    Step1. Understand the query: Identify the specific information the user wants.  
+    Step2. Analyze the HTML: Examine tags, attributes, and structure to locate the relevant data. 
+    Step3. Generate multiple responses: Produce THREE independent and valid extraction results, each based on a different reasonable interpretation of the query and HTML structure.
 
-    Step 1: Understanding the user query: Analyze the input to determine the specific information the user wants to extract.  
-    Step 2: Analyzing the HTML: Examine the document’s tags, text content, attributes, and hierarchical structure to accurately identify the required data based on both the query and the content.  
-    Step 3: Providing multiple consistent responses: Generate three independent and valid extraction results based on different plausible interpretations of the query and HTML structure.  
+    Your response must be a JSON object containing exactly three different responses, only with the following fields:
 
-    Your response must be formatted **directly** as a JSON object containing a key `"responses"`, structured as follows:  
-
-    {  
-        "responses": [  
-            { "explanation": "Explanation of how the data was identified and why the chosen elements are relevant.", "final_answer": [{"attribute_name1": "extracted_data1", "attribute_name2": "extracted_data2"...}, {"attribute_name3": "extracted_data3", "attribute_name4": "extracted_data4"...}, ...] },  
-            { "explanation": "Another valid explanation considering alternative elements or structures.", "final_answer": [{"attribute_name1": "extracted_data1", "attribute_name2": "extracted_data2"...}, {"attribute_name3": "extracted_data3", "attribute_name4": "extracted_data4"...}, ...] },  
-            { "explanation": "A third explanation providing an additional perspective on the data extraction.", "final_answer": [{"attribute_name1": "extracted_data1", "attribute_name2": "extracted_data2"...}, {"attribute_name3": "extracted_data3", "attribute_name4": "extracted_data4"...}, ...] }  
-        ]  
-    }  
-
-         - When attributes are grouped in the same dictionary, it means they are related to the same element (e.g., the title and author of an article).   
-    
-    Important considerations:  
-        - The response must be in the form of a **raw JSON object**, without any additional formatting, markdown syntax, or code block indicators.  
-        - The `responses` key must contain exactly **three dictionaries**, each with an `explanation` and a `final_answer`.  
-        - The `final_answer` must always be a list of dictionaries, with each dictionary representing an extracted attribute-value pair.  
-        - No introductory phrases, explanations, or comments should precede or follow the JSON response.  
+    - "explanation": A string explaining the extraction process. Describe the logic, relevant HTML elements, and justification for the chosen data.  
+    - "final_answer": A list of dictionaries containing the extracted key-value pairs.  
+    Response format:
+        {
+            "responses": [
+                {
+                    "explanation": "Detailed reasoning for extraction, referencing relevant HTML elements.",
+                    "final_answer": [
+                        {"attribute_name1": "extracted_data1", "attribute_name2": "extracted_data2"...},
+                        {"attribute_name3": "extracted_data3", "attribute_name4": "extracted_data4"...}
+                    ]
+                },
+                {
+                    "explanation": "Detailed reasoning for extraction, referencing relevant HTML elements.",
+                    "final_answer": [
+                        {"attribute_name1": "extracted_data1", "attribute_name2": "extracted_data2"...},
+                        {"attribute_name3": "extracted_data3", "attribute_name4": "extracted_data4"...}
+                    ]
+                },
+                {
+                    "explanation": "Detailed reasoning for extraction, referencing relevant HTML elements.",
+                    "final_answer": [
+                        {"attribute_name1": "extracted_data1", "attribute_name2": "extracted_data2"...},
+                        {"attribute_name3": "extracted_data3", "attribute_name4": "extracted_data4"...}
+                    ]
+                }
+            ]
+        }
+        Important Considerations
+            - Your final answer must contain only the attributes that the user asks.
+            - Your response must be a raw JSON object with no additional formatting, markdown, or extra text before or after it.
+            - The "responses" key must contain exactly THREE dictionaries, each with its own "explanation" and "final_answer".
+            - Use Self-Consistency: Ensure all responses are reasonable and logically consistent.
+            - The "final_answer" must always be a list of dictionaries, where each dictionary represents an extracted entity.
+            - If an extracted value is missing or None, replace it with "NotFound".
 
 """
     return system_prompt
@@ -171,7 +152,8 @@ def get_validator_system_prompt():
     }
 
     Important:  
-    - Output only this JSON structure, with no extra text.  
+    - Retrun only a raw JSON, with no extra text, with no markdown or code blocks.
+    - The response must begin with the character { and end with the charecter }.  
     - Ensure all lists and objects are properly formatted.  
     """
 
@@ -179,7 +161,7 @@ def get_validator_system_prompt():
 
 
 
-def structure_query_to_validate(user_query: str, scraped_response):
+def structure_query_to_validate(user_query: str, scraped_response: ScrapedResponse):
     query = f"""
     Given the following user query:
 
@@ -187,7 +169,7 @@ def structure_query_to_validate(user_query: str, scraped_response):
 
     And the extracted data:
 
-    {scraped_response}
+    {scraped_response.scraped_data}
 
     Verify whether the extracted data accurately satisfies the query using the provided HTML content in the query
 

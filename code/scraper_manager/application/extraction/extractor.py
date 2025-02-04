@@ -4,11 +4,11 @@ from pydantic_ai.agent import Agent
 from pydantic_ai.usage import Usage
 from dataset_work.html_cleaner import HTML_Cleaner
 from scraper_manager.core.exceptions import InvalidResultDuringValidation
-from scraper_manager.application.extraction.responses import ScrapedResponse
+from scraper_manager.application.extraction.responses import ScrapedResponse, Response
 from scraper_manager.infrastructure.integration.external_models import ExternalModel
 from scraper_manager.application.validation.validators import BaseValidator, DefaultValidator
-from scraper_manager.application.prompts.prompts import get_full_system_prompt, get_simple_system_prompt, get_system_prompt_with_COT, get_system_prompt_with_selfconsistency, get_system_prompt_without_COT, get_validator_system_prompt
-from typing import Tuple
+from scraper_manager.application.prompts.prompts import get_full_system_prompt, get_simple_system_prompt, get_system_prompt_with_COT, get_system_prompt_without_COT, get_validator_system_prompt
+from typing import Tuple, Union
 class DataExtractorSettings(TypedDict):
     """
     A type definition for the settings used in the DataExtractor.
@@ -25,9 +25,13 @@ class DataExtractorSettings(TypedDict):
             - Higher values allow for longer responses.
             - Lower values restrict the response length to be more concise.
     """
-    temperature: float
-    max_tokens: int
-    timeout: float
+    temperature: float = 0.6
+    max_tokens: int = 1000
+    timeout: float = 60.0
+    response_format = {"type": "json_object", "schema": ScrapedResponse.model_json_schema()} | {'type': 'json_object', 'schema': Response.model_json_schema()}
+
+SCRAPED_RESPONSE_FORMAT = {"type": "json_object", "schema": ScrapedResponse.model_json_schema()}
+RESPONSE_FORMAT = {"type": "json_object", "schema": Response.model_json_schema()}
 
 
 class DataExtractor:
@@ -54,11 +58,15 @@ class DataExtractor:
                  endpoint: str | None = None, 
                  api_key: str | None = None, 
                  env_alias: str | None = None,
-                 validator: BaseValidator | None = None,
-                 settings: DataExtractorSettings = None):
-     
+                 validator: BaseValidator | None = None):
+
         async_client = AsyncClient()
-        self.settings = settings
+        self.settings = DataExtractorSettings(
+        temperature=0.6, 
+        max_tokens=1000, 
+        timeout=60.0,
+        response_format = SCRAPED_RESPONSE_FORMAT 
+    )
         self.model_name = model_name
         if endpoint is None:
             self.agent: Agent = Agent(
@@ -72,8 +80,14 @@ class DataExtractor:
             validator = DefaultValidator()
         self.agent.result_validator(validator.validate)
 
+    def set_system_prompt(self, new_system_prompt):
+         @self.agent.system_prompt
+         def set():
+            return new_system_prompt
+
     async def extract(self, query: str, *,
                         html_content: str,
+                        settings: DataExtractorSettings = None,
                         html_path: str = None,
                         is_local: bool = False,
                         refinement: bool = True,
@@ -118,10 +132,16 @@ class DataExtractor:
                 print(extracted_data)
                 ```
         """
-        
+        if settings is not None:
+            self.settings = settings
+
+        if selfconsistency:
+            self.settings.response_format = RESPONSE_FORMAT
+            
+
         @self.agent.system_prompt
         def set_system_prompt():
-            return DataExtractor.select_system_prompt(selfconsistency, cot)
+            return DataExtractor.__select_system_prompt__(selfconsistency, cot)
         
         cleaned_html = HTML_Cleaner.clean_without_download(url=html_path, tags=['script', 'style'], html_content=html_content, is_local=is_local)
         retries = 0
@@ -129,6 +149,7 @@ class DataExtractor:
         while not is_valid and retries < 3:
             
             try:
+                # print(self.settings)
                 scraped_data = await self.agent.run(f'{query}:\n{cleaned_html}', model_settings=self.settings, deps=selfconsistency) # creo que esto vale porque es un diccionario. 
             except Exception as e:
                 return ScrapedResponse(is_valid=False, explanation=e.message, feedback=e.message, final_answer=[], refinement_count=retries), Usage(request_tokens=len(query), response_tokens=0, total_tokens=len(query))
@@ -147,10 +168,9 @@ class DataExtractor:
         return (scraped_data.data, scraped_data.usage())
 
     @staticmethod
-    def select_system_prompt(selfconsistency: bool, cot: bool):
-        if selfconsistency and not cot:
-            system_prompt = get_system_prompt_with_selfconsistency()
-        elif selfconsistency and cot:
+    def __select_system_prompt__(selfconsistency: bool, cot: bool):
+        
+        if selfconsistency and cot:
             system_prompt = get_full_system_prompt()
         elif cot and not selfconsistency:
             system_prompt = get_system_prompt_with_COT()

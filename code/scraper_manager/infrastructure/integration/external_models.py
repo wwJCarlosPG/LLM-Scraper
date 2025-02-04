@@ -49,7 +49,7 @@ class ExternalAPIResponse(TypedDict):
         choices (list[ExternalAPIChoice]): A list of possible response choices.
         usage (dict[str, int]): Token usage statistics in the response.
     """
-    choices: list[dict]
+    # choices: list[dict]
     usage: dict[str, int]
     choices: list[ExternalAPIChoice]
 
@@ -96,7 +96,7 @@ class ExternalRequest(BaseModel):
     temperature: float = 0.7
     max_tokens: int = 1000
     messages: list[MessageRequest] = []
-    # response_format: dict = {}
+    response_format: dict = {}
 
 
 
@@ -257,16 +257,21 @@ class ExternalAgentModel(AgentModel):
         request.model_name = self.model_name
         timeout = 30.0
         if model_settings:
-            request.temperature = model_settings['temperature']
-            request.max_tokens = model_settings['max_tokens']
-            timeout = model_settings['timeout']
+            if model_settings['temperature']:
+                request.temperature = model_settings['temperature']
+            if model_settings['max_tokens']:
+                request.max_tokens = model_settings['max_tokens']
+            if model_settings['response_format']:
+                request.response_format = model_settings['response_format']
+            if model_settings['timeout']:
+                timeout = model_settings['timeout']
         request_json = request.model_dump_json(by_alias=True)
 
         headers = {
             "Authorization": f"Bearer {self.auth.api_key}",
             "Content-Type": "application/json",
         }
-        
+        # print(request_json)
         async with self.http_client.stream(
             'POST',
             self.endpoint,

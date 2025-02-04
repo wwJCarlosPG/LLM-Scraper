@@ -46,7 +46,7 @@ def generate_labeled_dataset():
 
     print('Done')
 
-async def test(site: str, extractor: DataExtractor, refinement: bool, cot: bool, dest_path: str, llm_result_path: str):
+async def test(site: str, extractor: DataExtractor, refinement: bool, cot: bool,self_consistency, dest_path: str, llm_result_path: str):
     labeled_ds = os.listdir(dest_path)
     htmls = os.listdir(f'pages/dataset/{site}')
     htmls.sort(key = lambda x: x.split('.')[0])
@@ -70,10 +70,10 @@ async def test(site: str, extractor: DataExtractor, refinement: bool, cot: bool,
                         if f'{htmls[i]}:query{j+1}' in lines:
                             continue
                         try:
-                            agent_response = await extractor.extract(query, html_content=html_content, selfconsistency=False, refinement=False)
+                            agent_response = await extractor.extract(query, html_content=html_content, selfconsistency=self_consistency, refinement=refinement, cot=cot)
                         except Exception as e:
                             print(f"Finalizado con error {htmls[i]}:query{j+1} ---> {e}")
-                            with open(f'{llm_result_path}/with_refinement_and_cot_errors.txt','a') as processed:
+                            with open(f'{llm_result_path}/with_selfconsistency_errors.txt','a') as processed:
                                 processed.write(f'\n{htmls[i]}:query{j+1}')    
                         try:
                             usage = agent_response[1]
@@ -102,8 +102,13 @@ async def test(site: str, extractor: DataExtractor, refinement: bool, cot: bool,
                             processed.write(f'\n{htmls[i]}:query{j+1}')    
                             print(f'\n{htmls[i]}:query{j+1}')
 
-async def test2(site: str, extractor: DataExtractor):
-    dest_path = f'code/results/{site}/without_refinement_with_cot'
+async def test2(site: str, extractor: DataExtractor, model, refinement, cot):
+    if refinement and cot:
+        dir = 'with_refinement_and_cot'
+    elif not refinement and cot:
+        dir = 'without_refinement_with_cot'
+    
+    dest_path = f'code/results/{site}/{model}/{dir}'
     # labeled_ds = os.listdir(dest_path)
     # htmls = os.listdir(f'pages/dataset/{site}')
     # htmls.sort(key = lambda x: x.split('.')[0])
@@ -126,7 +131,7 @@ async def test2(site: str, extractor: DataExtractor):
                 
                 query = responses[indexs[i]-1][queries[i]]
                 try:
-                    agent_response = await extractor.extract(query, html_content=html_content, selfconsistency=False, refinement=False)
+                    agent_response = await extractor.extract(query, html_content=html_content, selfconsistency=False, refinement=refinement, cot=cot)
                 except Exception as e:
                     print(f"Finalizado con error {html_files[i]}: {e}")
                 try:
@@ -134,8 +139,8 @@ async def test2(site: str, extractor: DataExtractor):
                     agent_response = agent_response[0]
                 except Exception as e:
                     print(f"Usage error {html_files[i]}: {e}")
-                    usage = Usage(request_tokens=len(query)+len(html),response_tokens=len(agent_response.explanation),total_tokens=len(query)+len(html))
-                responses[indexs[i]-1][f'response{indexs[i]-1}'] = {
+                    usage = Usage(request_tokens=len(query)+len(html_content),response_tokens=len(agent_response.explanation),total_tokens=len(query)+len(html_content))
+                responses[indexs[i]-1][f'response{indexs[i]}'] = {
                         "scraped_data": agent_response.scraped_data,
                         'explanation': agent_response.explanation,
                         'feedback': agent_response.feedback,
@@ -145,15 +150,16 @@ async def test2(site: str, extractor: DataExtractor):
                         'total_tokens': usage.total_tokens
                     }
                 with open(os.path.join(dest_path, files[i]), 'w') as updated_file:
+                    print(f"Updated {os.path.join(dest_path, files[i])}")
                     json.dump(labeled_data, updated_file, indent=4)
                             
                     with open('code/results/processed.txt','a') as processed:
                         processed.write(f'\n {queries[i]}: {html_files[i]}')
-
+                        print(f'Processed {queries[i]}: {html_files[i]}')
 
 
 def collect_errors(site):
-    dest_path = f'code/results/{site}/without_refinement_with_cot'
+    dest_path = f'code/results/{site}/llama3.3-70B/without_refinement_with_cot'
 
     dirs = os.listdir(dest_path)
     for dir in dirs:
@@ -166,7 +172,11 @@ def collect_errors(site):
                     if responses[i][f'response{i+1}']['scraped_data'] == []:
                         with open('code/results/errors.txt', 'a') as errors:
                             errors.write(f'\n{dir}: query{i+1}')
-                except Exception:
+                except KeyError as e:
+                    with open('code/results/errors.txt', 'a') as errors:
+                            errors.write(f'\n{dir}: query{i+1}')
+                except Exception as e:
+                    print(e)
                     print(dir)
                     return
                 
@@ -189,8 +199,45 @@ def remove_duplicates():
             for line in lines:
                 file.write(line)
 
-                    
 
+
+def make_equal_queries():
+    d1 = 'code/results/bbc/llama3.3-70B/with_refinement_and_cot'
+    d2 = 'code/results/bbc/llama3.3-70B/without_refinement_with_cot'
+    dirs1 = os.listdir(d1)
+    dirs2 = os.listdir(d2)
+
+    for i in range(len(dirs1)):
+        make_equal_queries_and_remove_response(os.path.join(d1,dirs1[i]), os.path.join(d2,dirs2[i])) 
+
+
+
+def make_equal_queries_and_remove_response(path1: str, path2: str):
+    with open(path1, 'r') as file:
+        data = json.load(file)
+        responses1 = data['responses']
+        # print(responses1[0])
+        print('\n')
+        with open(path2, 'r') as file2:
+            data2 = json.load(file2)
+            responses2 = data2['responses']
+            # print(responses2[0])
+
+            for i in range(len(responses1)):
+                try:
+                    if responses1[i][f'query{i+1}'] != responses2[i][f'query{i+1}']:
+                        responses2[i][f'query{i+1}'] = responses1[i][f'query{i+1}']
+                        responses2[i][f'data{i+1}'] = responses1[i][f'data{i+1}']
+                        with open(path2, 'w') as file2:
+                            json.dump(data2, file2, indent=4)
+                            print(f'Updated {path2}')
+                        # print(file)
+                except Exception as e:
+                    print(file.name)
+                    print(file2.name)
+                    # print(responses2[i])
+                    print(e)
+                    return
 
 
 
