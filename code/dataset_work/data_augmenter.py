@@ -140,7 +140,7 @@ class Data_Augmenter:
         sites (list[Site]): A list of Site instances to be processed.
     """
 
-    def __init__(self, llm, sites:list [Site]):
+    def __init__(self, llm, sites:list [Site], site: str = None):
         """
         Initializes the Data_Augmenter with an LLM and a list of sites. It generates
         div attributes and applies modifications to the HTML files.
@@ -150,10 +150,11 @@ class Data_Augmenter:
             sites (list[Site]): A list of Site instances.
         """
         self.llm = llm
-        attrs = self.generate_divs(sites)
+        attrs = self.generate_divs(sites, site)
         self.put_divs(attrs)
+        self.sites = sites
 
-    def generate_divs(self, sites: list[Site], is_generated: bool = True):
+    def generate_divs(self, sites: list[Site], site, is_generated: bool = True):
         """
         Generates or loads div attributes for the given sites.
 
@@ -165,13 +166,19 @@ class Data_Augmenter:
         Returns:
             dict[Site, list[dict]]: A dictionary mapping sites to their generated attributes.
         """
-        
+        print(f'LEN DE SITES: {len(sites)}')
         result: dict[Site, list[dict]] = {}
         if is_generated:
             with open("divs_output.json", "r", encoding="utf-8") as json_file:
                 loaded_data = json.load(json_file)
+            if site:
+                result[sites[0]] = loaded_data[sites[0].web_name]
+                # print(len(result[site]))
+                # print(result)
 
+                return result
             for index in range(len(loaded_data)):
+                
                 result[sites[index]] = loaded_data[sites[index].web_name]
                 print(len(result[sites[index]]))
 
@@ -200,7 +207,6 @@ class Data_Augmenter:
             json.dump(serializable_result, json_file, indent=4, ensure_ascii=False)
         return result
 
-        
     def put_divs(self, attributes: dict[Site, list[dict]]):
         """
         Generates or loads div attributes for the given sites.
@@ -213,6 +219,7 @@ class Data_Augmenter:
         Returns:
             dict[Site, list[dict]]: A dictionary mapping sites to their generated attributes.
         """
+
         for site in list(attributes.keys()):
             
             for path, file_name in site.get_all():
@@ -290,36 +297,48 @@ class Data_Augmenter:
 
 
 
-if __name__ == "__main__":
-    sites: list[Site] = []
-    files = os.listdir(DEST_PATH)
-    for file in files:
-        if file[len(file)-4: len(file)] != 'html':
-            continue
-        path = os.path.join(DEST_PATH, file)
-        file_name, web_name = clean_name(file)
-        
-        aux_site = Site(web_name)
-        if aux_site not in sites:
-            sites.append(Site(web_name))
-        index = sites.index(Site(web_name))
-        sites[index].append(file_name=file_name, path=path)
-
-    Data_Augmenter.change_attribute_name(sites)
+def main():
+    # sites: list[Site] = []
+    # files = os.listdir('pages/cleaned_amazon_best_sellers')
+    # for file in files:
+    #     if file[len(file)-4: len(file)] != 'html':
+    #         continue
+    #     path = os.path.join('pages/cleaned_amazon_best_sellers', file)
+    #     # file_name, web_name = clean_name(file)
+    #     file_name = file
+    #     web_name = 'amazon_best_sellers_fashion'
+    #     aux_site = Site(web_name)
+    #     if aux_site not in sites:
+    #         sites.append(Site(web_name))
+    #     print(sites)
+    #     index = sites.index(Site(web_name))
+    #     sites[index].append(file_name=file_name, path=path)
+    #     print()
     
+    sites = []
+    files = os.listdir('pages/cleaned_amazon_best_sellers')
+    sites.append(Site(web_name='amazon_best_sellers_fashion'))
+    for file in files:
+        path = os.path.join('pages/cleaned_amazon_best_sellers', file)
+        file_name = file
+        sites[0].append(file_name=file_name, path=path)
 
-    # llm = Gemini()
-    # data_augmenter = Data_Augmenter(llm, sites)
+    # print(sites)
 
+    llm = Gemini()
+
+    d = Data_Augmenter(llm, sites,'amazon_best_sellers_fashion')
+    # Data_Augmenter.put_divs(,)
+    d.change_attribute_name()
     pass
 
 
-def main():
+# def main():
     
 
 
-    llm = Gemini()
-    d = Data_Augmenter(llm,sites)
+#     llm = Gemini()
+#     d = Data_Augmenter(llm,sites)
     # Data_Augmenter.change_attrxibute_name(sites)
 
 

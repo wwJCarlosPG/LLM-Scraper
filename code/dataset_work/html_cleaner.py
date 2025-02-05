@@ -4,7 +4,7 @@ from dataset_work.consts import ROOT, DEST_PATH
 from urllib3.util.retry import Retry
 from charset_normalizer import detect
 from requests.adapters import HTTPAdapter
-
+import re
 class HTML_Cleaner:
     """
     A class to clean HTML files by removing specified tags and performing operations 
@@ -29,11 +29,20 @@ class HTML_Cleaner:
                 htmls = os.listdir(page_path)
                 for html in htmls:
                     html_path = os.path.join(page_path, html)
-                    HTML_Cleaner.clean_html(html_path=html_path, file_name=html, tags=tags, dest_path=dest_path)
+                    HTML_Cleaner.clean_and_save(html_path=html_path, file_name=html, tags=tags, dest_path=dest_path)
             except Exception as e:
                 print(e)    
-
-
+    @staticmethod
+    def clean_site(root: str,files: list, tags: list[str], dest_path: str = DEST_PATH):
+        
+        for file in files:
+            file_path = os.path.join(root, file)
+            print(file_path)
+            try:
+                HTML_Cleaner.clean_and_save(html_path=file_path, file_name=file, tags=tags, dest_path=dest_path)
+            except Exception as e:
+                pass
+                
     @staticmethod
     def clean_and_save(html_path: str, file_name: str, tags: list, dest_path: str = DEST_PATH):
         """
@@ -137,7 +146,8 @@ class HTML_Cleaner:
 
         print(f'after: {len(os.listdir(path))}')
 
-    def rename_files(root_path: str = DEST_PATH):
+    @staticmethod
+    def rename_files(root_path: str = DEST_PATH, with_re: bool = False):
         """
         Renames files in the given directory to remove unwanted characters.
 
@@ -152,12 +162,17 @@ class HTML_Cleaner:
 
         files = os.listdir(root_path)
         for file in files:
-            new_file_name = file
-            if file.__contains__('?'):
-                new_file_name = new_file_name.replace('?','')
-            new_file_name = new_file_name.replace('html.html', 'html')
-            new_file_name = new_file_name.replace('&','').replace('*','').replace(':','').replace('\"', '')
-            new_file_name = new_file_name.replace('#','')
+            if with_re:
+                match = re.search(r'amazon.*?___\d+___\d+\.html', file)
+                new_file_name= match.group(0) if match else file 
+            else:
+                print(file)
+                new_file_name = file
+                if file.__contains__('?'):
+                    new_file_name = new_file_name.replace('?','')
+                new_file_name = new_file_name.replace('html.html', 'html')
+                new_file_name = new_file_name.replace('&','').replace('*','').replace(':','').replace('\"', '')
+                new_file_name = new_file_name.replace('#','')
             os.rename(f'{root_path}/{file}', f'{root_path}/{new_file_name}')
 
     @staticmethod         
@@ -192,4 +207,7 @@ if __name__ == '__main__':
     # HTML_Cleaner.clean_all(urls, ['script', 'style'])
     # cleaned_path = DEST_PATH
     # HTML_Cleaner.clean_by_size()
-    HTML_Cleaner.rename_files()
+    # dirs  = os.listdir("pages/amazon_best_sellers")
+    # HTML_Cleaner.clean_site("pages/amazon_best_sellers",dirs, ['script', 'style'],'pages/cleaned_amazon_best_sellers')
+    HTML_Cleaner.rename_files("pages/cleaned_amazon_best_sellers", True)
+

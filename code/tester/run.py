@@ -5,25 +5,25 @@ from pydantic_ai.usage import Usage
 from scraper_manager.application.extraction.extractor import DataExtractor
 
 def generate_labeled_dataset():
-    dest_path = 'pages/labeled_dataset/nytimes'
+    dest_path = 'pages/labeled_dataset/amazon_best_sellers_fashion'
     os.makedirs(dest_path, exist_ok=True)
 
-    root_path = "pages/dataset/nytimes"
+    root_path = "pages/amazon_best_sellers"
     files = os.listdir(root_path)
-    llm_labeler = FireworksLLMLabeler("fw_3ZKL6bqRbTf3SGtNKBLc9LGM")
+    llm_labeler = FireworksLLMLabeler("fw_3ZfAFkx4wwfRovV1t2NrFJsh")
     total = len(files)
     print(f'Total: {total}')
 
-    def clean_years(years, files):
-        root_path = "pages/dataset/nytimes"
-        for file in files:
-            for year in years:
-                if str(year) in file:
-                    if os.path.exists(os.path.join(root_path,file)):
-                        os.remove(os.path.join(root_path,file))
+    # def clean_years(years, files):
+    #     root_path = "pages/dataset/nytimes"
+    #     for file in files:
+    #         for year in years:
+    #             if str(year) in file:
+    #                 if os.path.exists(os.path.join(root_path,file)):
+    #                     os.remove(os.path.join(root_path,file))
         
-    clean_years([2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2021, 2022, 2023, '__2__', '__4__', '__6__', '__8__', '__10__', '__12__'], files)
-
+    # clean_years([2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2021, 2022, 2023, '__2__', '__4__', '__6__', '__8__', '__10__', '__12__'], files)
+    
     for file in files:
         total = total-1
         print(f'Current: {total}')

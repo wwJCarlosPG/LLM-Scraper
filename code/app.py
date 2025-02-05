@@ -3,7 +3,7 @@ from pydantic_ai.exceptions import UnexpectedModelBehavior
 from scraper_manager.application.extraction.extractor import DataExtractor
 from scraper_manager.application.validation.validators import BasedAgentValidator, ValidatorResponse
 from dataset_work.data_augmenter import main
-from tester.run import test, collect_errors, sort_txt, remove_duplicates, test2, make_equal_queries
+from tester.run import test, collect_errors, sort_txt, remove_duplicates, test2, make_equal_queries, generate_labeled_dataset
 from typing import Tuple
 from dotenv import load_dotenv
 import jsonschema
@@ -70,6 +70,7 @@ async def main():
 
 
     # """
+    generate_labeled_dataset()
     # # try:
     # x = await b.extract("Extract all news headlines and their tag from the document.", html_content=htmlx, selfconsistency = False, cot=True)
     # # # except UnexpectedModelBehavior:
@@ -83,7 +84,7 @@ async def main():
     # x = llm(f'Extract headlines from this {html}')
     # print(x)
     # await test('bbc', b, True, True, True, 'code/results/bbc/llama3.3-70B/with_selfconsistency', 'code/results/bbc/llama3.3-70B')
-    await test2('bbc', b, 'llama3.3-70B', refinement=False, cot=True)
+    # await test2('bbc', b, 'llama3.3-70B', refinement=False, cot=True)
     # make_equal_queries()
     # collect_errors('bbc')
     # remove_duplicates()
