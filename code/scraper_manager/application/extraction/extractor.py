@@ -9,6 +9,7 @@ from scraper_manager.infrastructure.integration.external_models import ExternalM
 from scraper_manager.application.validation.validators import BaseValidator, DefaultValidator
 from scraper_manager.application.prompts.prompts import get_full_system_prompt, get_simple_system_prompt, get_system_prompt_with_COT, get_system_prompt_without_COT, get_validator_system_prompt
 from typing import Tuple, Union
+import pdfkit
 class DataExtractorSettings(TypedDict):
     """
     A type definition for the settings used in the DataExtractor.
@@ -144,6 +145,11 @@ class DataExtractor:
             return DataExtractor.__select_system_prompt__(selfconsistency, cot)
         
         cleaned_html = HTML_Cleaner.clean_without_download(url=html_path, tags=['script', 'style'], html_content=html_content, is_local=is_local)
+        print(cleaned_html)
+    #    pdfkit.from_string(cleaned_html, f'output.pdf')
+
+
+
         retries = 0
         is_valid = False
         while not is_valid and retries < 3:

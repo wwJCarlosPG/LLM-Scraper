@@ -1,7 +1,10 @@
 # from scraper_manager.application.extraction.responses import ScrapedResponse
 import math
 import pdfkit
-
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
 
 def find_majority(responses):
     similarity = 0
@@ -27,37 +30,25 @@ def find_majority(responses):
             
     return responses[result]
 
-from bs4 import BeautifulSoup
+def html_to_raw_text_pdf(html_content, output_file):
 
-def clean_by_tag(html_content: str, tags: list[str]):
-        """
-        Removes specified tags from the provided HTML content.
-
-        Args:
-            html_content (str): The HTML content to clean.
-            tags (list[str]): A list of tags to be removed from the HTML.
-
-        Returns:
-            str: The cleaned HTML content as a string.
-        """
-        soup = BeautifulSoup(html_content, 'html.parser')
-
-        for tag in tags:
-            for t in soup.find_all(tag):
-                t.decompose()
-
-        cleaned_html = str(soup)
-        return cleaned_html
-
-def from_html_to_pdf(html_content, url, output_path, by_url = False):
+    c = canvas.Canvas(output_file, pagesize=letter)
+    width, height = letter
+    c.setFont('Helvetica', 10)
     
+    lines = html_content.split('\n')
+    y = height - 50  # Start from top of the page
     
-    with open('pages/amazon_best_sellers/https-web.archive.org-web-20220116013542-https-www.amazon.com-gp-bestsellers-fashion___1___2022.html', 'r') as file:
-        html_content = file.read()
-        html_content = clean_by_tag(html_content, ['script', 'style'])
-    if not by_url:
-        pdfkit.from_string(html_content, output_path)
+    for line in lines:
+        if y <= 50:  # Check if we need a new page
+            c.showPage()
+            y = height - 50
+        c.drawString(50, y, line)
+        y -= 12  # Move to next line
 
+    c.save()
 
+# with open('pages/dataset/bbc/attr_bbc___12___2011.html', 'r') as f:
+#         html = f.read()
 
-# from_html_to_pdf(None, None, "x.pdf")
+# html_to_raw_text_pdf(html, 'output.pdf')

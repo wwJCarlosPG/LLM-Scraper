@@ -12,19 +12,21 @@ import jsonschema
 async def main():
     load_dotenv()
     api_key1 = 'lm-studio'
-    api_key2 = "fw_3ZTGqYGPQoYjhmgeUGwBztzD"
-    endpoint1 = 'http://172.20.10.3:1234/v1/chat/completions'
+    api_key2 = "fw_3ZTqf9ocTJ7vU6HdE1iAVDiZ"
+    endpoint1 = 'http://localhost:1234/v1/chat/completions'
     endpoint2 = "https://api.fireworks.ai/inference/v1/chat/completions"
     model_name = "accounts/fireworks/models/llama-v3p3-70b-instruct"
+    # model_name = 'accounts/fireworks/models/mistral-7b'
+    # model_name = "accounts/fireworks/models/mistral-7b"
     # model_name = 'llama-3-8b-instruct'
-    d = {"temperature": 0.6, "max_tokens":1000, "timeout":120.0}
+    d = {"temperature": 0.2, "max_tokens":1000, "timeout":120.0}
     
 
     x = BasedAgentValidator(model_name=model_name, endpoint = endpoint2, api_key=api_key2)
     b = DataExtractor(model_name=model_name,endpoint=endpoint2, api_key=api_key2, validator=x)
     # b = DataExtractor(model_name='gemini:1.5-latest',settings=d, validator=x)
-    # with open('pages/dataset/bbc/attr_bbc___12___2011.html', 'r') as f:
-    #     html = f.read()
+    with open('pages/dataset/bbc/attr_bbc___12___2011.html', 'r') as f:
+        html = f.read()
     htmlx = """
     <!DOCTYPE html>
     <html lang="en">
@@ -70,12 +72,35 @@ async def main():
 
 
     # """
-    generate_labeled_dataset()
-    # # try:
-    # x = await b.extract("Extract all news headlines and their tag from the document.", html_content=htmlx, selfconsistency = False, cot=True)
-    # # # except UnexpectedModelBehavior:
-    # # #     raise
+
+    # import base64
+
+    # h = html.encode('utf-8')
+    # base64_bytes = base64.b64encode(h)
+    # base64_str = base64_bytes.decode('ascii')
+    # # generate_labeled_dataset()
+    # # # try:
+    x = await b.extract("Extract all news headlines and their tag from the document.", html_content=html, selfconsistency = False, cot=True)
+    # # # # except UnexpectedModelBehavior:
+    # # # #     raise
     # print(x[0])
+
+    # import os
+    # from dataset_work.html_cleaner import HTML_Cleaner
+
+    # dirs = os.listdir('pages/dataset/bbc')
+
+    # for dir in dirs:
+    #     with open(f'pages/dataset/bbc/{dir}', 'r') as file:
+    #         x = file.read()
+    #         print(f'before: {len(x)}')
+    #         new_x = HTML_Cleaner.clean_by_tag(x, ['script', 'style', 'div', 'link', 'meta', 'br', 'hr'])
+    #         print(f'after: {len(new_x)}\n')
+    #         # with open('output.html', 'w') as f:
+    #         #     f.write(new_x)
+    #         # break
+    #         # print(f'after: {len(new_x)}')
+
     # print(x[1])
     # from scraper_manager.application.extraction.responses import ScrapedResponse
     # print(ScrapedResponse.model_json_schema())

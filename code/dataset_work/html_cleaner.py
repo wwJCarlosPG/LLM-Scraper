@@ -1,10 +1,11 @@
+import re
 import os, requests
-from bs4 import BeautifulSoup
-from dataset_work.consts import ROOT, DEST_PATH
 from urllib3.util.retry import Retry
 from charset_normalizer import detect
 from requests.adapters import HTTPAdapter
-import re
+from dataset_work.consts import ROOT, DEST_PATH
+from bs4 import BeautifulSoup, Comment, NavigableString
+
 class HTML_Cleaner:
     """
     A class to clean HTML files by removing specified tags and performing operations 
@@ -175,29 +176,92 @@ class HTML_Cleaner:
                 new_file_name = new_file_name.replace('#','')
             os.rename(f'{root_path}/{file}', f'{root_path}/{new_file_name}')
 
-    @staticmethod         
-    def clean_by_tag(html_content: str, tags: list[str]):
+
+    @staticmethod
+    def clean_by_tag(html_content: str, tags_to_remove: list[str], context_length: int = 0) -> str:
         """
-        Removes specified tags from the provided HTML content.
+        Removes specified tags from the provided HTML content while keeping their inner text.
+        Also removes comments and empty text nodes.
 
         Args:
             html_content (str): The HTML content to clean.
-            tags (list[str]): A list of tags to be removed from the HTML.
+            tags_to_remove (list[str]): A list of tags to be removed from the HTML.
 
         Returns:
             str: The cleaned HTML content as a string.
         """
         soup = BeautifulSoup(html_content, 'html.parser')
+        if context_length != 0:
+            tags_to_remove = ['link', 'meta', 'br', 'hr', 'style', 'script']
 
-        for tag in tags:
-            for t in soup.find_all(tag):
-                t.decompose()
+        # clean level 1
+        # remove the specific tags
+        for tag in tags_to_remove:
+            for script in soup.find_all(tag):
+                script.decompose()
+
+        # remove comments
+        for comment in soup.findAll(text = lambda text: isinstance(text, Comment)):
+            comment.extract()
+
+        # clean level 2
+        # remove unnecesary attributes
+        for tag in soup.find_all():
+            for attr in ['style', 'onclick', 'onload', 'width', 'height']:
+                del tag[attr]
+
+        # remove text tags without texts
+        for tag in soup.find_all():
+            if tag.get_text(strip = True) == '':
+                tag.decompose()
+
+        # remove white spaces
+        for element in soup.find_all(text = True):
+            element.replace_with(element.strip())
 
         cleaned_html = str(soup)
-        return cleaned_html
+        if context_length == 0:
+            return cleaned_html
+        
+        if len(cleaned_html) < context_length + 300:
+            return cleaned_html
+        
+        # clean level 3
+        # remove tags with text leaving only the text
+        for tag in soup.find_all(['p', 'b', 'strong', 'i', 'em', 'mark', 'small', 'del', 'ins', 'sub', 'sup']):
+            tag.unwrap()
 
+        # merge nodes with text, for example: <strong>Hello</strong> <p>World</p>
+        for element in soup.find_all(text=True):
+            if element.parent and element.parent.name not in ['script', 'style']:
+                if element.previous_sibling and isinstance(element.previous_sibling, NavigableString):
+                    element.previous_sibling.string += element.string
+                    element.extract()
+        
+        cleaned_html = str(soup)
+        if len(cleaned_html) < context_length + 300:
+            return cleaned_html
+        
+        # clean level 4
+        # remove divs leavinfg just the text 
+        for element in soup.find_all('div'):
+            if element.get_text(strip=True):  
+                element.unwrap()  
+            else:
+                element.decompose()  
+        
+        cleaned_html = str(soup)
+        if len(cleaned_html) < context_length + 300:
+            return cleaned_html
+        
+        
+        # clean level 5
+        # leave just the text
+        return soup.get_text('\n', strip=True)
+                
+       
 
-
+            
 
             
 if __name__ == '__main__':
