@@ -46,18 +46,33 @@ def generate_labeled_dataset():
 
     print('Done')
 
-async def test(site: str, extractor: DataExtractor, refinement: bool, cot: bool,self_consistency, dest_path: str, llm_result_path: str):
+async def test(site: str, extractor: DataExtractor, refinement: bool, cot: bool, self_consistency, separated_selfconsistency, root_path: str):
+    if refinement and cot:
+        dir = 'with_refinement_and_cot'
+    elif self_consistency and cot:
+        dir = 'with_selfconsistency'
+    elif separated_selfconsistency and cot:
+        dir = 'with_separated_selfconsistency'
+    elif not refinement and cot:
+        dir = 'without_refinement_with_cot'
+    else: dir = "without_cot"
+
+    dest_path = os.path.join(root_path, dir)
+    print(dest_path) 
     labeled_ds = os.listdir(dest_path)
     htmls = os.listdir(f'pages/dataset/{site}')
+    htmls = [html for html in htmls if not html.startswith('.DS')]
+
     htmls.sort(key = lambda x: x.split('.')[0])
     labeled_ds.sort(key = lambda x: x.split('.')[0])
     print(len(htmls))
     print(len(labeled_ds))
+    print(f'{dest_path}/{labeled_ds[0]}')
     for i in range(len(htmls)):
         with open(os.path.join(dest_path, labeled_ds[i]), 'r') as labeled_file:
             labeled_data: dict = json.load(labeled_file)
             print(os.path.join(f'pages/dataset/{site}', htmls[i]))
-            with open(f'{llm_result_path}/processed.txt','r') as processed:
+            with open(f'code/results/processed.txt','r') as processed:
                 lines = [line.strip() for line in processed.readlines()]
 
                 
@@ -69,11 +84,17 @@ async def test(site: str, extractor: DataExtractor, refinement: bool, cot: bool,
                         query = responses[j][f'query{j+1}']
                         if f'{htmls[i]}:query{j+1}' in lines:
                             continue
+                        data = responses[j][f'data{j+1}']
+                        keys = data[0].keys()
+                        output_format = {}
+                        for key in keys:
+                            output_format[key] = f"{key} value"
+                        
                         try:
-                            agent_response = await extractor.extract(query, html_content=html_content, selfconsistency=self_consistency, refinement=refinement, cot=cot)
+                            agent_response = await extractor.extract(query, html_content=html_content, selfconsistency=self_consistency, refinement=refinement, cot=cot, separated_selfconsistency=separated_selfconsistency, output_format=output_format)
                         except Exception as e:
                             print(f"Finalizado con error {htmls[i]}:query{j+1} ---> {e}")
-                            with open(f'{llm_result_path}/with_selfconsistency_errors.txt','a') as processed:
+                            with open(f'{root_path}/{dir}.txt','a') as processed:
                                 processed.write(f'\n{htmls[i]}:query{j+1}')    
                         try:
                             usage = agent_response[1]
@@ -97,18 +118,24 @@ async def test(site: str, extractor: DataExtractor, refinement: bool, cot: bool,
                     
                         with open(os.path.join(dest_path, labeled_ds[i]), 'w') as updated_file:
                             json.dump(labeled_data, updated_file, indent=4)
-                            
-                        with open(f'{llm_result_path}/processed.txt','a') as processed:
+                            print(f"Save it in {os.path.join(dest_path, labeled_ds[i])}")
+                        with open(f'code/results/processed.txt','a') as processed:
                             processed.write(f'\n{htmls[i]}:query{j+1}')    
                             print(f'\n{htmls[i]}:query{j+1}')
 
-async def test2(site: str, extractor: DataExtractor, model, refinement, cot):
+async def test2(site: str, extractor: DataExtractor, root_path, refinement, cot, selfconsistency, separated_selfconsistency):
     if refinement and cot:
         dir = 'with_refinement_and_cot'
+    elif selfconsistency and cot:
+        dir = "with_selfconsistency"
+    elif separated_selfconsistency and cot:
+        dir = "with_separated_selfconsistency"
     elif not refinement and cot:
         dir = 'without_refinement_with_cot'
+    elif not cot:
+        dir = 'without_cot'
     
-    dest_path = f'code/results/{site}/{model}/{dir}'
+    dest_path = f'{root_path}/{dir}'
     # labeled_ds = os.listdir(dest_path)
     # htmls = os.listdir(f'pages/dataset/{site}')
     # htmls.sort(key = lambda x: x.split('.')[0])
@@ -121,17 +148,21 @@ async def test2(site: str, extractor: DataExtractor, model, refinement, cot):
     print(indexs)
     files = [f.split(':')[0].strip() for f in lines]
     html_files = [f.split('.')[0].split('.')[0]+'.html'.strip() for f in files]
-
+    print(html_files)
     for i in range(len(files)):
         with open(os.path.join(f'pages/dataset/{site}', html_files[i])) as html:
             html_content = html.read()
             with open(os.path.join(dest_path, files[i]), 'r') as labeled_file:
                 labeled_data = json.load(labeled_file)
                 responses = labeled_data['responses']
-                
+                data = responses[indexs[i]-1][f'data{indexs[i]}']
+                keys = data[0].keys()
+                output_format = {}
+                for key in keys:
+                    output_format[key] = f"{key} value"
                 query = responses[indexs[i]-1][queries[i]]
                 try:
-                    agent_response = await extractor.extract(query, html_content=html_content, selfconsistency=False, refinement=refinement, cot=cot)
+                    agent_response = await extractor.extract(query, html_content=html_content, selfconsistency=selfconsistency, refinement=refinement, cot=cot, separated_selfconsistency=separated_selfconsistency, output_format=output_format)
                 except Exception as e:
                     print(f"Finalizado con error {html_files[i]}: {e}")
                 try:
@@ -158,8 +189,8 @@ async def test2(site: str, extractor: DataExtractor, model, refinement, cot):
                         print(f'Processed {queries[i]}: {html_files[i]}')
 
 
-def collect_errors(site):
-    dest_path = f'code/results/{site}/llama3.3-70B/without_refinement_with_cot'
+def collect_errors(dest_path):
+    # dest_path = f'code/results/{site}/llama3.3-70B/without_refinement_with_cot'
 
     dirs = os.listdir(dest_path)
     for dir in dirs:
@@ -169,7 +200,7 @@ def collect_errors(site):
             for i in range(len(responses)):
                 
                 try:
-                    if responses[i][f'response{i+1}']['scraped_data'] == []:
+                    if responses[i][f'response{i+1}']['scraped_data'] == [] or responses[i][f'response{i+1}']['request_tokens'] == -1:
                         with open('code/results/errors.txt', 'a') as errors:
                             errors.write(f'\n{dir}: query{i+1}')
                 except KeyError as e:

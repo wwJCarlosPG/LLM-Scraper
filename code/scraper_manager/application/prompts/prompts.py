@@ -19,8 +19,8 @@ def get_simple_system_prompt():
     """
     return simple_system_prompt
 # No.2
-def get_system_prompt_without_COT():
-    system_prompt_without_COT = """
+def get_system_prompt_without_COT(output_format):
+    system_prompt_without_COT = f"""
     You are an expert in web scraping, specialized in extracting information from static HTML documents based on natural language queries.  
 
     Your task consists of two key steps:  
@@ -29,25 +29,25 @@ def get_system_prompt_without_COT():
     Step 2: Analyzing the HTML: Examine the document’s tags, text content, attributes, and hierarchical structure to accurately identify the required data based on both the query and the content.
     Step 3: Construct a valid JSON response consisting ONLY of one field:    
     
-    Present the extracted information in the following structured format enclosed within curly braces '{}':  
+    Present the extracted information in the following structured format enclosed within curly braces '{{}}':  
     
-        { "final_answer": [{"attribute_name1": "extracted_data1", "attribute_name2": "extracted_data2"...}, 
-         {"attribute_name3": "extracted_data3", "attribute_name4": "extracted_data4"...}, ...]}
+        {{ "final_answer": [{output_format}, {output_format}...], }}
 
          - When attributes are grouped in the same dictionary, it means they are related to the same element (e.g., the title and author of an article). 
     
     Important considerations:  
         - Your final answer must contain only the attributes that the user asks.
-        - The response must only contain text within the specified field `final_answer`.  
-        - No additional text, comments, or output should appear outside of the JSON structure.  
-        - The `final_answer` must always be a valid JSON string, with data presented inside a list of dictionaries.  
+        - Your response must be a valid and complete JSON object. It must begin with {{ and end with }}.  
+        - No text outside "final_answer".  
+        - Close all brackets and avoid trailing commas.  
+        - If a value is missing, return "NotFound", not None or any other placeholder.  
 
 """
     return system_prompt_without_COT
 
 # No.3 
-def get_system_prompt_with_COT():
-    system_prompt = """
+def get_system_prompt_with_COT(output_format):
+    system_prompt = f"""
     You are an expert in web scraping, specialized in extracting information from static HTML documents based on natural language queries.
 
     Your task consists of three steps:
@@ -60,17 +60,14 @@ def get_system_prompt_with_COT():
        - "final_answer": A list of dictionaries containing the extracted key-value pairs.  
 
     Response format:  
-    {
+    {{
         "explanation": "Your detailed reasoning here.",
-        "final_answer": [
-            {"attribute_name1": "extracted_data1", "attribute_name2": "extracted_data2"...},
-            {"attribute_name3": "extracted_data3", "attribute_name4": "extracted_data4"...}...
-        ]
-    }
+        "final_answer": [ {output_format}, {output_format}...]
+    }}
 
     Key rules:
     - Your final answer must contain only the attributes that the user asks.
-    - Your response must be a valid and complete JSON object. It must begin with { and end with }.  
+    - Your response must be a valid and complete JSON object. It must begin with {{ and end with }}.  
     - No text outside "explanation" and "final_answer".  
     - Close all brackets and avoid trailing commas.  
     - If a value is missing, return "NotFound", not None or any other placeholder.  
@@ -78,8 +75,8 @@ def get_system_prompt_with_COT():
     return system_prompt
 
 # No.4
-def get_full_system_prompt():
-    system_prompt = """
+def get_full_system_prompt(output_format):
+    system_prompt = f"""
     You are an expert in web scraping, specialized in extracting structured data from static HTML documents based on natural language queries.
 
     Your task consists of three steps:
@@ -93,31 +90,22 @@ def get_full_system_prompt():
     - "explanation": A string explaining the extraction process. Describe the logic, relevant HTML elements, and justification for the chosen data.  
     - "final_answer": A list of dictionaries containing the extracted key-value pairs.  
     Response format:
-        {
+        {{
             "responses": [
-                {
+                {{
                     "explanation": "Detailed reasoning for extraction, referencing relevant HTML elements.",
-                    "final_answer": [
-                        {"attribute_name1": "extracted_data1", "attribute_name2": "extracted_data2"...},
-                        {"attribute_name3": "extracted_data3", "attribute_name4": "extracted_data4"...}
-                    ]
-                },
-                {
+                    "final_answer": [{output_format}, {output_format}...]
+                }},
+                {{
                     "explanation": "Detailed reasoning for extraction, referencing relevant HTML elements.",
-                    "final_answer": [
-                        {"attribute_name1": "extracted_data1", "attribute_name2": "extracted_data2"...},
-                        {"attribute_name3": "extracted_data3", "attribute_name4": "extracted_data4"...}
-                    ]
-                },
-                {
+                    "final_answer": [{output_format}, {output_format}...]
+                }},
+                {{
                     "explanation": "Detailed reasoning for extraction, referencing relevant HTML elements.",
-                    "final_answer": [
-                        {"attribute_name1": "extracted_data1", "attribute_name2": "extracted_data2"...},
-                        {"attribute_name3": "extracted_data3", "attribute_name4": "extracted_data4"...}
-                    ]
-                }
+                    "final_answer": [{output_format}, {output_format}...]
+                }}
             ]
-        }
+        }}
         Important Considerations
             - Your final answer must contain only the attributes that the user asks.
             - Your response must be a raw JSON object with no additional formatting, markdown, or extra text before or after it.
@@ -136,7 +124,8 @@ def get_validator_system_prompt():
 
     Follow these steps:
 
-    Step1. Understand the user query and identify the expected information.  
+    Step1. Understand the user query and identify the expected information. 
+        Example: If the query is 'Extract the names of products with a price higher than $5'. Only the product names must be present. The price is not required, but if included, it does not affect validity. 
     Step2. Analyze the extracted data to check if attributes match the query using this structure:  
        [{"attribute1": "data1", "attribute2": "data2"...}, {"attribute3": "data3", "attribute4": "data4"...}...]  
        Attributes in the same dictionary relate to the same element, while separate dictionaries represent distinct elements.  
@@ -152,9 +141,12 @@ def get_validator_system_prompt():
     }
 
     Important:  
+    - data_i can be any type
     - Retrun only a raw JSON, with no extra text, with no markdown or code blocks.
     - The response must begin with the character { and end with the charecter }.  
     - Ensure all lists and objects are properly formatted.  
+
+    Now, the query and the HTML:
     """
 
     return validator_system_prompt

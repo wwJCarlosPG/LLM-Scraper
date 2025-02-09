@@ -9,6 +9,7 @@ from scraper_manager.infrastructure.integration.external_models import ExternalM
 from scraper_manager.application.extraction.responses import ScrapedResponse, Response
 from scraper_manager.core.exceptions import InvalidResultDuringValidation, InvalidValidationFormat
 from scraper_manager.application.prompts.prompts import get_validator_system_prompt, structure_query_to_validate
+import json
 class ValidatorResponse(BaseModel):
     """
     Represents the response of a validation process that evaluates 
@@ -72,7 +73,7 @@ class BaseValidator(ABC):
             ValidatorResponse: A validated response object.
         """
         try:
-            json = json.loads(response_to_validate)
+            json_response = json.loads(response_to_validate)
         except Exception:
             response_to_validate = response_to_validate.strip("\n\t")
             # response_to_validate = response_to_validate.encode('utf-8').decode('unicode_escape')
@@ -87,7 +88,6 @@ class BaseValidator(ABC):
                 response_to_validate = response_to_validate + '}'
             if response_to_validate.count('"') % 2 != 0:
                 response_to_validate = response_to_validate.rstrip('"')
-        # print(response_to_validate)
         response = ValidatorResponse.model_validate_json(response_to_validate)
         return response
      
@@ -106,7 +106,7 @@ class DefaultValidator(BaseValidator):
         """
         super().__init__()
 
-    def validate(self, data: str) -> ScrapedResponse:
+    def validate(self, response_to_validate: str) -> ScrapedResponse:
         """
         Validate the extracted data by parsing it into a `ScrapedResponse` object.
 
@@ -116,10 +116,9 @@ class DefaultValidator(BaseValidator):
         Returns:
             ScrapedResponse: The parsed and validated scraped data.
         """
-        validated_response = Response.model_validate_json(data)
-        # return validated_response
-        # validated_response = ScrapedResponse.model_validate_json(data)
-        return validated_response
+        scraped_response = ScrapedResponse.model_validate_json(response_to_validate,strict=False)
+
+        return scraped_response
     
 
 class BasedAgentValidator(BaseValidator):
@@ -157,9 +156,9 @@ class BasedAgentValidator(BaseValidator):
             ValueError: If no valid API key is provided or found in environment variables.
         """
         self.validator_settings = BasedAgentValidatorSettings(
-        temperature=0.6, 
+        temperature=0.5, 
         timeout=60.0, 
-        max_tokens=1000, 
+        max_tokens=3000, 
         response_format={"type": "json_object", "schema": ValidatorResponse.model_json_schema()} 
 )
         async_client = AsyncClient()
@@ -188,16 +187,16 @@ class BasedAgentValidator(BaseValidator):
             - A valid scraped response if validation is successful.
 
         """
-        start = response_to_validate.find('{')
-        reversed_response = response_to_validate[::-1]
-        reversed_end = reversed_response.find('}')
-        end = len(response_to_validate) - reversed_end - 1 
-        response_to_validate[start:end+1]
+        # start = response_to_validate.find('{')
+        # reversed_response = response_to_validate[::-1]
+        # reversed_end = reversed_response.find('}')
+        # end = len(response_to_validate) - reversed_end - 1 
+        # response_to_validate[start:end+1]
 
-        response_to_validate = response_to_validate[start:end+1]
+        # response_to_validate = response_to_validate[start:end+1]
         # print(response_to_validate)
         try:
-            json = json.loads(response_to_validate)
+            json_response = json.loads(response_to_validate)
         except Exception:
             response_to_validate = response_to_validate.strip("\n\t")
             # response_to_validate = response_to_validate.encode('utf-8').decode('unicode_escape')
@@ -215,7 +214,9 @@ class BasedAgentValidator(BaseValidator):
                 scraped_response = find_majority(scraped_response_collection.responses)
                 # print(scraped_response) 
             else:
+                # print(response_to_validate)
                 scraped_response = ScrapedResponse.model_validate_json(response_to_validate,strict=False)
+
             messages = run_context.messages
             request_parts = [m.parts for m in messages if m.kind == 'request']
             user_query = [request.content for request in request_parts[len(request_parts) - 1] if request.part_kind == 'user-prompt']
@@ -232,6 +233,7 @@ class BasedAgentValidator(BaseValidator):
             scraped_response.is_valid = validator_response.data.is_valid
             return scraped_response
         except Exception as e:
+            # print(response_to_validate)
             print(f"InvalidResultDuringValidation: {e} \nfor response {response_to_validate}" )
             raise InvalidResultDuringValidation(message=f"An error ocurred during validation process: {e}.")
 

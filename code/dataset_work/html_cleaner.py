@@ -79,7 +79,7 @@ class HTML_Cleaner:
             print(e)
 
     @staticmethod
-    def clean_without_download(tags: list[str], url: str = None, html_content: str = None, is_local: bool = False) -> str:
+    def clean_without_download(tags: list[str], url: str = None, html_content: str = None, is_local: bool = False, context_length: int = 0) -> str:
         """
         Cleans an HTML page either from a URL or from a local source without downloading it.
 
@@ -93,7 +93,7 @@ class HTML_Cleaner:
             str: The cleaned HTML content as a string.
         """
         if html_content is not None:
-            return HTML_Cleaner.clean_by_tag(html_content, tags)
+            return HTML_Cleaner.clean_by_tag(html_content, tags, context_length)
 
         USER_AGENT = "my new app's user agent"
         retry_strategy = Retry(
@@ -115,11 +115,12 @@ class HTML_Cleaner:
             else:
                 with open(url, 'r') as file:
                     response = file.read()
-            return HTML_Cleaner.clean_by_tag(response, tags)
+                    print("HELLO!")
+                    print(context_length)
+            return HTML_Cleaner.clean_by_tag(response, tags, context_length)
             
         except Exception as e:
             print(f"Request failed: {e}")
-
 
     @staticmethod
     def clean_by_size(size_limit: int = 11000, path: str = DEST_PATH):
@@ -176,9 +177,8 @@ class HTML_Cleaner:
                 new_file_name = new_file_name.replace('#','')
             os.rename(f'{root_path}/{file}', f'{root_path}/{new_file_name}')
 
-
     @staticmethod
-    def clean_by_tag(html_content: str, tags_to_remove: list[str], context_length: int = 0) -> str:
+    def clean_by_tag(html_content: str, tags_to_remove: list[str], context_length: int = 0, level: int = 3) -> str:
         """
         Removes specified tags from the provided HTML content while keeping their inner text.
         Also removes comments and empty text nodes.
@@ -199,67 +199,154 @@ class HTML_Cleaner:
         for tag in tags_to_remove:
             for script in soup.find_all(tag):
                 script.decompose()
-
+        
+        cleaned_html = str(soup)
+        # print(f"1: {cleaned_html.index('$27')}")
         # remove comments
         for comment in soup.findAll(text = lambda text: isinstance(text, Comment)):
             comment.extract()
+
+        cleaned_html = str(soup)
+        # print(f"2: {cleaned_html.index('$27')}")
+        # print(cleaned_html.index('<img'))
 
         # clean level 2
         # remove unnecesary attributes
         for tag in soup.find_all():
             for attr in ['style', 'onclick', 'onload', 'width', 'height']:
                 del tag[attr]
+            for attr in list(tag.attrs):  # Iterate over a copy of the attributes
+                if  attr != 'src' and attr != 'class' and attr != 'id':
+                # if attr.startswith('data-') or attr.startswith('aria-') or attr.startswith('search-') or attr.startswith('value'):
+                    del tag[attr]
 
+        cleaned_html = str(soup)
+        # print(f"3: {cleaned_html.index('$27')}")
+        # print(cleaned_html.index('<img'))
+        # print(cleaned_html[472:500])
+        
         # remove text tags without texts
-        for tag in soup.find_all():
-            if tag.get_text(strip = True) == '':
-                tag.decompose()
+        for tag in soup.find_all(): # Check all tags
+            if tag.get_text(strip=True) == '' and tag.name != 'img' and not tag.find('img'):
+                # If it's a tag with no text and no <img> children, remove it
+                tag.unwrap()
+        
+        cleaned_html = str(soup)
+        # print(f"4: {cleaned_html.index('$27')}")
+        # try:
+        #     print(cleaned_html.index('<img'))
+        # except Exception as e:
+        #     print(e)
 
         # remove white spaces
         for element in soup.find_all(text = True):
             element.replace_with(element.strip())
 
+        # print(soup.find('img').name)
+        
         cleaned_html = str(soup)
+        # print(f"5: {cleaned_html.index('$27')}")
+        cleaned_html = str(soup)
+        # print(len(cleaned_html))
         if context_length == 0:
+            print("ZERO")
             return cleaned_html
         
         if len(cleaned_html) < context_length + 300:
+            # print(len(cleaned_html))
+
             return cleaned_html
         
         # clean level 3
         # remove tags with text leaving only the text
-        for tag in soup.find_all(['p', 'b', 'strong', 'i', 'em', 'mark', 'small', 'del', 'ins', 'sub', 'sup']):
+        for tag in soup.find_all(['p', 'b', 'span', 'strong', 'i', 'em', 'mark', 'small', 'del', 'ins', 'sub', 'sup', 'a', 'option']):
+            if tag.find('img'):
+                continue
             tag.unwrap()
 
-        # merge nodes with text, for example: <strong>Hello</strong> <p>World</p>
-        for element in soup.find_all(text=True):
-            if element.parent and element.parent.name not in ['script', 'style']:
-                if element.previous_sibling and isinstance(element.previous_sibling, NavigableString):
-                    element.previous_sibling.string += element.string
-                    element.extract()
+        cleaned_html = str(soup)
+        # print(f"6: {cleaned_html.index('$27')}")
+
+        cleaned_html = str(soup)
+        # # print(cleaned_html)
+        # # merge nodes with text, for example: <strong>Hello</strong> <p>World</p>
+        # for element in soup.find_all(text=True):
+        #     if element.parent and element.parent.name not in ['script', 'style']:
+        #         if element.previous_sibling and isinstance(element.previous_sibling, NavigableString):
+        #             element.previous_sibling.string += element.string
+        #             element.extract()
+
+        cleaned_html = str(soup)
+        # print(f"7: {cleaned_html.index('$27')}")
         
+        for tag in soup.find_all():
+            for attr in ['role', 'id', 'alt', 'title']:
+                del tag[attr]
+
+
+        cleaned_html = str(soup)
+        # print(f"8: {cleaned_html.index('$27')}")
+
         cleaned_html = str(soup)
         if len(cleaned_html) < context_length + 300:
+            print(len(cleaned_html))
+
             return cleaned_html
         
+
         # clean level 4
-        # remove divs leavinfg just the text 
+        # remove class attributes
+        for tag in soup.find_all():
+            for attr in ['class']:
+                del tag[attr]
+
+        cleaned_html = str(soup)
+        # print(f"9: {cleaned_html.index('$27')}")
+
+        cleaned_html = str(soup)
+        if len(cleaned_html) < context_length + 300:
+            print(len(cleaned_html))
+            return cleaned_html
+        
+        # clean level 5
+        print('level5')
+        # remove divs leaving just the text 
         for element in soup.find_all('div'):
             if element.get_text(strip=True):  
                 element.unwrap()  
             else:
-                element.decompose()  
+                element.decompose()
+
+        cleaned_html = str(soup)
+        # print(f"10: {cleaned_html.index('$27')}")  
         
         cleaned_html = str(soup)
         if len(cleaned_html) < context_length + 300:
+            print(len(cleaned_html))
             return cleaned_html
         
-        
-        # clean level 5
+        # clean level 6
         # leave just the text
         return soup.get_text('\n', strip=True)
                 
-       
+
+    @staticmethod   
+    def split_html_with_beautifulsoup(html_content: str, chunk_size: int) -> list[str]:
+        soup = BeautifulSoup(html_content, 'html.parser')
+        fragments = []
+        current_fragment = ''
+
+        for element in soup.body.descendants:
+            element_string = str(element)
+            if len(current_fragment) + len(element_string) <= chunk_size:
+                current_fragment += element_string
+            else:
+                fragments.append(current_fragment)
+                current_fragment = element_string
+
+        if current_fragment:
+            fragments.append(current_fragment)
+        return fragments
 
             
 

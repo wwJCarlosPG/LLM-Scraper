@@ -23,11 +23,10 @@ class Evaluator:
                     try:
                          data = labeled_data_dict['responses'][index][f'data{index+1}']
                          response = labeled_data_dict['responses'][index][f'response{index+1}']['scraped_data']
-                    except Exception as e:
-                         return
-                    comparisson_result, tp = Evaluator.__compare__(data, response)
-                    
-                    if response != []:
+                         comparisson_result, tp = Evaluator.__compare__(data, response)
+                    except KeyError:
+                         continue
+                    if response != [] and data != []:
                               response_length = len(list(response[0].keys())) * len(response)
                               data_length = len(list(data[0].keys())) * len(data)
                     else: continue
@@ -35,6 +34,7 @@ class Evaluator:
                     fn = data_length - tp
 
                     with open(insights_path, 'a') as insights_file:
+                         print("X")
                          insights_file.write(f'{labeled_file} query{index+1}: {comparisson_result} -- {tp} -- {fp} -- {fn}\n')
 
 
@@ -72,6 +72,6 @@ class Evaluator:
 # buscar si hay una biblioteca que te de algo como sinonimos o algo asi, quizas una biblioteca de embedding 
 
 
-# p = 'code/results/bbc/llama3.3-70B/with_refinement_and_cot'
+p = 'code/results/amazon_best_sellers/llama3.3-70B/without_refinement_with_cot'
 
-# Evaluator.evaluate(p)
+Evaluator.evaluate(p)
