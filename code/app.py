@@ -14,14 +14,19 @@ async def main():
     # load_dotenv()
     # # key = "AIzaSyDysReK_sh0Iwfra7do4b1Jgi6KdGr6PKY"
     # # model_name = "gemini-1.5-pro"
-    # # api_key1 = 'lm-studio'
-    api_key1 = "fw_3ZRMs9d6Uh296J917sxT4W14"
+    
+    
+    # LM Studio section
+    api_key1 = 'lm-studio'
+    endpoint1 = 'http://localhost:1234/v1/chat/completions'
+    model_name = 'llama-3-8b-instruct'
     # # endpoint1 = 'http://172.20.10.3:1234/v1/chat/completions'
-    endpoint1 = "https://api.fireworks.ai/inference/v1/chat/completions"
-    model_name = "accounts/fireworks/models/llama-v3p3-70b-instruct"
+
+    # api_key1 = "fw_3ZRMs9d6Uh296J917sxT4W14"
+    # endpoint1 = "https://api.fireworks.ai/inference/v1/chat/completions"
+    # model_name = "accounts/fireworks/models/llama-v3p3-70b-instruct"
     # # model_name = 'accounts/fireworks/models/mistral-7b'
     # # model_name = "accounts/fireworks/models/mistral-7b"
-    # # model_name = 'llama-3-8b-instruct'
     # # model_name = 'yarn-mistral-7b-128k'
     # # model_name = "Qwen2-VL-7B-Instruct"
     # # model_name = "accounts/sentientfoundation/models/dobby-mini-leashed-llama-3-1-8b"
@@ -29,7 +34,7 @@ async def main():
     html = ""
     settings = {"temperature": 0.5, "max_tokens":10000, "timeout":120.0}
     validator = BasedAgentValidator(model_name=model_name,api_key=api_key1, endpoint=endpoint1 )
-    extractor = DataExtractor(model_name=model_name, endpoint=endpoint1, api_key=api_key1, validator=validator, context_length=128000)
+    extractor = DataExtractor(model_name=model_name, endpoint=endpoint1, api_key=api_key1, validator=validator, context_length=8000)
     data = await extractor.extract("Extract all product with price more than $25.00 from the document.", html_content=html, selfconsistency = False, cot=True, refinement=False, separated_selfconsistency=False, output_format={"ProductTitle": "Value of product title"})
 
     print(data)
