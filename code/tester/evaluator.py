@@ -1,9 +1,11 @@
 import os
 import json
+import re
 class Evaluator:
     
     @staticmethod
     def evaluate(responses_path: str):
+                         
         files = os.listdir(responses_path)
         dirs = responses_path.split('/')
         dirs.insert(len(dirs)-1, 'insights')
@@ -12,6 +14,8 @@ class Evaluator:
              insights_path += '/' + dirs[i]
 
         insights_path = insights_path + '.txt'
+        with open(insights_path, 'w') as insights_file:
+               insights_file.write('')
         for labeled_file in files:
             print(labeled_file)
             abs_path = os.path.join(responses_path, labeled_file)
@@ -23,9 +27,17 @@ class Evaluator:
                     try:
                          data = labeled_data_dict['responses'][index][f'data{index+1}']
                          response = labeled_data_dict['responses'][index][f'response{index+1}']['scraped_data']
+                          
+                         # response = re.sub(r"^\d+\s+offers\s+from\s+", "", response)
+                         response_tokens = labeled_data_dict['responses'][index][f'response{index+1}']['response_tokens']
                          comparisson_result, tp = Evaluator.__compare__(data, response)
-                    except KeyError:
-                         continue
+                         refinement_count = labeled_data_dict['responses'][index][f'response{index+1}']['refinement_count']
+                         there_is_isvalid = True
+                         is_valid = labeled_data_dict['responses'][index][f'response{index+1}']['is_valid']
+                    except KeyError as e:
+                         there_is_isvalid = False
+
+                         print(f"Error: {e}")
                     if response != [] and data != []:
                               response_length = len(list(response[0].keys())) * len(response)
                               data_length = len(list(data[0].keys())) * len(data)
@@ -35,7 +47,10 @@ class Evaluator:
 
                     with open(insights_path, 'a') as insights_file:
                          print("X")
-                         insights_file.write(f'{labeled_file} query{index+1}: {comparisson_result} -- {tp} -- {fp} -- {fn}\n')
+                         if there_is_isvalid:
+                              insights_file.write(f'{labeled_file} query{index+1}: {comparisson_result} -- {tp} -- {fp} -- {fn} -- {is_valid} -- {refinement_count} -- {response_tokens}\n')
+                         else:
+                              insights_file.write(f'{labeled_file} query{index+1}: {comparisson_result} -- {tp} -- {fp} -- {fn} -- NotFound -- {refinement_count} -- {response_tokens}\n')
 
 
 
@@ -71,7 +86,15 @@ class Evaluator:
 
 # buscar si hay una biblioteca que te de algo como sinonimos o algo asi, quizas una biblioteca de embedding 
 
+sites = ["bbc", "amazon_best_sellers"]
+models = ['llama3.3-70B', 'dobby-mini-leashed-llama3.1-8B']
+techniques = ['with_separated_selfconsistency', 'with_selfconsistency', 'with_refinement_and_cot', 'without_refinement_with_cot']
+for site in sites:
+     for model in models:
+          for technique in techniques:
+               path = f'code/results/{site}/{model}/{technique}'
+               Evaluator.evaluate(path)
 
-p = 'code/results/amazon_best_sellers/llama3.3-70B/without_refinement_with_cot'
-
-Evaluator.evaluate(p)
+for model in models:
+     path = f'code/results/merged_dataset/{model}/without_cot'
+     Evaluator.evaluate(path)

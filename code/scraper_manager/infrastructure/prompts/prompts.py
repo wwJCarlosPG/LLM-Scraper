@@ -1,4 +1,4 @@
-from scraper_manager.application.extraction.responses import ScrapedResponse
+# from scraper_manager.application.extraction.responses import ScrapedResponse
 
 # In complexity order
 
@@ -153,7 +153,7 @@ def get_validator_system_prompt():
 
 
 
-def structure_query_to_validate(user_query: str, scraped_response: ScrapedResponse):
+def structure_query_to_validate(user_query: str, scraped_data): # pasar esto como diccionario
     query = f"""
     Given the following user query:
 
@@ -161,7 +161,7 @@ def structure_query_to_validate(user_query: str, scraped_response: ScrapedRespon
 
     And the extracted data:
 
-    {scraped_response.scraped_data}
+    {scraped_data}
 
     Verify whether the extracted data accurately satisfies the query using the provided HTML content in the query
 

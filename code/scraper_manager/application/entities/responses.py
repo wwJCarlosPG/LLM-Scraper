@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import Union, Annotated, Any
+from typing import Union, Any
 
 class ScrapedResponse(BaseModel):
     """
@@ -48,7 +48,6 @@ class ScrapedResponse(BaseModel):
         default = 0
     )
 
-
 class Response(BaseModel):
     """
     Represents the response containing extracted data from a web scraping task.
@@ -68,4 +67,22 @@ class Response(BaseModel):
         description='A list or a single instance of ScrapedResponse that contains the extracted data from a web scraping task.'
     )
 
- 
+class ValidatorResponse(BaseModel):
+    """
+    Represents the response of a validation process that evaluates 
+    whether extracted data meets the given user query requirements.
+
+    Attributes:
+        explanation (str): A detailed justification of the validation outcome, 
+            describing why the extracted data is considered correct or incorrect 
+            based on the provided HTML content and query.
+        is_valid (bool): A boolean flag indicating the validation result.
+            - True if the extracted data is accurate and satisfies the query.
+            - False if the extracted data does not meet the query requirements.
+    """
+    explanation: str = Field(
+        description="A detailed explanation justifying the validity or invalidity of the extracted data based on the query and HTML content."
+    )
+    is_valid: bool = Field(
+        description="A boolean indicating whether the extracted data is correct (True) or incorrect (False) based on the validation."
+    )

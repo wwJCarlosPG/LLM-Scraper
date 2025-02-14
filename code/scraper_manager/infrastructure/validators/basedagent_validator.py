@@ -1,125 +1,15 @@
-from typing import TypedDict
+from typing import Union
+from scraper_manager.application.entities.responses import ScrapedResponse, ValidatorResponse, Response
+from scraper_manager.application.interfaces.validator_interface import BaseValidator
+from scraper_manager.application.entities.validator_settings import BasedAgentValidatorSettings
 from httpx import AsyncClient
-from pydantic_ai import RunContext
 from pydantic_ai.agent import Agent
-from abc import ABC, abstractmethod
-from pydantic import BaseModel, Field
-from scraper_manager.core.utils import find_majority
+from scraper_manager.infrastructure.prompts.prompts import get_validator_system_prompt, structure_query_to_validate
 from scraper_manager.infrastructure.integration.external_models import ExternalModel
-from scraper_manager.application.extraction.responses import ScrapedResponse, Response
-from scraper_manager.core.exceptions import InvalidResultDuringValidation, InvalidValidationFormat
-from scraper_manager.application.prompts.prompts import get_validator_system_prompt, structure_query_to_validate
+from scraper_manager.infrastructure.exceptions.exceptions import InvalidResultDuringValidation, InvalidValidationFormat
+from pydantic_ai import RunContext
 import json
-class ValidatorResponse(BaseModel):
-    """
-    Represents the response of a validation process that evaluates 
-    whether extracted data meets the given user query requirements.
-
-    Attributes:
-        explanation (str): A detailed justification of the validation outcome, 
-            describing why the extracted data is considered correct or incorrect 
-            based on the provided HTML content and query.
-        is_valid (bool): A boolean flag indicating the validation result.
-            - True if the extracted data is accurate and satisfies the query.
-            - False if the extracted data does not meet the query requirements.
-    """
-    explanation: str = Field(
-        description="A detailed explanation justifying the validity or invalidity of the extracted data based on the query and HTML content."
-    )
-    is_valid: bool = Field(
-        description="A boolean indicating whether the extracted data is correct (True) or incorrect (False) based on the validation."
-    )
-
-class BasedAgentValidatorSettings(TypedDict):
-    response_format =  {"type": "json_object", "schema": ValidatorResponse.model_json_schema()}
-    timeout: float = 60.0
-    temperature: float = 0.5
-    max_tokens: int = 1000
-
-
-class BaseValidator(ABC):
-    """
-    Abstract base class for validators that assess the accuracy of extracted data 
-    against a user-provided query.
-
-    Methods:
-        validate(user_query: str, html_content: str, response_to_validate: str) -> Union[ValidatorResponse, ScrapedResponse]:
-            Abstract method to validate extracted data against a query.
-    """
-
-    @abstractmethod
-    def validate(self, response_to_validate) -> ScrapedResponse:
-        """
-        Validate the extracted data against the provided user query.
-        
-        Args:
-            response_to_validate (str): The data to be validated, typically in JSON format.
-
-        Returns:
-            Union[ValidatorResponse, ScrapedResponse]: 
-            - `ValidatorResponse`: Contains validation status and an explanation.
-            - `ScrapedResponse`: Represents a successful extraction result.
-        """
-        raise NotImplementedError()
-    
-    def self_validator(self, response_to_validate: str):
-        """
-        Validates the provided JSON string by converting it to a `ValidatorResponse` object.
-
-        Args:
-            data (str): JSON formatted string containing validation data.
-
-        Returns:
-            ValidatorResponse: A validated response object.
-        """
-        try:
-            json_response = json.loads(response_to_validate)
-        except Exception:
-            response_to_validate = response_to_validate.strip("\n\t")
-            # response_to_validate = response_to_validate.encode('utf-8').decode('unicode_escape')
-            start = response_to_validate.find('{')
-            reversed_response = response_to_validate[::-1]
-            reversed_end = reversed_response.find('}')
-            end = len(response_to_validate) - reversed_end - 1 
-            response_to_validate[start:end+1]
-            if not response_to_validate.startswith('{'):
-                response_to_validate = '{' + response_to_validate
-            if not response_to_validate.endswith('}'):
-                response_to_validate = response_to_validate + '}'
-            if response_to_validate.count('"') % 2 != 0:
-                response_to_validate = response_to_validate.rstrip('"')
-        response = ValidatorResponse.model_validate_json(response_to_validate)
-        return response
-     
-class DefaultValidator(BaseValidator):
-    """
-    Default implementation of `BaseValidator` that validates scraped data 
-    using the `ScrapedResponse` model.
-
-    Methods:
-        validate(data: str) -> Union[ValidatorResponse, ScrapedResponse]:
-            Validates the given data and returns a `ScrapedResponse` object.
-    """
-    def __init__(self):
-        """
-        Initializes the DefaultValidator instance.
-        """
-        super().__init__()
-
-    def validate(self, response_to_validate: str) -> ScrapedResponse:
-        """
-        Validate the extracted data by parsing it into a `ScrapedResponse` object.
-
-        Args:
-            data (str): JSON formatted string containing the scraped response.
-
-        Returns:
-            ScrapedResponse: The parsed and validated scraped data.
-        """
-        scraped_response = ScrapedResponse.model_validate_json(response_to_validate,strict=False)
-
-        return scraped_response
-    
+from scraper_manager.infrastructure.utils import find_majority
 
 class BasedAgentValidator(BaseValidator):
     """
@@ -172,8 +62,38 @@ class BasedAgentValidator(BaseValidator):
                 model = ExternalModel(api_key = api_key,endpoint=endpoint, model_name=model_name, env_alias = env_alias, http_client=async_client),
                 system_prompt = get_validator_system_prompt(),
             )
-            self.agent.result_validator(self.self_validator)
+            self.agent.result_validator(self.self_validate)
         
+    def self_validate(self, response_to_validate: str):
+        """
+        Validates the provided JSON string by converting it to a `ValidatorResponse` object.
+
+        Args:
+            data (str): JSON formatted string containing validation data.
+
+        Returns:
+            ValidatorResponse: A validated response object.
+        """
+        try:
+            json_response = json.loads(response_to_validate)
+        except Exception:
+            response_to_validate = response_to_validate.strip("\n\t")
+            # response_to_validate = response_to_validate.encode('utf-8').decode('unicode_escape')
+            start = response_to_validate.find('{')
+            reversed_response = response_to_validate[::-1]
+            reversed_end = reversed_response.find('}')
+            end = len(response_to_validate) - reversed_end - 1 
+            response_to_validate[start:end+1]
+            if not response_to_validate.startswith('{'):
+                response_to_validate = '{' + response_to_validate
+            if not response_to_validate.endswith('}'):
+                response_to_validate = response_to_validate + '}'
+            if response_to_validate.count('"') % 2 != 0:
+                response_to_validate = response_to_validate.rstrip('"')
+        response = ValidatorResponse.model_validate_json(response_to_validate)
+        return response
+    
+    
     async def validate(self, run_context: RunContext, response_to_validate: str) -> ScrapedResponse:
         """
         Validates the extracted data using an AI-based agent.
@@ -220,7 +140,7 @@ class BasedAgentValidator(BaseValidator):
             messages = run_context.messages
             request_parts = [m.parts for m in messages if m.kind == 'request']
             user_query = [request.content for request in request_parts[len(request_parts) - 1] if request.part_kind == 'user-prompt']
-            query = structure_query_to_validate(user_query, scraped_response)
+            query = structure_query_to_validate(user_query, scraped_response.scraped_data)
             try:
                 validator_response = await self.agent.run(query, model_settings=self.validator_settings) 
             except Exception as e:

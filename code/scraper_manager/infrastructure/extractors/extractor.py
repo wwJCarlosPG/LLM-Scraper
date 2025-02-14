@@ -1,49 +1,23 @@
-from typing import TypedDict
 from httpx import AsyncClient
 from pydantic_ai.agent import Agent
 from pydantic_ai.usage import Usage
 from dataset_work.html_cleaner import HTML_Cleaner
-from scraper_manager.core.exceptions import InvalidResultDuringValidation
-from scraper_manager.application.extraction.responses import ScrapedResponse, Response
+from scraper_manager.infrastructure.exceptions.exceptions import InvalidResultDuringValidation
+from scraper_manager.application.entities.responses import ScrapedResponse, Response
 from scraper_manager.infrastructure.integration.external_models import ExternalModel
-from scraper_manager.application.validation.validators import BaseValidator, DefaultValidator
-from scraper_manager.application.prompts.prompts import get_full_system_prompt, get_simple_system_prompt, get_system_prompt_with_COT, get_system_prompt_without_COT, get_validator_system_prompt
-from typing import Tuple, Union
-import pdfkit
-import gensim.downloader as api
-from gensim.matutils import cossim
-from typing import List, Dict, Any
-import itertools
+from scraper_manager.application.interfaces.validator_interface import BaseValidator
+from scraper_manager.infrastructure.prompts.prompts import get_full_system_prompt, get_system_prompt_with_COT, get_system_prompt_without_COT
+from typing import List, Dict, Any, Tuple
 from collections import defaultdict
 from statistics import mean
-
-
-class DataExtractorSettings(TypedDict):
-    """
-    A type definition for the settings used in the DataExtractor.
-
-    Attributes:
-        temperature (float): 
-            The degree of randomness or creativity in the model's response.
-            - A higher value (e.g., 0.9) results in more creative and diverse outputs.
-            - A lower value (e.g., 0.2) makes the output more focused and deterministic.
-
-        max_tokens (int): 
-            The maximum number of tokens (words or characters, depending on the model) 
-            that the model is allowed to generate in response.
-            - Higher values allow for longer responses.
-            - Lower values restrict the response length to be more concise.
-    """
-    temperature: float = 0.3
-    max_tokens: int = 10000
-    timeout: float = 60.0
-    response_format = {"type": "json_object", "schema": ScrapedResponse.model_json_schema()} | {'type': 'json_object', 'schema': Response.model_json_schema()}
+from scraper_manager.application.entities.extractor_settings import DataExtractorSettings
+from scraper_manager.application.interfaces.extractor_interface import BaseExtractor
 
 SCRAPED_RESPONSE_FORMAT = {"type": "json_object", "schema": ScrapedResponse.model_json_schema()}
 RESPONSE_FORMAT = {"type": "json_object", "schema": Response.model_json_schema()}
 
 
-class DataExtractor:
+class DataExtractor(BaseExtractor):
     """
         A class for extracting structured data from HTML content using a language model.
 
@@ -59,7 +33,7 @@ class DataExtractor:
             endpoint (str, optional): The API endpoint for the model. Defaults to None.
             api_key (str, optional): The API key for authentication. Defaults to None.
             env_alias (str, optional): The environment alias for the external model. Defaults to None.
-            validator (BaseValidator, optional): An optional validator to verify extracted data.
+            validator (BaseValidator): A validator to verify extracted data.
             settings (DataExtractor): 
      """
     def __init__(self, *, 
@@ -67,7 +41,7 @@ class DataExtractor:
                  endpoint: str | None = None, 
                  api_key: str | None = None, 
                  env_alias: str | None = None,
-                 validator: BaseValidator | None = None,
+                 validator: BaseValidator,
                  context_length: int = 0):
 
         async_client = AsyncClient()
@@ -87,8 +61,6 @@ class DataExtractor:
             self.agent: Agent = Agent(
                 model = ExternalModel(api_key = api_key,endpoint=endpoint, model_name=model_name, env_alias = env_alias, http_client=async_client)
             )
-        if validator is None:
-            validator = DefaultValidator()
         self.agent.result_validator(validator.validate)
 
     def set_system_prompt(self, new_system_prompt):
@@ -157,15 +129,10 @@ class DataExtractor:
             return DataExtractor.__select_system_prompt__(selfconsistency, cot, output_format)
         
         cleaned_html = HTML_Cleaner.clean_without_download(url=html_path, tags=['script', 'style'], html_content=html_content, is_local=is_local, context_length=self.__context_length)
-        # print(cleaned_html)
         print(f'HTML Length: {len(cleaned_html)}')
         is_splited = False
-        if self.__context_length < len(cleaned_html)+1000:
-            splited_html = HTML_Cleaner.split_html_with_beautifulsoup(cleaned_html, self.__context_length - 2000)
-            is_splited = True
         retries = 0
         is_valid = False
-        chunk_index = 0
         while not is_valid and retries < 3: # poner retries como un parametro
             
     
@@ -297,11 +264,3 @@ class DataExtractor:
         return result, usage
 
             
-
-            
-
-    
-  
-    
-
-
