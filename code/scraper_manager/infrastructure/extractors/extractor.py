@@ -13,9 +13,16 @@ from statistics import mean
 from scraper_manager.application.entities.extractor_settings import DataExtractorSettings
 from scraper_manager.application.interfaces.extractor_interface import BaseExtractor
 
-SCRAPED_RESPONSE_FORMAT = {"type": "json_object", "schema": ScrapedResponse.model_json_schema()}
-RESPONSE_FORMAT = {"type": "json_object", "schema": Response.model_json_schema()}
-
+# SCRAPED_RESPONSE_FORMAT = {"type": "json_schema", "json_schema": ScrapedResponse.model_json_schema()}
+RESPONSE_FORMAT = {"type": "json_schema", "json_schema": Response.model_json_schema()}
+SCRAPED_RESPONSE_FORMAT = {
+    "type": "json_schema",
+    "json_schema": {
+        "name": "ScrapedResponse",
+        "strict": "true",  # <--- IMPORTANTE: Validación estricta
+        "schema": ScrapedResponse.model_json_schema()  # El esquema Pydantic generado
+    }
+}
 
 class DataExtractor(BaseExtractor):
     """
@@ -68,11 +75,43 @@ class DataExtractor(BaseExtractor):
          def set():
             return new_system_prompt
 
+
     async def extract(self, query: str, *,
                         html_content: str,
                         settings: DataExtractorSettings = None,
                         html_path: str = None,
                         is_local: bool = False,
+                        refinement: bool = True,
+                        selfconsistency: bool = False,
+                        separated_selfconsistency: bool = False,
+                        cot: bool = True,
+                        output_format: dict,
+                        in_chunks: bool = False,
+                        chunks: list) -> Tuple[ScrapedResponse, Usage]:
+        
+        if in_chunks:
+            print(f'LEN CHUNKS: {len(chunks)}')
+            return await self.__extract_in_chunks(query = query, 
+                                                  chunks = chunks, 
+                                                  settings = settings, 
+                                                  refinement = refinement, 
+                                                  selfconsistency = selfconsistency, 
+                                                  separated_selfconsistency = separated_selfconsistency, 
+                                                  cot = cot, 
+                                                  output_format = output_format)
+        else:
+            return await self.__extract(query, 
+                                        html_content = html_content, 
+                                        settings = settings, 
+                                        refinement = refinement, 
+                                        selfconsistency = selfconsistency, 
+                                        separated_selfconsistency = separated_selfconsistency, 
+                                        cot = cot, 
+                                        output_format = output_format)
+
+    async def __extract(self, query: str, *,
+                        html_content: str,
+                        settings: DataExtractorSettings = None,
                         refinement: bool = True,
                         selfconsistency: bool = False,
                         separated_selfconsistency: bool = False,
@@ -128,9 +167,11 @@ class DataExtractor(BaseExtractor):
         def set_system_prompt():
             return DataExtractor.__select_system_prompt__(selfconsistency, cot, output_format)
         
-        cleaned_html = HTML_Cleaner.clean_without_download(url=html_path, tags=['script', 'style'], html_content=html_content, is_local=is_local, context_length=self.__context_length)
+        cleaned_html = html_content
+        
+        # cleaned_html = HTML_Cleaner.clean_without_download(url=html_path, tags=['script', 'style'], html_content=html_content, is_local=is_local, context_length=self.__context_length)
         print(f'HTML Length: {len(cleaned_html)}')
-        is_splited = False
+        # is_splited = False
         retries = 0
         is_valid = False
         while not is_valid and retries < 3: # poner retries como un parametro
@@ -142,6 +183,8 @@ class DataExtractor(BaseExtractor):
                     return response
                 else:
                     scraped_data = await self.agent.run(f'{query}:\n{cleaned_html}', model_settings=self.settings, deps=selfconsistency) 
+            except TimeoutError as t:
+                return ScrapedResponse(is_valid=False, explanation='Timeout error', feedback='Timeout error', final_answer=[], refinement_count=retries), Usage(request_tokens=len(query), response_tokens=0, total_tokens=len(query))
             except Exception as e:
                     return ScrapedResponse(is_valid=False, explanation=e.message, feedback=e.message, final_answer=[], refinement_count=retries), Usage(request_tokens=len(query), response_tokens=0, total_tokens=len(query))
 
@@ -157,6 +200,52 @@ class DataExtractor(BaseExtractor):
 
         scraped_data.data.refinement_count = retries
         return (scraped_data.data, scraped_data.usage())
+
+
+    async def __extract_in_chunks(self, query, chunks, settings, refinement, selfconsistency, separated_selfconsistency, cot, output_format):
+        scraped_data_collection = []
+        usages = []
+        for chunk in chunks:
+            scraped_data = await self.__extract(query = query, 
+                                                html_content = chunk, 
+                                                settings = settings, 
+                                                refinement = refinement, 
+                                                selfconsistency = selfconsistency, 
+                                                separated_selfconsistency = separated_selfconsistency, 
+                                                cot = cot, 
+                                                output_format = output_format)
+            scraped_data_collection.append(scraped_data[0])
+            usages.append(scraped_data[1])
+        print("MERGING CHUNKS...")
+        return self.__merge_chunks(scraped_data_collection, usages)
+
+
+    def __merge_chunks(self, scraped_data_collection, usages):
+        result = ScrapedResponse(final_answer=[])
+        usage = Usage(request_tokens=0, total_tokens=0, response_tokens=0)
+        print(scraped_data_collection)
+        print(usages)
+
+        for partial_response in scraped_data_collection:
+            if not partial_response.is_valid:
+                result.is_valid = False
+            result.scraped_data.extend(partial_response.scraped_data)
+            result.explanation += partial_response.explanation  # hacer algo con la explicacion
+            result.refinement_count=partial_response.refinement_count
+
+        for partial_usage in usages:
+            usage.request_tokens+=partial_usage.request_tokens
+            print("xxx")
+
+            usage.response_tokens+=partial_usage.response_tokens
+            print("xxx")
+
+            usage.total_tokens+=partial_usage.total_tokens
+            print("xxx")
+
+
+        return result, usage
+
 
     @staticmethod
     def __select_system_prompt__(selfconsistency: bool, cot: bool, output_format: dict):

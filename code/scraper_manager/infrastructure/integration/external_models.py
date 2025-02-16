@@ -265,8 +265,12 @@ class ExternalAgentModel(AgentModel):
                 request.response_format = model_settings['response_format']
             if model_settings['timeout']:
                 timeout = model_settings['timeout']
-        request_json = request.model_dump_json(by_alias=True)
 
+        request_json = request.model_dump_json(by_alias=True)
+        # print(request_json)
+      
+        
+        # print(request.response_format)
         headers = {
             "Authorization": f"Bearer {self.auth.api_key}",
             "Content-Type": "application/json",
@@ -277,7 +281,7 @@ class ExternalAgentModel(AgentModel):
             self.endpoint,
             content=request_json,
             headers=headers,
-            timeout=timeout
+            timeout=240
         ) as response:
             if response.status_code != 200:
                 print("STATUS CODE != 200")
