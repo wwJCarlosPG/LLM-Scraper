@@ -13,14 +13,20 @@ from statistics import mean
 from scraper_manager.application.entities.extractor_settings import DataExtractorSettings
 from scraper_manager.application.interfaces.extractor_interface import BaseExtractor
 
-# SCRAPED_RESPONSE_FORMAT = {"type": "json_schema", "json_schema": ScrapedResponse.model_json_schema()}
-RESPONSE_FORMAT = {"type": "json_schema", "json_schema": Response.model_json_schema()}
+RESPONSE_FORMAT = {
+    "type": "json_schema",
+    "json_schema": {
+        "name": "ScrapedResponse",
+        "strict": "true",  
+        "schema": Response.model_json_schema()  
+    }
+}
 SCRAPED_RESPONSE_FORMAT = {
     "type": "json_schema",
     "json_schema": {
         "name": "ScrapedResponse",
-        "strict": "true",  # <--- IMPORTANTE: Validación estricta
-        "schema": ScrapedResponse.model_json_schema()  # El esquema Pydantic generado
+        "strict": "true",  
+        "schema": ScrapedResponse.model_json_schema()  
     }
 }
 
@@ -41,7 +47,7 @@ class DataExtractor(BaseExtractor):
             api_key (str, optional): The API key for authentication. Defaults to None.
             env_alias (str, optional): The environment alias for the external model. Defaults to None.
             validator (BaseValidator): A validator to verify extracted data.
-            settings (DataExtractor): 
+            settings (dict, optional): Aditional settings for extractor. 
      """
     def __init__(self, *, 
                  model_name: str, 
@@ -49,20 +55,29 @@ class DataExtractor(BaseExtractor):
                  api_key: str | None = None, 
                  env_alias: str | None = None,
                  validator: BaseValidator,
-                 context_length: int = 0):
+                 settings: dict | None = None):
 
         async_client = AsyncClient()
-        self.__context_length = context_length
-        self.settings = DataExtractorSettings(
-        temperature=0.5, 
-        max_tokens=10000, 
-        timeout=60.0,
-        response_format = SCRAPED_RESPONSE_FORMAT 
-    )
+        
+        if settings is None:
+            self.settings = DataExtractorSettings(
+                temperature=0.5, 
+                max_tokens=10000, 
+                timeout=60.0,
+                response_format = SCRAPED_RESPONSE_FORMAT 
+            )
+        else:
+            for key in settings.keys():
+                valid_keys = set(DataExtractorSettings.__annotations__.keys())
+                if key not in valid_keys:
+                    raise ValueError(f"Invalid setting key: {key}")
+            self.settings = settings
+
+        
         self.model_name = model_name
         if endpoint is None:
             self.agent: Agent = Agent(
-                model=model_name, model_settings=self.settings
+                model=model_name
             )
         else:
             self.agent: Agent = Agent(
@@ -169,12 +184,10 @@ class DataExtractor(BaseExtractor):
         
         cleaned_html = html_content
         
-        # cleaned_html = HTML_Cleaner.clean_without_download(url=html_path, tags=['script', 'style'], html_content=html_content, is_local=is_local, context_length=self.__context_length)
         print(f'HTML Length: {len(cleaned_html)}')
-        # is_splited = False
         retries = 0
         is_valid = False
-        while not is_valid and retries < 3: # poner retries como un parametro
+        while not is_valid and retries < 3: 
             
     
             try:
@@ -266,12 +279,9 @@ class DataExtractor(BaseExtractor):
         usage = Usage()
         usages = []
         while i < 3:
-            # try:
                 scraped_data = await self.agent.run(f'{query}:\n{cleaned_html}', model_settings=self.settings, deps=selfconsistency) 
                 scraped_data_collection.append(scraped_data.data)
                 usages.append(scraped_data.usage())
-            # except Exception:
-                # pass
                 i+=1
         
         if scraped_data_collection != []:

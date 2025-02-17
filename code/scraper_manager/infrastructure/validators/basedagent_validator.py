@@ -31,7 +31,8 @@ class BasedAgentValidator(BaseValidator):
                  model_name:str,
                  endpoint: str | None = None,
                  api_key: str | None = None,
-                 env_alias: str | None = None):
+                 env_alias: str | None = None,
+                 settings: dict | None = None):
         """
         Initializes the BasedAgentValidator with the provided parameters.
 
@@ -40,24 +41,34 @@ class BasedAgentValidator(BaseValidator):
             endpoint (str, optional): The API endpoint of the validation service.
             api_key (str, optional): API key for authentication.
             env_alias (str, optional): Environment variable alias for retrieving API keys.
+            settings (dict, optional): Additional settings for the validator.
 
         Raises:
             ValueError: If no valid API key is provided or found in environment variables.
         """
-        self.validator_settings = BasedAgentValidatorSettings(
-        temperature=0.5, 
-        timeout=60.0, 
-        max_tokens=3000, 
-        response_format = {
-    "type": "json_schema",
-    "json_schema": {
-        "name": "ValidatorResponse",
-        "strict": "true", 
-        "schema": ValidatorResponse.model_json_schema()  
-    }
-}
-        # response_format={"type": "json_object", "schema": ValidatorResponse.model_json_schema()} 
-)
+        if settings is None:
+            self.validator_settings = BasedAgentValidatorSettings(
+            temperature=0.5, 
+            timeout=60.0, 
+            max_tokens=3000, 
+            response_format = {
+        "type": "json_schema",
+        "json_schema": {
+            "name": "ValidatorResponse",
+            "strict": "true", 
+            "schema": ValidatorResponse.model_json_schema()  
+                }
+            }
+        )
+        else:
+            for key in settings.keys():
+                valid_keys = set(BasedAgentValidatorSettings.__annotations__.keys())
+                if key not in valid_keys:
+                    raise ValueError(f"Invalid setting key: {key}")
+            self.settings = settings
+            
+
+
         async_client = AsyncClient()
         self.model_name = model_name
         if endpoint is None:

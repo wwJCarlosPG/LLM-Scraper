@@ -40,7 +40,8 @@ def get_system_prompt_without_COT(output_format):
         - Your response must be a valid and complete JSON object. It must begin with {{ and end with }}.  
         - No text outside "final_answer".  
         - Close all brackets and avoid trailing commas.  
-        - If a value is missing, return "NotFound", not None or any other placeholder.  
+        - If a value is missing, return "NotFound", not None or any other placeholder.
+        - If no information matching the query is found in the HTML, return an empty array in the "final_answer" field  
 
 """
     return system_prompt_without_COT
@@ -71,6 +72,8 @@ def get_system_prompt_with_COT(output_format):
     - No text outside "explanation" and "final_answer".  
     - Close all brackets and avoid trailing commas.  
     - If a value is missing, return "NotFound", not None or any other placeholder.  
+    - If no information matching the query is found in the HTML, return an empty array in the "final_answer" field  
+
     """
     return system_prompt
 
@@ -113,6 +116,8 @@ def get_full_system_prompt(output_format):
             - Use Self-Consistency: Ensure all responses are reasonable and logically consistent.
             - The "final_answer" must always be a list of dictionaries, where each dictionary represents an extracted entity.
             - If an extracted value is missing or None, replace it with "NotFound".
+            - If no information matching the query is found in the HTML, return an empty array in the "final_answer" field  
+
 
 """
     return system_prompt
