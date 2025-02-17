@@ -1,6 +1,8 @@
+from scraper_manager.application.utils import get_html_content
+from scraper_manager.application.interfaces.storage_interface import BaseStorage
 from scraper_manager.application.interfaces.extractor_interface import BaseExtractor
 from scraper_manager.application.interfaces.html_cleaner_interface import BaseHTMLCleaner
-from scraper_manager.application.interfaces.storage_interface import BaseStorage
+
 class DataProcessingHandler:
     def __init__(self, extractor: BaseExtractor, html_cleaner: BaseHTMLCleaner, storage: BaseStorage):
         self.extractor = extractor
@@ -8,7 +10,16 @@ class DataProcessingHandler:
         self.storage = storage
 
     
-    async def excecute(self, query: str, html: str, selfconsistency: bool, cot: bool, refinement: bool, separated_selfconsistency: bool, context_length, output_format: dict):
+    async def excecute(self, *,
+                       query: str, 
+                       html: str | None = None,
+                       html_url: str | None = None, 
+                       selfconsistency: bool = False, 
+                       cot: bool = True, 
+                       refinement: bool = False, 
+                       separated_selfconsistency: bool = False, 
+                       context_length, 
+                       output_format: dict):
         """_summary_
 
         Args:
@@ -21,6 +32,12 @@ class DataProcessingHandler:
             output_format (dict): _description_
         """
         chunks = []
+        if html is None:
+            if html_url is not None:
+                html = get_html_content(html_url)
+            else:
+                raise ValueError(f"html parameter and html_url parameter can't be None at the same time.")
+
         html = self.html_cleaner.clean_by_tag(html, [], context_length)
         print(len(html))
         print(context_length - len(html))

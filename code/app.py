@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 
 async def main():
     load_dotenv()
-    
+    html = ""
     # LM Studio section
     # api_key1 = 'lm-studio'
     # endpoint1 = 'http://localhost:1234/v1/chat/completions'

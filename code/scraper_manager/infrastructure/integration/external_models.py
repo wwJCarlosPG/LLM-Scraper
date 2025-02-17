@@ -128,7 +128,10 @@ class ExternalModel(Model):
                  ):
         
         super().__init__()
-        if api_key == None:
+        if env_alias is None:
+            env_alias = endpoint.replace('/','_').replace('.','').replace(':','')
+
+        if api_key is None:
             if env_api_key := os.getenv(env_alias):
                 api_key = env_api_key
             else:

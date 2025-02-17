@@ -93,17 +93,6 @@ class DefaultHTMLCleaner:
                     continue
                 tag.unwrap()
 
-            cleaned_html = str(soup)
-            # print(f"6: {cleaned_html.index('$27')}")
-
-            cleaned_html = str(soup)
-            # # print(cleaned_html)
-            # # merge nodes with text, for example: <strong>Hello</strong> <p>World</p>
-            # for element in soup.find_all(text=True):
-            #     if element.parent and element.parent.name not in ['script', 'style']:
-            #         if element.previous_sibling and isinstance(element.previous_sibling, NavigableString):
-            #             element.previous_sibling.string += element.string
-            #             element.extract()
 
             cleaned_html = str(soup)
             # print(f"7: {cleaned_html.index('$27')}")
@@ -155,27 +144,7 @@ class DefaultHTMLCleaner:
 
             return cleaned_html
             
-            # # clean level 6
-            # # leave just the text
-            # return soup.get_text('\n', strip=True)
 
-
-    # def split_html(self, html_content: str, chunk_size: int) -> list[str]:
-    #     soup = BeautifulSoup(html_content, 'html.parser')
-    #     fragments = []
-    #     current_fragment = ''
-
-    #     for element in soup.body.descendants:
-    #         element_string = str(element)
-    #         if len(current_fragment) + len(element_string) <= chunk_size:
-    #             current_fragment += element_string
-    #         else:
-    #             fragments.append(current_fragment)
-    #             current_fragment = element_string
-
-    #     if current_fragment:
-    #         fragments.append(current_fragment)
-    #     return fragments
     def split_html(self, html: str, chunk_size: int) -> list[str]:
         """
         Divide un HTML en fragmentos, asegurándose de que cada fragmento no exceda un tamaño máximo,
