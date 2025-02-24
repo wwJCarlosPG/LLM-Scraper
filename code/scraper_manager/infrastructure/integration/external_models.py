@@ -101,17 +101,24 @@ class ExternalRequest(BaseModel):
 
 
 class ExternalModel(Model):
-    """Represents an external model that interacts with an API.
+    """
+    Represents an external model that interacts with an API.
+
+    This class handles authentication and communication with an external language
+    model accessed through an API endpoint.  It allows for specifying the API key
+    directly or retrieving it from an environment variable.
 
     Args:
-        api_key (str | None): API key for authentication.
+        api_key (str | None): API key for authentication. If None, the key
+            will be retrieved from the environment variable specified by `env_alias`.
         model_name (str): The name of the model to be used.
         endpoint (str): The API endpoint URL.
         env_alias (str): The environment variable alias to retrieve the API key.
-        http_client (AsyncHTTPClient | None): HTTP client for async requests.
+        http_client (AsyncHTTPClient | None): HTTP client for async requests. If None, a new AsyncClient will be created
 
     Raises:
-        Exception: If the API key is not provided or set in the environment variable.
+        ValueError: If the API key is not provided and the specified environment
+            variable is not set.
 
     Attributes:
         auth (ApiKeyAuth): API authentication instance.
@@ -126,6 +133,22 @@ class ExternalModel(Model):
                  env_alias: str,
                  http_client: AsyncHTTPClient | None 
                  ):
+        """
+            Initializes an ExternalModel instance.
+
+            Sets up the authentication, model name, endpoint, and HTTP client for
+            communicating with the external API.
+
+            Args:
+                api_key (str | None): API key for authentication.
+                model_name (str): The name of the model to be used.
+                endpoint (str): The API endpoint URL.
+                env_alias (str): The environment variable alias to retrieve the API key.
+                http_client (AsyncHTTPClient | None): HTTP client for async requests.
+            Raises:
+                ValueError: If the API key is not provided and the specified environment
+                    variable is not set.
+        """
         
         super().__init__()
         if env_alias is None:
@@ -147,15 +170,20 @@ class ExternalModel(Model):
     function_tools: list[ToolDefinition],
     allow_text_result: bool,
     result_tools: list[ToolDefinition]) -> AgentModel:
-        """Creates an instance of the ExternalAgentModel.
+        """
+        Creates an instance of the ExternalAgentModel.
+
+        This method is used to create an `ExternalAgentModel` instance, which
+        is responsible for interacting with the external API using the
+        specified tools and settings.
 
         Args:
-            function_tools (list[ToolDefinition]): A list of function tools.
-            allow_text_result (bool): Flag to allow text-based responses.
-            result_tools (list[ToolDefinition]): Tools used to process results.
+            function_tools (List[ToolDefinition]): A list of function tools that the agent can use.
+            allow_text_result (bool): Flag indicating whether text-based responses are allowed.
+            result_tools (List[ToolDefinition]): Tools used to process the results from the API.
 
         Returns:
-            AgentModel: An instance of ExternalAgentModel.
+            AgentModel: An instance of `ExternalAgentModel` configured to interact with the external API.
         """
         return ExternalAgentModel(
             function_tools = function_tools,

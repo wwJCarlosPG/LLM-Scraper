@@ -147,16 +147,17 @@ class DefaultHTMLCleaner:
 
     def split_html(self, html: str, chunk_size: int) -> list[str]:
         """
-        Divide un HTML en fragmentos, asegurándose de que cada fragmento no exceda un tamaño máximo,
-        que se divida al final de una etiqueta y que los fragmentos no se solapen.
+        Divides an HTML document into fragments, ensuring that each fragment does not exceed a maximum size,
+        that the division occurs at the end of a tag, and that the fragments do not overlap.
 
         Args:
-            html: El HTML a dividir.
-            max_length: El tamaño máximo de cada fragmento (en caracteres).
+            html: The HTML content to be split.
+            chunk_size: The maximum size of each fragment.
 
         Returns:
-            Una lista de fragmentos HTML.
+            A list of HTML fragments.
         """
+
 
         soup = BeautifulSoup(html, "html.parser")
         fragments = []

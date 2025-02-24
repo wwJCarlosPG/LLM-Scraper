@@ -12,21 +12,28 @@ from scraper_manager.infrastructure.exceptions.exceptions import InvalidResultDu
 
 class BasedAgentValidator(BaseValidator):
     """
-    An AI-based validator that uses an external model to assess data accuracy 
-    against the user query and HTML content.
+    Class for validating extracted data using an agent based on PydanticAI or an external model.
+
+    This class is initialized with a language model (PydanticAI or an external model)
+    and a validation system. It uses the model to evaluate the validity of the
+    extracted data and provides an explanation.
 
     Attributes:
+        validator_settings (BasedAgentValidatorSettings): Settings for the validator agent.
+        model_name (str): Name of the language model to use.
+        agent (Agent): The PydanticAI agent responsible for validation.
+
+    Args:
         model_name (str): The name of the model to be used for validation.
-        endpoint (str, optional): API endpoint for external model calls.
-        api_key (str, optional): API key for authentication.
-        env_alias (str, optional): Environment variable alias for the API key.
-        agent (Agent): The agent responsible for running validation queries.
+        endpoint (str, optional): The API endpoint for the external model. Defaults to None.
+        api_key (str, optional): The API key for authentication of the external model. Defaults to None.
+        env_alias (str, optional): The environment alias for the external model. Defaults to None.
+        settings (dict, optional): Custom settings for the validator. Defaults to None.
 
-    Methods:
-        validate(run_context: RunContext, response_to_validate: str) -> Union[ValidatorResponse, ScrapedResponse]:
-            Performs validation using an AI model based on the given user query.
+    Raises:
+        `ValueError`: If an invalid setting is provided.
     """
-
+ 
     def __init__(self, *,
                  model_name:str,
                  endpoint: str | None = None,
@@ -34,18 +41,27 @@ class BasedAgentValidator(BaseValidator):
                  env_alias: str | None = None,
                  settings: dict | None = None):
         """
-        Initializes the BasedAgentValidator with the provided parameters.
+        Initializes a BasedAgentValidator instance.
+
+        Configures the validator based on a PydanticAI agent or an external model,
+        setting the necessary configurations and the connection to the language model.
 
         Args:
-            model_name (str): The name of the AI model used for validation.
-            endpoint (str, optional): The API endpoint of the validation service.
-            api_key (str, optional): API key for authentication.
-            env_alias (str, optional): Environment variable alias for retrieving API keys.
-            settings (dict, optional): Additional settings for the validator.
+            model_name (str): The name of the language model to use.
+            endpoint (str, optional): The API endpoint for the external model.
+                If provided, an `ExternalModel` is used. Defaults to None.
+            api_key (str, optional): The API key to authenticate with the external model. If not provided
+             and `ExternalModel` is used then env_alias is required. Defaults to None.
+            env_alias (str, optional): An alias for the environment, used for the external model.
+                Defaults to None.
+            settings (dict, optional): A dictionary with custom settings for the validator.
+                If not provided, the default settings defined in
+                `BasedAgentValidatorSettings` are used. Defaults to None.
 
         Raises:
-            ValueError: If no valid API key is provided or found in environment variables.
+            ValueError: If an invalid setting key is provided in `settings`.
         """
+        
         if settings is None:
             self.validator_settings = BasedAgentValidatorSettings(
             temperature=0.5, 
@@ -83,15 +99,16 @@ class BasedAgentValidator(BaseValidator):
             )
         self.agent.result_validator(self.self_validate)
         
-    def self_validate(self, response_to_validate: str):
+    def self_validate(self, response_to_validate: str) -> ValidatorResponse:
         """
         Validates the provided JSON string by converting it to a `ValidatorResponse` object.
 
         Args:
-            data (str): JSON formatted string containing validation data.
+            response_to_validate (str): JSON formatted string containing validation data.
 
         Returns:
-            ValidatorResponse: A validated response object.
+            `ValidatorResponse`: 
+            - A validated response object.
         """
         try:
             json_response = json.loads(response_to_validate)
@@ -123,41 +140,41 @@ class BasedAgentValidator(BaseValidator):
     
     async def validate(self, run_context: RunContext, response_to_validate: str) -> ScrapedResponse:
         """
-        Validates the extracted data using an AI-based agent.
+            Validates the extracted data using an AI-based validation agent.
 
-        Args:
-            run_context (RunContext): The context of the current run, containing user messages.
-            response_to_validate (str): JSON formatted response to be validated.
+            This method takes an execution context (`RunContext`) and a response to validate
+            (in JSON format), and uses the validation agent to determine whether the data
+            is valid. If validation is successful, it returns a valid `ScrapedResponse` object;
+            otherwise, it raises an exception.
 
-        Returns:
-            ScrapedResponse: 
-            - A valid scraped response if validation is successful.
+            Args:
+                run_context (RunContext): The context of the current run, containing user messages.
+                response_to_validate (str): JSON formatted response to be validated.
+
+            Returns:
+                `ScrapedResponse`: 
+                - A valid scraped response if validation is successful.
+
+            Raises:
+                `InvalidValidationFormat`: If the format of the response to validate is invalid.
+                `InvalidResultDuringValidation`: If an error occurs during the validation process.
 
         """
-        # start = response_to_validate.find('{')
-        # reversed_response = response_to_validate[::-1]
-        # reversed_end = reversed_response.find('}')
-        # end = len(response_to_validate) - reversed_end - 1 
-        # response_to_validate[start:end+1]
-
-        # response_to_validate = response_to_validate[start:end+1]
-        # print(response_to_validate)
         try:
             json_response = json.loads(response_to_validate)
         except Exception:
-            response_to_validate = response_to_validate.lstrip() #Quita espacios en blanco al inicio
+            response_to_validate = response_to_validate.lstrip() # remove spaces at the begining
             if response_to_validate.startswith("```json"):
-                response_to_validate = response_to_validate[len("```json"):]  # Elimina "```json" del inicio
+                response_to_validate = response_to_validate[len("```json"):]  # Remove "```json"
             elif response_to_validate.startswith("```"):
                 response_to_validate = response_to_validate[len("```"):]
 
-            response_to_validate = response_to_validate.rstrip() #Quita espacios en blanco al final
+            response_to_validate = response_to_validate.rstrip() # remove spaces at the end
             if response_to_validate.endswith("```"):
-                response_to_validate = response_to_validate[:-len("```")]  # Elimina "```" del final
+                response_to_validate = response_to_validate[:-len("```")]  
 
             response_to_validate = response_to_validate.strip() 
             response_to_validate = response_to_validate.strip("\n\t")
-            # response_to_validate = response_to_validate.encode('utf-8').decode('unicode_escape')
             if not response_to_validate.startswith('{'):
                 response_to_validate = '{' + response_to_validate
             if not response_to_validate.endswith('}'):
@@ -170,9 +187,7 @@ class BasedAgentValidator(BaseValidator):
             if selfconsistency:
                 scraped_response_collection = Response.model_validate_json(response_to_validate, strict=False)
                 scraped_response = find_majority(scraped_response_collection.responses)
-                # print(scraped_response) 
             else:
-                # print(response_to_validate)
                 scraped_response = ScrapedResponse.model_validate_json(response_to_validate,strict=False)
 
             messages = run_context.messages

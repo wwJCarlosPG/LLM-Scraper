@@ -39,8 +39,8 @@ async def main():
     load_dotenv()
     
     settings = {"temperature": 0.5, "max_tokens":10000, "timeout":120.0}
-    query = "Find all news headlines about sports."
-    link = 'https://www.bbc.com'
+    query = "Extrae los autores del artículo, el título y las preguntas que se hacen en la noticia."
+    link = 'http://www.cubadebate.cu/especiales/2025/02/17/la-hora-de-las-criptomonedas-en-cuba/'
 
     with open('pages/dataset/bbc/bbc___1___2011.html', 'r') as f:
         html = f.read()
@@ -57,14 +57,14 @@ async def main():
     dph = DataProcessingHandler(extractor = extractor, html_cleaner = html_cleaner, storage = local_storage)
     await dph.excecute(
         query = query, 
-        html=html,
-        # html_url= 'https://www.bbc.com',
+        # html=html,
+        html_url= link,
         selfconsistency = False,
         cot=True, 
         refinement=False,
         separated_selfconsistency=False, 
         context_length=32000,
-        output_format={"Headline": "Value of Headline"})
+        output_format={"Autores": "Valor del campo de autores", "Titulo":"Valor del titulo de la noticia", "Preguntas":"Valor de las preguntas que se hacen en la noticia"})
     
     
 

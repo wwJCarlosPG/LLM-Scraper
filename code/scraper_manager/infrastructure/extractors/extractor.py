@@ -34,21 +34,23 @@ class DataExtractor(BaseExtractor):
     """
         A class for extracting structured data from HTML content using a language model.
 
-        This class initializes an AI agent to process queries and extract relevant data 
-        from provided HTML pages. A validation mechanism can be optionally applied to 
+        This class initializes an AI agent to process queries and extract relevant data
+        from provided HTML pages. A validation mechanism can be optionally applied to
         ensure the quality of the extracted data.
 
         Attributes:
+            settings (DataExtractorSettings): Configuration settings for the data extractor.
+            model_name (str): The name of the language model to be used for data extraction.
             agent (Agent): The Pydantic AI agent responsible for executing queries.
-        
+
         Args:
             model_name (str): The name of the model to be used for data extraction.
             endpoint (str, optional): The API endpoint for the model. Defaults to None.
             api_key (str, optional): The API key for authentication. Defaults to None.
             env_alias (str, optional): The environment alias for the external model. Defaults to None.
             validator (BaseValidator): A validator to verify extracted data.
-            settings (dict, optional): Aditional settings for extractor. 
-     """
+            settings (dict, optional): Additional settings for the extractor.
+    """
     def __init__(self, *, 
                  model_name: str, 
                  endpoint: str | None = None, 
@@ -56,6 +58,28 @@ class DataExtractor(BaseExtractor):
                  env_alias: str | None = None,
                  validator: BaseValidator,
                  settings: dict | None = None):
+        """
+        Initializes a `DataExtractor` instance.
+
+        Configures the data extractor with the specified language model, validator,
+        and settings. It sets up the AI agent to process queries and extract data
+        from HTML content.
+
+        Args:
+            model_name (str): The name of the language model to use.
+            endpoint (str, optional): The API endpoint for the external model.
+                If provided, an `ExternalModel` is used. Defaults to None.
+            api_key (str, optional): The API key to authenticate with the external model.
+                If not provided and `ExternalModel` is used then env_alias is required. Defaults to None.
+            env_alias (str, optional): An alias for the environment, used for the external model.
+                Defaults to None.
+            validator (BaseValidator): A validator instance to verify extracted data.
+            settings (dict, optional): A dictionary with custom settings for the extractor.
+                If not provided, the default settings defined in `DataExtractorSettings` are used.
+            context_length (int): The maximum context length.
+        Raises:
+            `ValueError`: If an invalid setting key is provided in `settings`.
+        """
 
         async_client = AsyncClient()
         
@@ -86,6 +110,16 @@ class DataExtractor(BaseExtractor):
         self.agent.result_validator(validator.validate)
 
     def set_system_prompt(self, new_system_prompt):
+         """
+        Sets a new system prompt for the AI agent.
+
+        This method allows you to dynamically update the system prompt of the agent,
+        which can be useful for adapting the agent's behavior based on different
+        extraction requirements.
+
+        Args:
+            new_system_prompt (str): The new system prompt to be set for the agent.
+        """
          @self.agent.system_prompt
          def set():
             return new_system_prompt
@@ -94,8 +128,6 @@ class DataExtractor(BaseExtractor):
     async def extract(self, query: str, *,
                         html_content: str,
                         settings: DataExtractorSettings = None,
-                        html_path: str = None,
-                        is_local: bool = False,
                         refinement: bool = True,
                         selfconsistency: bool = False,
                         separated_selfconsistency: bool = False,
@@ -104,8 +136,30 @@ class DataExtractor(BaseExtractor):
                         in_chunks: bool = False,
                         chunks: list) -> Tuple[ScrapedResponse, Usage]:
         
+        """
+        Extracts structured data from HTML content using a language model and optional chunking.
+
+        This method serves as the main entry point for data extraction. It determines
+        whether to process the HTML content in chunks or as a whole, and calls the
+        appropriate extraction method.
+
+        Args:
+            query (str): A natural language query specifying the data to extract.
+            html_content (str): A string containing the raw HTML content to be processed.
+            settings (DataExtractorSettings, optional): Custom settings for this extraction.
+            refinement (bool, optional): Enables iterative refinement of the extraction. Defaults to True.
+            selfconsistency (bool, optional): Enables self-consistency checks. Defaults to False.
+            separated_selfconsistency (bool, optional): Enables separated self-consistency. Defaults to False.
+            cot (bool, optional): Enables chain-of-thought prompting. Defaults to True.
+            output_format (dict): Desired format for the output data.
+            in_chunks (bool, optional): If True, the HTML will be processed in chunks. Defaults to False.
+            chunks (list): A list of HTML chunks if processing in chunks.
+
+        Returns:
+            Tuple[ScrapedResponse, Usage]: A tuple containing the scraped response and usage information.
+        """
+        
         if in_chunks:
-            print(f'LEN CHUNKS: {len(chunks)}')
             return await self.__extract_in_chunks(query = query, 
                                                   chunks = chunks, 
                                                   settings = settings, 
@@ -132,44 +186,23 @@ class DataExtractor(BaseExtractor):
                         separated_selfconsistency: bool = False,
                         cot: bool = True,
                         output_format: dict) -> Tuple[ScrapedResponse, Usage]:
-        """ 
-            Extract structured data from an HTML document using a natural language query.
+        """
+        Extract structured data from an HTML document using a natural language query.
 
-            This method processes an HTML document (provided as content or a file path), 
-            cleans unnecessary elements such as `<script>` and `<style>` tags, and uses 
-            an AI agent to extract relevant data based on the given query.
+        Args:
+            query (str):
+                A natural language query specifying the data to extract from the HTML.
+            html_content (str):
+                A string containing the raw HTML content to be processed.
 
-            Args:
-                query (str): 
-                    A natural language query specifying the data to extract from the HTML.
-                html_content (str): 
-                    A string containing the raw HTML content to be processed.
-                html_path (str, optional): 
-                    Path to the HTML file if available. If provided, the content will be read from the file. 
-                    Defaults to None.
-                is_local (bool, optional): 
-                    Indicates whether the provided HTML path points to a local file. 
-                    If True, the file will be read locally; otherwise, it will be treated as a URL. 
-                    Defaults to False.
+        Returns:
+            Tuple[ScrapedResponse, Usage]:
+                A tuple containing the extracted data in a structured format and usage information.
 
-            Returns:
-                dict: 
-                    A dictionary containing the extracted data in a structured format.
-
-            Raises:
-                ValueError: If both `html_content` and `html_path` are missing.
-                Exception: If an issue occurs during data extraction.
-                InvalidResultDuringValidation: If an error ocurred during validation.
-
-            Example:
-                ```python
-                extractor = DataExtractor(model_name="gpt-4")
-                extracted_data = await extractor.extract(
-                    query="Extract all news headlines",
-                    html_content="<html><body><h1>News</h1></body></html>"
-                )
-                print(extracted_data)
-                ```
+        Raises:
+            ValueError: If both `html_content` and `html_path` are missing.
+            Exception: If an issue occurs during data extraction.
+            InvalidResultDuringValidation: If an error occurred during validation.
         """
         if settings is not None:
             self.settings = settings
@@ -216,6 +249,27 @@ class DataExtractor(BaseExtractor):
 
 
     async def __extract_in_chunks(self, query, chunks, settings, refinement, selfconsistency, separated_selfconsistency, cot, output_format):
+        """
+        Extracts data from HTML content by processing it in chunks.
+
+        This method splits the HTML content into smaller chunks and processes each chunk
+        separately using the __extract method. It then merges the results from each chunk
+        to produce a final result.
+
+        Args:
+            query (str): A natural language query specifying the data to extract.
+            chunks (list): A list of HTML chunks to be processed.
+            settings (DataExtractorSettings, optional): Custom settings for this extraction.
+            refinement (bool, optional): Enables iterative refinement of the extraction.
+            selfconsistency (bool, optional): Enables self-consistency checks.
+            separated_selfconsistency (bool, optional): Enables separated self-consistency.
+            cot (bool, optional): Enables chain-of-thought prompting.
+            output_format (dict): Desired format for the output data.
+
+        Returns:
+            Tuple[ScrapedResponse, Usage]: A tuple containing the scraped response and usage information.
+        """
+        
         scraped_data_collection = []
         usages = []
         for chunk in chunks:
@@ -234,6 +288,20 @@ class DataExtractor(BaseExtractor):
 
 
     def __merge_chunks(self, scraped_data_collection, usages):
+        """
+        Merges the results from multiple chunks into a single ScrapedResponse.
+
+        This method combines the scraped data and usage information from each chunk
+        to create a final result that represents the entire HTML document.
+
+        Args:
+            scraped_data_collection (list[ScrapedResponse]): A list of ScrapedResponse objects from each chunk.
+            usages (list[Usage]): A list of Usage objects from each chunk.
+
+        Returns:
+            Tuple[ScrapedResponse, Usage]: A tuple containing the merged scraped response and usage information.
+        """
+
         result = ScrapedResponse(final_answer=[])
         usage = Usage(request_tokens=0, total_tokens=0, response_tokens=0)
         print(scraped_data_collection)
@@ -262,7 +330,20 @@ class DataExtractor(BaseExtractor):
 
     @staticmethod
     def __select_system_prompt__(selfconsistency: bool, cot: bool, output_format: dict):
-        
+        """
+        Selects the appropriate system prompt based on the given parameters.
+
+        This method determines which system prompt to use based on whether self-consistency
+        is enabled, chain-of-thought prompting is enabled, and the desired output format.
+
+        Args:
+            selfconsistency (bool): Indicates whether self-consistency is enabled.
+            cot (bool): Indicates whether chain-of-thought prompting is enabled.
+            output_format (dict): Desired format for the output data.
+
+        Returns:
+            str: The selected system prompt.
+        """
         if selfconsistency:
             system_prompt = get_full_system_prompt(output_format)
         elif cot and not selfconsistency:
@@ -273,6 +354,22 @@ class DataExtractor(BaseExtractor):
     
     
     async def __with_separated_selfconsistency(self,query: str, cleaned_html: str, selfconsistency: bool, output_format: dict):
+        """
+        Extracts data with separated self-consistency.
+
+        This method performs data extraction multiple times and merges the results based
+        on a majority vote.
+
+        Args:
+            query (str): A natural language query specifying the data to extract.
+            cleaned_html (str): The HTML content to be processed.
+            selfconsistency (bool): Indicates whether self-consistency is enabled.
+            output_format (dict): Desired format for the output data.
+
+        Returns:
+            Tuple[ScrapedResponse, Usage]: A tuple containing the scraped response and usage information.
+        """
+        
         i = 0
         scraped_data_collection = []
         result = ScrapedResponse(final_answer=[])
@@ -303,7 +400,7 @@ class DataExtractor(BaseExtractor):
         
     def __merge_collection(self, data: List[List[Dict[str, Any]]]) -> List[Dict[str, Any]]:
         """
-        Filters a list of three lists of dictionaries, keeping only the *dictionaries*
+        Filters a list of three lists of dictionaries, keeping only the dictionaries
         that appear in at least two of the three lists.
 
         Args:
@@ -345,21 +442,34 @@ class DataExtractor(BaseExtractor):
 
 
 
-    def __merge_scraped_data(scraped_data_collection: list[ScrapedResponse], usages: list[Usage]):
-        result: ScrapedResponse = ScrapedResponse()
-        usage: Usage = Usage()
-        for partial_response in scraped_data_collection:
-            if not partial_response.is_valid:
-                result.is_valid = False
-            result.scraped_data.extend(partial_response.scraped_data)
-            result.explanation += partial_response.explanation
-            result.refinement_count=partial_response.refinement_count
+    # def __merge_scraped_data(scraped_data_collection: list[ScrapedResponse], usages: list[Usage]):
+    #     """
+    #     Merges a collection of ScrapedResponse objects into a single ScrapedResponse object.
 
-        for partial_usage in usages:
-            usage.request_tokens+=partial_usage.request_tokens
-            usage.response_tokens+=partial_usage.response_tokens
-            usage.total_tokens+=partial_usage.total_tokens
+    #     This method combines the scraped data, explanations, and refinement counts from
+    #     multiple partial responses into a single, comprehensive response.
 
-        return result, usage
+    #     Args:
+    #         scraped_data_collection (list[ScrapedResponse]): A list of ScrapedResponse objects to merge.
+    #         usages (list[Usage]): A list of Usage objects to merge.
+
+    #     Returns:
+    #         Tuple[ScrapedResponse, Usage]: A tuple containing the merged ScrapedResponse and Usage objects.
+    #     """
+    #     result: ScrapedResponse = ScrapedResponse()
+    #     usage: Usage = Usage()
+    #     for partial_response in scraped_data_collection:
+    #         if not partial_response.is_valid:
+    #             result.is_valid = False
+    #         result.scraped_data.extend(partial_response.scraped_data)
+    #         result.explanation += partial_response.explanation
+    #         result.refinement_count=partial_response.refinement_count
+
+    #     for partial_usage in usages:
+    #         usage.request_tokens+=partial_usage.request_tokens
+    #         usage.response_tokens+=partial_usage.response_tokens
+    #         usage.total_tokens+=partial_usage.total_tokens
+
+    #     return result, usage
 
             
