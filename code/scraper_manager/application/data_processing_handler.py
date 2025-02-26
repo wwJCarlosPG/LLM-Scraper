@@ -1,4 +1,3 @@
-from scraper_manager.application.utils import get_html_content
 from scraper_manager.application.interfaces.storage_interface import BaseStorage
 from scraper_manager.application.interfaces.extractor_interface import BaseExtractor
 from scraper_manager.application.interfaces.html_cleaner_interface import BaseHTMLCleaner
@@ -72,7 +71,7 @@ class DataProcessingHandler:
         chunks = []
         if html is None:
             if html_url is not None:
-                html = get_html_content(html_url)
+                html = self.html_cleaner.get_html_content(html_url)
             else:
                 raise ValueError(f"html parameter and html_url parameter can't be None at the same time.")
 

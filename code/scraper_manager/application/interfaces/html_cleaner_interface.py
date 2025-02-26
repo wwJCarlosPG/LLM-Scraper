@@ -9,3 +9,7 @@ class BaseHTMLCleaner(ABC):
     @abstractmethod
     def split_html(html_content: str, chunk_size: int) -> list[str]:
         raise NotImplementedError()
+    
+    @abstractmethod
+    def get_html_content(url: str):
+        raise NotImplementedError()
