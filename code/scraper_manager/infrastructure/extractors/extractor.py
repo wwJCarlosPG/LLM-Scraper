@@ -128,6 +128,7 @@ class DataExtractor(BaseExtractor):
     async def extract(self, query: str, *,
                         html_content: str,
                         settings: DataExtractorSettings = None,
+                        context: str = None,
                         refinement: bool = True,
                         selfconsistency: bool = False,
                         separated_selfconsistency: bool = False,
