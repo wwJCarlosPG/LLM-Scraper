@@ -1,17 +1,16 @@
+from statistics import mean
 from httpx import AsyncClient
+from collections import defaultdict
 from pydantic_ai.agent import Agent
 from pydantic_ai.usage import Usage
-from dataset_work.html_cleaner import HTML_Cleaner
-from scraper_manager.infrastructure.exceptions.exceptions import InvalidResultDuringValidation
-from scraper_manager.application.entities.responses import ScrapedResponse, Response
-from scraper_manager.infrastructure.integration.external_models import ExternalModel
-from scraper_manager.application.interfaces.validator_interface import BaseValidator
-from scraper_manager.infrastructure.prompts.prompts import get_full_system_prompt, get_system_prompt_with_COT, get_system_prompt_without_COT
 from typing import List, Dict, Any, Tuple
-from collections import defaultdict
-from statistics import mean
-from scraper_manager.application.entities.extractor_settings import DataExtractorSettings
+from dataset_work.html_cleaner import HTML_Cleaner
+from core.entities.responses import ScrapedResponse, Response 
+from core.entities.extractor_settings import DataExtractorSettings
 from scraper_manager.application.interfaces.extractor_interface import BaseExtractor
+from scraper_manager.application.interfaces.validator_interface import BaseValidator
+from scraper_manager.infrastructure.integration.external_models import ExternalModel
+from scraper_manager.infrastructure.prompts.prompts import get_full_system_prompt, get_system_prompt_with_COT, get_system_prompt_without_COT
 
 RESPONSE_FORMAT = {
     "type": "json_schema",
@@ -438,39 +437,3 @@ class DataExtractor(BaseExtractor):
 
         return new_result
        
-            
-
-
-
-
-    # def __merge_scraped_data(scraped_data_collection: list[ScrapedResponse], usages: list[Usage]):
-    #     """
-    #     Merges a collection of ScrapedResponse objects into a single ScrapedResponse object.
-
-    #     This method combines the scraped data, explanations, and refinement counts from
-    #     multiple partial responses into a single, comprehensive response.
-
-    #     Args:
-    #         scraped_data_collection (list[ScrapedResponse]): A list of ScrapedResponse objects to merge.
-    #         usages (list[Usage]): A list of Usage objects to merge.
-
-    #     Returns:
-    #         Tuple[ScrapedResponse, Usage]: A tuple containing the merged ScrapedResponse and Usage objects.
-    #     """
-    #     result: ScrapedResponse = ScrapedResponse()
-    #     usage: Usage = Usage()
-    #     for partial_response in scraped_data_collection:
-    #         if not partial_response.is_valid:
-    #             result.is_valid = False
-    #         result.scraped_data.extend(partial_response.scraped_data)
-    #         result.explanation += partial_response.explanation
-    #         result.refinement_count=partial_response.refinement_count
-
-    #     for partial_usage in usages:
-    #         usage.request_tokens+=partial_usage.request_tokens
-    #         usage.response_tokens+=partial_usage.response_tokens
-    #         usage.total_tokens+=partial_usage.total_tokens
-
-    #     return result, usage
-
-            

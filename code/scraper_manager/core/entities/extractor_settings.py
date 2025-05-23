@@ -1,5 +1,5 @@
 from typing import TypedDict
-from scraper_manager.application.entities.responses import ScrapedResponse, Response
+from core.entities.responses import ScrapedResponse, Response
 
 class DataExtractorSettings(TypedDict):
     """

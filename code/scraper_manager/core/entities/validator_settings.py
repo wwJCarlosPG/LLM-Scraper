@@ -1,5 +1,5 @@
 from typing import TypedDict
-from scraper_manager.application.entities.responses import ValidatorResponse
+from core.entities.responses import ValidatorResponse
 
 class BasedAgentValidatorSettings(TypedDict):
     """
