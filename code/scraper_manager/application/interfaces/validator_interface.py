@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from scraper_manager.application.entities.responses import ScrapedResponse, ValidatorResponse
+from scraper_manager.core.entities.responses import ScrapedResponse, ValidatorResponse
 import json
 
 class BaseValidator(ABC):

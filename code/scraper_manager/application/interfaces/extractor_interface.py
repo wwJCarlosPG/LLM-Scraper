@@ -1,8 +1,8 @@
 from typing import Tuple
 from abc import ABC, abstractmethod
 from pydantic_ai.usage import Usage
-from core.entities.responses import ScrapedResponse
-from core.entities.extractor_settings import DataExtractorSettings
+from scraper_manager.core.entities.responses import ScrapedResponse
+from scraper_manager.core.entities.extractor_settings import DataExtractorSettings
 
 class BaseExtractor(ABC):
     @abstractmethod

@@ -5,8 +5,8 @@ from pydantic_ai.agent import Agent
 from pydantic_ai.usage import Usage
 from typing import List, Dict, Any, Tuple
 from dataset_work.html_cleaner import HTML_Cleaner
-from core.entities.responses import ScrapedResponse, Response 
-from core.entities.extractor_settings import DataExtractorSettings
+from scraper_manager.core.entities.responses import ScrapedResponse, Response 
+from scraper_manager.core.entities.extractor_settings import DataExtractorSettings
 from scraper_manager.application.interfaces.extractor_interface import BaseExtractor
 from scraper_manager.application.interfaces.validator_interface import BaseValidator
 from scraper_manager.infrastructure.integration.external_models import ExternalModel

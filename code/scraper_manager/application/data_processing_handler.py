@@ -32,7 +32,7 @@ class DataProcessingHandler:
         self.storage = storage
 
     
-    async def excecute(self, *,
+    async def execute(self, *,
                        query: str, 
                        html: str | None = None,
                        html_url: str | None = None, 

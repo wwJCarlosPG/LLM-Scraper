@@ -5,8 +5,8 @@ from pydantic_ai.agent import Agent
 from scraper_manager.infrastructure.utils import find_majority
 from scraper_manager.infrastructure.integration.external_models import ExternalModel
 from scraper_manager.application.interfaces.validator_interface import BaseValidator
-from scraper_manager.application.entities.validator_settings import BasedAgentValidatorSettings
-from scraper_manager.application.entities.responses import ScrapedResponse, ValidatorResponse, Response
+from scraper_manager.core.entities.validator_settings import BasedAgentValidatorSettings
+from scraper_manager.core.entities.responses import ScrapedResponse, ValidatorResponse, Response
 from scraper_manager.infrastructure.prompts.prompts import get_validator_system_prompt, structure_query_to_validate
 from scraper_manager.infrastructure.exceptions.exceptions import InvalidResultDuringValidation, InvalidValidationFormat
 
