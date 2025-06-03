@@ -46,7 +46,7 @@ async def main():
         html = f.read()
 
 
-    model_name = "gemini-1.5-pro"
+    model_name = "gemini-2.0-flash"
 
     validator = BasedAgentValidator(model_name=model_name)
     extractor = DataExtractor(model_name=model_name, validator=validator)
@@ -55,7 +55,7 @@ async def main():
 
 
     dph = DataProcessingHandler(extractor = extractor, html_cleaner = html_cleaner, storage = local_storage)
-    await dph.excecute(
+    await dph.execute(
         query = query, 
         # html=html,
         html_url= link,

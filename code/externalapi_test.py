@@ -62,7 +62,7 @@ async def main():
 
 
     dph = DataProcessingHandler(extractor = extractor, html_cleaner = html_cleaner, storage = local_storage)
-    await dph.excecute(
+    await dph.execute(
         query = query, 
         # html=html,
         html_url= link,

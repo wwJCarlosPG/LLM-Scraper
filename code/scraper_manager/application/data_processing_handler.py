@@ -40,7 +40,7 @@ class DataProcessingHandler:
                        cot: bool = True, 
                        refinement: bool = False, 
                        separated_selfconsistency: bool = False, 
-                       context_length, 
+                       context_length: int = 32000, # do it something with that.
                        output_format: dict):
         """
             Executes the data processing workflow, extracting, cleaning, and storing data.

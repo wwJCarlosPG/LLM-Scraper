@@ -1,7 +1,7 @@
 from fastapi.routing import APIRouter
 from fastapi import Path
 from typing import Annotated
-
+from scraper_manager.config.logging import logger
 router = APIRouter(tags=["Authentication"], prefix="/auth")
 
 
@@ -10,4 +10,5 @@ def get_user(username: Annotated[str, Path(title="Username", description="The us
     """
     Get user by username.
     """
+    logger.info(f"{username}")
     return {"username": username}

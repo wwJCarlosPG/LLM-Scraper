@@ -4,14 +4,13 @@ from collections import defaultdict
 from pydantic_ai.agent import Agent
 from pydantic_ai.usage import Usage
 from typing import List, Dict, Any, Tuple
-from dataset_work.html_cleaner import HTML_Cleaner
+from scraper_manager.config.logging import logger
 from scraper_manager.core.entities.responses import ScrapedResponse, Response 
 from scraper_manager.core.entities.extractor_settings import DataExtractorSettings
 from scraper_manager.application.interfaces.extractor_interface import BaseExtractor
 from scraper_manager.application.interfaces.validator_interface import BaseValidator
 from scraper_manager.infrastructure.integration.external_models import ExternalModel
 from scraper_manager.infrastructure.prompts.prompts import get_full_system_prompt, get_system_prompt_with_COT, get_system_prompt_without_COT
-
 RESPONSE_FORMAT = {
     "type": "json_schema",
     "json_schema": {
@@ -81,7 +80,8 @@ class DataExtractor(BaseExtractor):
         """
 
         async_client = AsyncClient()
-        
+        # logger.info(f"Initializing DataExtractor with model: {model_name}, endpoint: {endpoint}, api_key: {api_key}, env_alias: {env_alias}")
+        print("Initializing DataExtractor with model: ", model_name, "endpoint: ", endpoint, "api_key: ", api_key, "env_alias: ", env_alias)
         if settings is None:
             self.settings = DataExtractorSettings(
                 temperature=0.5, 
@@ -99,6 +99,7 @@ class DataExtractor(BaseExtractor):
         
         self.model_name = model_name
         if endpoint is None:
+            print("Initializing DataExtractor with local model: ", model_name)
             self.agent: Agent = Agent(
                 model=model_name
             )
@@ -107,7 +108,7 @@ class DataExtractor(BaseExtractor):
                 model = ExternalModel(api_key = api_key,endpoint=endpoint, model_name=model_name, env_alias = env_alias, http_client=async_client)
             )
         self.agent.result_validator(validator.validate)
-
+        
     def set_system_prompt(self, new_system_prompt):
          """
         Sets a new system prompt for the AI agent.

@@ -2,6 +2,7 @@ import json
 from httpx import AsyncClient
 from pydantic_ai import RunContext
 from pydantic_ai.agent import Agent
+from scraper_manager.config.logging import logger
 from scraper_manager.infrastructure.utils import find_majority
 from scraper_manager.infrastructure.integration.external_models import ExternalModel
 from scraper_manager.application.interfaces.validator_interface import BaseValidator
@@ -9,7 +10,6 @@ from scraper_manager.core.entities.validator_settings import BasedAgentValidator
 from scraper_manager.core.entities.responses import ScrapedResponse, ValidatorResponse, Response
 from scraper_manager.infrastructure.prompts.prompts import get_validator_system_prompt, structure_query_to_validate
 from scraper_manager.infrastructure.exceptions.exceptions import InvalidResultDuringValidation, InvalidValidationFormat
-
 class BasedAgentValidator(BaseValidator):
     """
     Class for validating extracted data using an agent based on PydanticAI or an external model.
@@ -61,7 +61,7 @@ class BasedAgentValidator(BaseValidator):
         Raises:
             ValueError: If an invalid setting key is provided in `settings`.
         """
-        
+        logger.info("Initializing BasedAgentValidator...")
         if settings is None:
             self.validator_settings = BasedAgentValidatorSettings(
             temperature=0.5, 
@@ -88,6 +88,7 @@ class BasedAgentValidator(BaseValidator):
         async_client = AsyncClient()
         self.model_name = model_name
         if endpoint is None:
+            logger.info("Using PydanticAI agent for validation.")
             self.agent: Agent = Agent(
                 model=model_name,
                 system_prompt=get_validator_system_prompt()
