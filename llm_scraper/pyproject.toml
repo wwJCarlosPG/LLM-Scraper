@@ -1,0 +1,62 @@
+[project]
+name = "llm-scraper"
+version = "0.1.0"
+description = "LLM-powered web scraper"
+authors = [
+    {name = "jancarlospg",email = "wwjancarlospg2000@gmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.11,<4.0.0"
+dependencies = [
+    "langgraph (>=1.1.6,<2.0.0)",
+    "langchain-core (>=1.2.28,<2.0.0)",
+    "pydantic (>=2.12.5,<3.0.0)",
+    "trafilatura (>=2.0.0,<3.0.0)",
+    "markdownify (>=1.2.2,<2.0.0)",
+    "beautifulsoup4 (>=4.14.3,<5.0.0)",
+    "requests (>=2.33.1,<3.0.0)",
+    "python-dotenv (>=1.2.2,<2.0.0)",
+    "langsmith (>=0.7.33,<0.8.0)"
+]
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[dependency-groups]
+dev = [
+    "pytest (>=9.0.3,<10.0.0)",
+    "pytest-asyncio (>=1.3.0,<2.0.0)",
+    "ruff (>=0.15.10,<0.16.0)",
+    "pre-commit (>=4.5.1,<5.0.0)"
+]
+
+[tool.ruff]
+line-length = 88
+target-version = "py311"
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes (imports no usados, variables no definidas, etc.)
+    "I",   # isort (orden de imports)
+    "B",   # flake8-bugbear (bugs comunes)
+    "UP",  # pyupgrade (sintaxis moderna de Python)
+]
+ignore = [
+    "E501",  # line too long, ruff formatter lo maneja
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["scraper"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.poetry]
+name = "llm-scraper"
+version = "0.1.0"
+description = ""
+packages = [{include = "scraper"}]
