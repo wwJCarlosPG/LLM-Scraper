@@ -1,4 +1,5 @@
 import httpx
+from langsmith import traceable
 
 from scraper.core.entities.config import ProviderConfig
 from scraper.providers.base import BaseProvider
@@ -11,10 +12,12 @@ class GeminiProvider(BaseProvider):
         super().__init__(config)
         self.endpoint = f"{self.BASE_URL}/{self.model_name}:generateContent"
 
+    @traceable(name="GeminiProvider.invoke", run_type="llm")
     def invoke(self, user_prompt: str, system_prompt: str) -> str:
         with httpx.Client() as client:
             return self._request(client, user_prompt, system_prompt)
 
+    @traceable(name="GeminiProvider.ainvoke", run_type="llm")
     async def ainvoke(self, user_prompt: str, system_prompt: str) -> str:
         async with httpx.AsyncClient() as client:
             return await self._arequest(client, user_prompt, system_prompt)

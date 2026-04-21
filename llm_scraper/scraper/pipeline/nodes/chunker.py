@@ -1,9 +1,12 @@
+from logging import getLogger
+
 from scraper.adapters.html.cleaner import DefaultHTMLCleaner
 from scraper.adapters.html.semantic_chunker import SemanticChunker
 from scraper.core.entities.state import PipelineState
 
 default_chunker = DefaultHTMLCleaner()
 semantic_chunker = SemanticChunker()
+logger = getLogger(__name__)
 
 
 async def chunker_node(state: PipelineState) -> dict:

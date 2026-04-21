@@ -1,4 +1,5 @@
 import json
+from logging import getLogger
 
 from scraper.core.entities.responses import ScrapedResponse, ValidatorResponse
 from scraper.core.entities.state import PipelineState
@@ -7,6 +8,8 @@ from scraper.pipeline.prompts.validator import (
     get_validator_prompt,
 )
 from scraper.providers.factory import get_provider
+
+logger = getLogger(__name__)
 
 
 async def validator_node(state: PipelineState) -> dict:
@@ -19,7 +22,10 @@ async def validator_node(state: PipelineState) -> dict:
     # if single pass, validate current_response
     response_to_validate: ScrapedResponse = state["current_response"]
 
+    logger.info(f"[validator] validating iteration {retry_count + 1}")
+
     if response_to_validate is None:
+        logger.warning("[validator] no response to validate")
         return {
             "is_valid": False,
             "feedback": "No response to validate.",
@@ -28,6 +34,7 @@ async def validator_node(state: PipelineState) -> dict:
 
     # if extraction already failed at parsing, no point in validating
     if not response_to_validate.is_valid:
+        logger.warning("[validator] response already marked invalid at parsing")
         return {
             "is_valid": False,
             "feedback": response_to_validate.explanation,
@@ -36,6 +43,7 @@ async def validator_node(state: PipelineState) -> dict:
 
     # if refinement is disabled, skip validation and accept the response
     if not config.refinement:
+        logger.info("[validator] refinement disabled, accepting response")
         return {
             "is_valid": True,
             "feedback": None,
@@ -52,6 +60,10 @@ async def validator_node(state: PipelineState) -> dict:
     raw = await llm.ainvoke(user_prompt=user_prompt, system_prompt=system_prompt)
 
     validator_response = _parse_validator_response(raw)
+
+    logger.info(f"[validator] is_valid={validator_response.is_valid}")
+    if not validator_response.is_valid:
+        logger.info(f"[validator] feedback: {validator_response.explanation[:100]}...")
 
     updated_response = response_to_validate.model_copy(
         update={
@@ -80,6 +92,7 @@ def _parse_validator_response(raw: str) -> ValidatorResponse:
             is_valid=data.get("is_valid", False),
         )
     except json.JSONDecodeError:
+        logger.error(f"[validator] failed to parse validator response: {raw[:100]}")
         return ValidatorResponse(
             explanation=f"Failed to parse validator response: {raw}", is_valid=False
         )

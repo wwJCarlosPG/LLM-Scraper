@@ -6,11 +6,16 @@ with the default pipeline configuration.
 """
 
 import asyncio
+import logging
 
 from dotenv import load_dotenv
 
 from scraper.core.entities.config import PipelineConfig, ProviderConfig
 from scraper.pipeline.runner import run
+
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s"
+)
 
 load_dotenv()
 
@@ -24,7 +29,10 @@ async def main():
                 provider="gemini",
                 model_name="gemini-2.5-flash-lite",
                 env_alias="GEMINI_API_KEY",
-            )
+            ),
+            refinement=True,
+            cot=True,
+            max_retries=2,
         ),
         html_url="https://www.bbc.com",
     )

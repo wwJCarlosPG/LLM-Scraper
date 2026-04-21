@@ -1,9 +1,12 @@
 import json
+from logging import getLogger
 
 from scraper.core.entities.responses import ScrapedResponse
 from scraper.core.entities.state import PipelineState
 from scraper.pipeline.prompts.extractor import build_user_prompt, get_extractor_prompt
 from scraper.providers.factory import get_provider
+
+logger = getLogger(__name__)
 
 
 async def extractor_node(state: PipelineState) -> dict:
@@ -13,8 +16,13 @@ async def extractor_node(state: PipelineState) -> dict:
     feedback = state["feedback"]
     chunks = state["chunks"]
     cleaned_html = state["cleaned_html"]
+    retry_count = state["retry_count"]
 
+    logger.info(f"[extractor] iteration {retry_count + 1}")
+    if feedback:
+        logger.info(f"[extractor] feedback received: {feedback[:100]}...")
     llm = get_provider(config)
+
     system_prompt = get_extractor_prompt(
         output_format=output_format,
         cot=config.cot,
@@ -29,9 +37,11 @@ async def extractor_node(state: PipelineState) -> dict:
     )
 
     if in_chunks:
+        logger.info(f"[extractor] processing {len(chunks)} chunks")
         partial_responses = []
         for chunk in chunks:
             user_prompt = build_user_prompt(full_query, chunk)
+            logger.info(f"[extractor] processing chunk: {chunk[:50]}...")
             raw = await llm.ainvoke(
                 user_prompt=user_prompt, system_prompt=system_prompt
             )
@@ -42,6 +52,7 @@ async def extractor_node(state: PipelineState) -> dict:
         user_prompt = build_user_prompt(full_query, cleaned_html)
         raw = await llm.ainvoke(user_prompt=user_prompt, system_prompt=system_prompt)
         response = _parse_response(raw, config.self_consistency)
+        logger.info(f"[extractor] extracted {len(response.scraped_data)} items")
         return {"current_response": response, "partial_responses": []}
 
 
@@ -50,6 +61,7 @@ def _parse_response(raw: str, self_consistency: bool) -> ScrapedResponse:
     try:
         data = json.loads(raw)
     except json.JSONDecodeError as e:
+        logger.error(f"[extractor] failed to parse response: {e}")
         return ScrapedResponse(
             explanation=f"Failed to parse LLM response: {e}",
             scraped_data=[],
