@@ -48,3 +48,17 @@ ALLOWED_ATTRIBUTES = ("src", "class", "id")
 
 # Attributes to remove at level 3
 LEVEL3_ATTRIBUTES = ["role", "id", "alt", "title"]
+
+
+# HTML headers for semantic section splitting
+HTML_HEADERS_TO_SPLIT_ON = [
+    ("h1", "h1"),
+    ("h2", "h2"),
+    ("h3", "h3"),
+]
+
+# Elements to preserve intact during chunking
+ELEMENTS_TO_PRESERVE = ["table", "ul", "ol"]
+
+# Tags to remove before chunking
+DENYLIST_TAGS = ["script", "style", "head"]

@@ -32,7 +32,7 @@ class PipelineConfig(BaseModel):
     refinement: bool = True
 
     # HTML processing
-    use_markdown_conversion: bool = False
+    use_markdown_conversion: bool = True
     markdown_converter: Literal["trafilatura", "markdownify"] = "trafilatura"
 
     @model_validator(mode="after")

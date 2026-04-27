@@ -52,3 +52,8 @@ def _should_continue(state: PipelineState) -> str:
         return EDGE_END
 
     return EDGE_REFINE
+
+
+def print_graph():
+    graph = build_graph()
+    print(graph.get_graph().draw_ascii())

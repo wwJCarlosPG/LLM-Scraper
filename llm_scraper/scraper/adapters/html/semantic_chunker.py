@@ -1,51 +1,57 @@
-from bs4 import BeautifulSoup
+from logging import getLogger
 
-from scraper.core.consts import SEMANTIC_TAGS
+from langchain_text_splitters import (
+    HTMLSemanticPreservingSplitter,
+    RecursiveCharacterTextSplitter,
+)
+
+from scraper.core.consts import (
+    DENYLIST_TAGS,
+    ELEMENTS_TO_PRESERVE,
+    HTML_HEADERS_TO_SPLIT_ON,
+)
+
+logger = getLogger(__name__)
 
 
 class SemanticChunker:
     """
-    Splits HTML into semantically meaningful chunks instead of arbitrary character windows.
-    Prioritizes high-level semantic blocks to avoid splitting related content.
+    Splits HTML into semantically meaningful chunks using LangChain's
+    HTMLSemanticPreservingSplitter.
+
+    Preserves tables, lists and other structured elements intact,
+    never splitting them across chunks. Falls back to
+    RecursiveCharacterTextSplitter if no semantic structure is found.
     """
 
-    def chunk(self, html: str, chunk_size: int) -> list[str]:
-        soup = BeautifulSoup(html, "html.parser")
-        blocks = self._extract_blocks(soup)
-        return self._group_into_chunks(blocks, chunk_size)
+    def chunk(self, html: str, chunk_size: int, overlap: int = 200) -> list[str]:
+        splitter = HTMLSemanticPreservingSplitter(
+            headers_to_split_on=HTML_HEADERS_TO_SPLIT_ON,
+            max_chunk_size=chunk_size,
+            elements_to_preserve=ELEMENTS_TO_PRESERVE,
+            denylist_tags=DENYLIST_TAGS,
+        )
 
-    def _extract_blocks(self, soup: BeautifulSoup) -> list[str]:
-        blocks = []
-        for tag in SEMANTIC_TAGS:
-            elements = soup.find_all(tag)
-            for el in elements:
-                blocks.append(str(el))
+        try:
+            sections = splitter.split_text(html)
+        except Exception:
+            sections = []
 
-        # fallback: if no semantic tags found use direct children of body
-        if not blocks:
-            body = soup.body if soup.body else soup
-            blocks = [str(el) for el in body.contents if str(el).strip()]
+        if not sections:
+            logger.warning(
+                "No semantic sections found, falling back to plain text splitting"
+            )
+            return self._split_plain(html, chunk_size, overlap)
 
-        return blocks
+        logger.info(f"Split into {len(sections)} semantic sections")
 
-    def _group_into_chunks(self, blocks: list[str], chunk_size: int) -> list[str]:
-        chunks = []
-        current = ""
+        chunks = [s.page_content.strip() for s in sections if s.page_content.strip()]
+        return chunks if chunks else self._split_plain(html, chunk_size, overlap)
 
-        for block in blocks:
-            if len(current) + len(block) <= chunk_size:
-                current += block
-            else:
-                if current:
-                    chunks.append(current)
-                # if a single block exceeds chunk_size, split it by characters
-                if len(block) > chunk_size:
-                    for i in range(0, len(block), chunk_size):
-                        chunks.append(block[i : i + chunk_size])
-                else:
-                    current = block
-
-        if current:
-            chunks.append(current)
-
-        return chunks
+    def _split_plain(self, text: str, chunk_size: int, overlap: int) -> list[str]:
+        splitter = RecursiveCharacterTextSplitter(
+            chunk_size=chunk_size,
+            chunk_overlap=overlap,
+            length_function=len,
+        )
+        return splitter.split_text(text)

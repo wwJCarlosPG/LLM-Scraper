@@ -28,7 +28,7 @@ async def cleaner_node(state: PipelineState) -> dict:
         )
         cleaned = converter.convert(html, strategy=config.markdown_converter)
     else:
-        cleaned = cleaner.clean(html, config.context_length)
+        cleaned = cleaner.light_clean(html, config.context_length)
 
     logger.info(f"[cleaner] cleaned HTML length: {len(cleaned)} chars")
     return {"cleaned_html": cleaned, "html": html}

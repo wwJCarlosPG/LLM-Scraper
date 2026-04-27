@@ -115,3 +115,19 @@ class DefaultHTMLCleaner(CleanerPort):
             fragments.append(current)
 
         return fragments
+
+    def light_clean(self, html: str, context_length: int = 0) -> str:
+        """
+        Removes only noise tags (scripts, styles, meta) while preserving
+        the full semantic structure including headers. Used for chunking.
+        """
+        soup = BeautifulSoup(html, "html.parser")
+
+        for tag in NOISE_TAGS:
+            for el in soup.find_all(tag):
+                el.decompose()
+
+        for comment in soup.find_all(text=lambda t: isinstance(t, Comment)):
+            comment.extract()
+
+        return str(soup)
