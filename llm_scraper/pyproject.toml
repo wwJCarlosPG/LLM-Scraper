@@ -18,7 +18,9 @@ dependencies = [
     "python-dotenv (>=1.2.2,<2.0.0)",
     "langsmith (>=0.7.33,<0.8.0)",
     "grandalf (>=0.8,<0.9)",
-    "langchain-text-splitters (>=1.1.2,<2.0.0)"
+    "langchain-text-splitters (>=1.1.2,<2.0.0)",
+    "anthropic (>=0.99.0,<0.100.0)",
+    "openai (>=2.34.0,<3.0.0)"
 ]
 
 [build-system]

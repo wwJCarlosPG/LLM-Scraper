@@ -5,10 +5,11 @@ from scraper.core.ports.llm_port import LLMPort
 
 
 class BaseProvider(LLMPort):
-    def __init__(self, config: ProviderConfig):
+    def __init__(self, config: ProviderConfig, max_tokens: int = 4096):
         self.config = config
         self.api_key = self._resolve_api_key()
         self.model_name = config.model_name
+        self.max_tokens = max_tokens
 
     def _resolve_api_key(self) -> str:
         if self.config.api_key:
