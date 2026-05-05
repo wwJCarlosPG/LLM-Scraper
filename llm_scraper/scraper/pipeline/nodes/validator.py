@@ -16,6 +16,7 @@ async def validator_node(state: PipelineState) -> dict:
     config = state["config"]
     query = state["query"]
     retry_count = state["retry_count"]
+    cleaned_html = state["cleaned_html"]
 
     # pick the response to validate
     # if in chunks mode, validate the merged response
@@ -54,7 +55,9 @@ async def validator_node(state: PipelineState) -> dict:
     llm = get_provider(config)
     system_prompt = get_validator_prompt()
     user_prompt = build_validator_user_prompt(
-        query=query, scraped_data=response_to_validate.scraped_data
+        query=query,
+        scraped_data=response_to_validate.scraped_data,
+        content=cleaned_html,
     )
 
     raw = await llm.ainvoke(user_prompt=user_prompt, system_prompt=system_prompt)
@@ -69,6 +72,7 @@ async def validator_node(state: PipelineState) -> dict:
         update={
             "is_valid": validator_response.is_valid,
             "feedback": validator_response.explanation,
+            "refinement_count": retry_count + 1,
         }
     )
 
