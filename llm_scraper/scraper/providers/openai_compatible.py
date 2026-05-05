@@ -1,27 +1,29 @@
+import logging
+
 import httpx
+from langsmith import traceable
 
 from scraper.core.entities.config import ProviderConfig
 from scraper.providers.base import BaseProvider
 
+logger = logging.getLogger(__name__)
+
 
 class OpenAICompatibleProvider(BaseProvider):
-    """
-    Generic provider for any API that follows the OpenAI chat completions format.
-    Works with: Fireworks, LM Studio, Ollama, Together AI, etc.
-    """
-
-    def __init__(self, config: ProviderConfig):
+    def __init__(self, config: ProviderConfig, max_tokens: int = 4096):
         if not config.endpoint:
             raise ValueError(
                 "OpenAICompatibleProvider requires an endpoint in ProviderConfig."
             )
-        super().__init__(config)
+        super().__init__(config, max_tokens)
         self.endpoint = config.endpoint
 
+    @traceable(name="OpenAICompatibleProvider.invoke", run_type="llm")
     def invoke(self, user_prompt: str, system_prompt: str) -> str:
         with httpx.Client() as client:
             return self._request(client, user_prompt, system_prompt)
 
+    @traceable(name="OpenAICompatibleProvider.ainvoke", run_type="llm")
     async def ainvoke(self, user_prompt: str, system_prompt: str) -> str:
         async with httpx.AsyncClient() as client:
             return await self._arequest(client, user_prompt, system_prompt)
@@ -29,6 +31,7 @@ class OpenAICompatibleProvider(BaseProvider):
     def _build_payload(self, user_prompt: str, system_prompt: str) -> dict:
         return {
             "model": self.model_name,
+            "max_tokens": self.max_tokens,
             "messages": [
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt},

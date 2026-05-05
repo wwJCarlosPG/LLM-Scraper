@@ -1,15 +1,19 @@
+import logging
+
 import httpx
 from langsmith import traceable
 
 from scraper.core.entities.config import ProviderConfig
 from scraper.providers.base import BaseProvider
 
+logger = logging.getLogger(__name__)
+
 
 class GeminiProvider(BaseProvider):
     BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models"
 
-    def __init__(self, config: ProviderConfig):
-        super().__init__(config)
+    def __init__(self, config: ProviderConfig, max_tokens: int = 4096):
+        super().__init__(config, max_tokens)
         self.endpoint = f"{self.BASE_URL}/{self.model_name}:generateContent"
 
     @traceable(name="GeminiProvider.invoke", run_type="llm")
@@ -26,7 +30,10 @@ class GeminiProvider(BaseProvider):
         return {
             "system_instruction": {"parts": [{"text": system_prompt}]},
             "contents": [{"role": "user", "parts": [{"text": user_prompt}]}],
-            "generationConfig": {"responseMimeType": "application/json"},
+            "generationConfig": {
+                "responseMimeType": "application/json",
+                "maxOutputTokens": self.max_tokens,
+            },
         }
 
     def _parse_response(self, data: dict) -> str:
