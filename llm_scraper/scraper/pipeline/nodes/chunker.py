@@ -33,7 +33,7 @@ async def chunker_node(state: PipelineState) -> dict:
             "[chunker] more chunks than top_k_chunks, keeping only top_k_chunks"
         )
         scorer = RelevanceScorer(get_embedding_provider(config.embedding))
-        chunks = scorer.rank(
+        chunks, _ = scorer.rank(
             query=state["query"], chunks=chunks, top_k=config.top_k_chunks
         )
 

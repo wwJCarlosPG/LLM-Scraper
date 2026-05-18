@@ -20,7 +20,9 @@ class RelevanceScorer:
     def __init__(self, embedding_provider: EmbeddingPort):
         self.embedding_provider = embedding_provider
 
-    def rank(self, query: str, chunks: list[str], top_k: int) -> list[str]:
+    def rank(
+        self, query: str, chunks: list[str], top_k: int, compute_scores: bool = False
+    ) -> list[str]:
         """
         Rank chunks by relevance to the query and return the top-k.
 
@@ -36,7 +38,12 @@ class RelevanceScorer:
             logger.info(
                 f"[scorer] {len(chunks)} chunks <= top_k {top_k}, skipping ranking"
             )
-            return chunks
+            if compute_scores:
+                query_embedding = self.embedding_provider.embed([query])[0]
+                chunk_embeddings = self.embedding_provider.embed(chunks)
+                scores = util.cos_sim(query_embedding, chunk_embeddings)[0].tolist()
+                return chunks, [round(s, 3) for s in scores]
+            return chunks, [1.0] * len(chunks)
 
         logger.info(f"[scorer] ranking {len(chunks)} chunks, returning top {top_k}")
 
@@ -49,7 +56,8 @@ class RelevanceScorer:
             zip(scores.tolist(), chunks, strict=True), key=lambda x: x[0], reverse=True
         )
 
-        top_chunks = [chunk for _, chunk in ranked[:top_k]]
-        logger.info(f"[scorer] top scores: {[round(s, 3) for s, _ in ranked[:top_k]]}")
+        top_scores = [s for s, _ in ranked[:top_k]]
+        top_chunks = [c for _, c in ranked[:top_k]]
 
-        return top_chunks
+        logger.info(f"[scorer] top scores: {[round(s, 3) for s in top_scores]}")
+        return top_chunks, top_scores

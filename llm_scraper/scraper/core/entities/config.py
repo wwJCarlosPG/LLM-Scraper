@@ -6,6 +6,7 @@ from pydantic import BaseModel, Field, model_validator
 ProviderName = Literal[
     "gemini", "openai", "anthropic", "fireworks", "openai_compatible"
 ]
+EmbeddingProviderName = Literal["local", "openai"]
 
 
 class ProviderConfig(BaseModel):
@@ -19,6 +20,18 @@ class ProviderConfig(BaseModel):
 class EmbeddingConfig(BaseModel):
     model_name: str = "sentence-transformers/all-MiniLM-L6-v2"
     max_tokens: int = Field(default=256, ge=64)
+    provider: EmbeddingProviderName = "local"
+    api_key: str | None = None
+    env_alias: str | None = None
+
+    def resolve_api_key(self) -> str | None:
+        if self.api_key:
+            return self.api_key
+        if self.env_alias:
+            import os
+
+            return os.getenv(self.env_alias)
+        return None
 
 
 class PipelineConfig(BaseModel):

@@ -29,7 +29,7 @@ def test_relevant_chunk_ranked_first(scorer):
         "Follow us on Twitter Facebook Instagram LinkedIn YouTube",
     ]
 
-    ranked = scorer.rank(query=query, chunks=chunks, top_k=1)
+    ranked, _ = scorer.rank(query=query, chunks=chunks, top_k=1)
 
     assert len(ranked) == 1
     assert "MacBook Pro" in ranked[0]
@@ -45,7 +45,7 @@ def test_top_k_respected(scorer):
         "Subscribe to our newsletter for weekly updates.",
     ]
 
-    ranked = scorer.rank(query=query, chunks=chunks, top_k=2)
+    ranked, _ = scorer.rank(query=query, chunks=chunks, top_k=2)
 
     assert len(ranked) == 2
     assert all(
@@ -58,7 +58,7 @@ def test_no_ranking_when_chunks_lte_top_k(scorer):
     query = "anything"
     chunks = ["chunk 1", "chunk 2"]
 
-    result = scorer.rank(query=query, chunks=chunks, top_k=3)
+    result, _ = scorer.rank(query=query, chunks=chunks, top_k=3)
 
     assert result == chunks
 
@@ -69,7 +69,7 @@ def test_scores_are_higher_for_relevant_chunks(scorer):
     irrelevant = "Contact us at support@example.com for any questions."
 
     chunks = [irrelevant, relevant]
-    ranked = scorer.rank(query=query, chunks=chunks, top_k=1)
+    ranked, _ = scorer.rank(query=query, chunks=chunks, top_k=1)
 
     assert ranked[0] == relevant
 
