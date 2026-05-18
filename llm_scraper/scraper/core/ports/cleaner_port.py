@@ -7,6 +7,10 @@ class CleanerPort(ABC):
         raise NotImplementedError()
 
     @abstractmethod
+    def light_clean(self, html: str) -> str:
+        raise NotImplementedError()
+
+    @abstractmethod
     def split(self, html: str, chunk_size: int) -> list[str]:
         raise NotImplementedError()
 
