@@ -1,0 +1,1486 @@
+[
+  {
+    "id": 1,
+    "page": "bbc_com_sport_football_articles_c0k28522472o",
+    "domain": "news",
+    "url": "https://www.bbc.com/sport/football/articles/c0k28522472o",
+    "query": "Extract the names of all people mentioned in the article.",
+    "complexity": 1,
+    "output_format": {
+      "person": "person name"
+    },
+    "expected": [
+      {
+        "person": "Pep Guardiola"
+      },
+      {
+        "person": "Enzo Maresca"
+      },
+      {
+        "person": "Manuel Pellegrini"
+      },
+      {
+        "person": "Bernardo Silva"
+      },
+      {
+        "person": "John Stones"
+      },
+      {
+        "person": "Kevin de Bruyne"
+      },
+      {
+        "person": "Ederson"
+      },
+      {
+        "person": "Kyle Walker"
+      },
+      {
+        "person": "Andoni Iraola"
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "page": "bbc_com_sport_football_articles_c0k28522472o",
+    "domain": "news",
+    "url": "https://www.bbc.com/sport/football/articles/c0k28522472o",
+    "query": "Extract all quotes said by Guardiola in the article.",
+    "complexity": 1,
+    "output_format": {
+      "quote": "exact quote text"
+    },
+    "expected": [
+      {
+        "quote": "No way,"
+      },
+      {
+        "quote": "one more year"
+      },
+      {
+        "quote": "Yeah"
+      },
+      {
+        "quote": "I am here, I have a contract."
+      },
+      {
+        "quote": "Next. So many times – I have one more year."
+      },
+      {
+        "quote": "No, no, no, no, no, no, I have no idea [about] that,"
+      },
+      {
+        "quote": "They don't have to do anything, honestly."
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "page": "bbc_com_sport_football_articles_c0k28522472o",
+    "domain": "news",
+    "url": "https://www.bbc.com/sport/football/articles/c0k28522472o",
+    "query": "Extract the main events described in the article.",
+    "complexity": 2,
+    "output_format": {
+      "event": "event description"
+    },
+    "expected": [
+      {
+        "event": "final game of the season against Villa"
+      },
+      {
+        "event": "FA Cup final"
+      },
+      {
+        "event": "1992 Barcelona Olympics"
+      },
+      {
+        "event": "La Liga"
+      },
+      {
+        "event": "Champions League"
+      },
+      {
+        "event": "Carabao Cup"
+      },
+      {
+        "event": "Bundesliga"
+      },
+      {
+        "event": "German Cup"
+      },
+      {
+        "event": "European Cup"
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "page": "bbc_com_sport_football_articles_c0k28522472o",
+    "domain": "news",
+    "url": "https://www.bbc.com/sport/football/articles/c0k28522472o",
+    "query": "Extract all trophies Guardiola won with Manchester City, indicating the competition name and the number of titles won in that competition.",
+    "complexity": 2,
+    "output_format": {
+      "competition": "competition name",
+      "titles_won": "number of titles won in that competition"
+    },
+    "expected": [
+      {
+        "competition": "Premier League",
+        "titles_won": "6"
+      },
+      {
+        "competition": "Champions League",
+        "titles_won": "1"
+      },
+      {
+        "competition": "FA Cup",
+        "titles_won": "3"
+      },
+      {
+        "competition": "EFL Cup",
+        "titles_won": "5"
+      }
+    ]
+  },
+  {
+    "id": 5,
+    "page": "reuters_com",
+    "domain": "news",
+    "url": "https://www.reuters.com",
+    "html_file": "tests/fixtures/pages/news/reuters_home.html",
+    "query": "Extract all news headlines from technology section.",
+    "complexity": 1,
+    "output_format": {
+      "headline": "headline text",
+      "link": "URL of the article"
+    },
+    "expected": [
+      {
+        "headline": "Samsung union says to embark on 48,000-strong strike after impasse on bonuses"
+      },
+      {
+        "headline": "Fears of unfettered hacking spurred by Anthropic's Mythos AI model overstated"
+      }
+    ]
+  },
+  {
+    "id": 6,
+    "page": "reuters_com",
+    "domain": "news",
+    "url": "https://www.reuters.com",
+    "html_file": "tests/fixtures/pages/news/reuters_home.html",
+    "query": "Extract all headlines from In Case you Missed It section.",
+    "complexity": 2,
+    "output_format": {
+      "headline": "headline text"
+    },
+    "expected": [
+      {
+        "headline": "Trump drops IRS lawsuit in exchange for DOJ $1.8 billion 'weaponization' fund"
+      },
+      {
+        "headline": "How Trump’s crypto venture and Iran’s top exchange tapped into the same industry networks"
+      },
+      {
+        "headline": "Civil rights veterans see history repeating after high court guts Voting Rights Act"
+      }
+    ]
+  },
+  {
+    "id": 7,
+    "page": "reuters_com",
+    "domain": "news",
+    "url": "https://www.reuters.com",
+    "query": "Extract all headlines from More Top Stories section and their associated image links.",
+    "complexity": 2,
+    "output_format": {
+      "headline": "headline text",
+      "image_link": "image URL"
+    },
+    "expected": [
+      {
+        "headline": "The AI bots are coming and the young are booing, not applauding",
+        "image_link": "https://www.reuters.com/resizer/v2/NRVP3Q6Q3NPEXEXKIYO3HNTNL4.jpg?auth=98f69f8e5c9cd2f4681f064c49e15d0c0f25df183c78a9ed30ad945c6d64dd85&width=240&quality=80"
+      },
+      {
+        "headline": "As Merz struggles, Germany's far-right AfD goes local to woo voters",
+        "image_link": "https://www.reuters.com/resizer/v2/SKDGUL46AFKH3IDG6CNS5LVHIU.jpg?auth=aaf518e2feb5fd8160cb37fa998a0f9f38ab24274ea93d33035695c4262c3805&width=120&quality=80"
+      },
+      {
+        "headline": "Exclusive: US plans to shrink forces available to NATO during crises",
+        "image_link": "https://www.reuters.com/resizer/v2/36ZTP4EUHZLRRLCSAO7ZJV3NM4.jpg?auth=6bf872ffb634b0c40cffdab1e7ef7bc459bf9fd14276fbffbdecc907a3f5c82f&width=120&quality=80"
+      },
+      {
+        "headline": "Trump reveals new details of bunker-like ballroom with drone base",
+        "image_link": "https://www.reuters.com/resizer/v2/GV7CIGMZYFOORCUCOCOTXVLIR4.jpg?auth=07219d7428d9f1cbe9be1ddd917ae5a295bf3668d74e908ea023aa887adb2d35&width=120&quality=80"
+      }
+    ]
+  },
+  {
+    "id": 8,
+    "page": "reuters_com",
+    "domain": "news",
+    "url": "https://www.reuters.com",
+    "query": "How many articles are about Russia or Ukraine?",
+    "complexity": 3,
+    "output_format": {
+      "count": "number of articles about Russia or Ukraine"
+    },
+    "expected": [
+      {
+        "count": "3"
+      }
+    ]
+  },
+  {
+    "id": 9,
+    "page": "dev_to_actiandev_how-to-evaluate-vector-databases-in-2026-213m",
+    "domain": "news",
+    "url": "https://dev.to/actiandev/how-to-evaluate-vector-databases-in-2026-213m",
+    "query": "Extract the benchmark tools with their corresponding typical bias",
+    "complexity": 2,
+    "output_format": {
+      "benchmark_tool": "name of the benchmark tool",
+      "bias": "typical bias associated with the tool"
+    },
+    "expected": [
+      {
+        "benchmark_tool": "VectorDBBench",
+        "bias": "Favors massive clusters; penalizes single-node systems."
+      },
+      {
+        "benchmark_tool": "vector-db-benchmark",
+        "bias": "Favors RAM-heavy architectures; ignores TCO of memory."
+      },
+      {
+        "benchmark_tool": "ANN-Benchmarks",
+        "bias": "Uses outdated, low-dimensional datasets (SIFT/GIST)."
+      },
+      {
+        "benchmark_tool": "NeurIPS / VLDB",
+        "bias": "Focuses on math/theory; ignores operational/SLA reality."
+      }
+    ]
+  },
+  {
+    "id": 10,
+    "page": "dev_to_actiandev_how-to-evaluate-vector-databases-in-2026-213m",
+    "domain": "news",
+    "url": "https://dev.to/actiandev/how-to-evaluate-vector-databases-in-2026-213m",
+    "query": "Extract just the name of the five production tests that actually matter and that are mentioned in the article",
+    "complexity": 2,
+    "output_format": {
+      "test_name": "name of the production test"
+    },
+    "expected": [
+      {
+        "test_name": "Filtering under concurrent load"
+      },
+      {
+        "test_name": "Performance degradation over time"
+      },
+      {
+        "test_name": "Tail latency under load (P95/P99)"
+      },
+      {
+        "test_name": "Total cost of ownership (TCO)"
+      },
+      {
+        "test_name": "Operational maturity"
+      }
+    ]
+  },
+  {
+    "id": 11,
+    "page": "dev_to_actiandev_how-to-evaluate-vector-databases-in-2026-213m",
+    "domain": "news",
+    "url": "https://dev.to/actiandev/how-to-evaluate-vector-databases-in-2026-213m",
+    "query": "Extract the author's name and the date of publication of the article",
+    "complexity": 1,
+    "output_format": {
+      "author": "name of the author",
+      "publication_date": "date of publication"
+    },
+    "expected": [
+      {
+        "author": "Odewole Babatunde Samson",
+        "publication_date": "19 may"
+      }
+    ]
+  },
+  {
+    "id": 1,
+    "page": "scrapeme_live_shop",
+    "domain": "ecommerce",
+    "url": "https://scrapeme.live/shop/",
+    "query": "Extract all product names and their prices.",
+    "complexity": 1,
+    "output_format": {
+      "product": "product name",
+      "price": "product price"
+    },
+    "expected": [
+      {
+        "product": "Bulbasaur",
+        "price": "63.00"
+      },
+      {
+        "product": "Ivysaur",
+        "price": "87.00"
+      },
+      {
+        "product": "Venusaur",
+        "price": "105.00"
+      },
+      {
+        "product": "Charmander",
+        "price": "48.00"
+      },
+      {
+        "product": "Charmeleon",
+        "price": "165.00"
+      },
+      {
+        "product": "Charizard",
+        "price": "156.00"
+      },
+      {
+        "product": "Squirtle",
+        "price": "130.00"
+      },
+      {
+        "product": "Wartortle",
+        "price": "123.00"
+      },
+      {
+        "product": "Blastoise",
+        "price": "76.00"
+      },
+      {
+        "product": "Caterpie",
+        "price": "73.00"
+      },
+      {
+        "product": "Metapod",
+        "price": "148.00"
+      },
+      {
+        "product": "Butterfree",
+        "price": "162.00"
+      },
+      {
+        "product": "Weedle",
+        "price": "25.00"
+      },
+      {
+        "product": "Kakuna",
+        "price": "148.00"
+      },
+      {
+        "product": "Beedrill",
+        "price": "168.00"
+      },
+      {
+        "product": "Pidgey",
+        "price": "159.00"
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "page": "scrapeme_live_shop",
+    "domain": "ecommerce",
+    "url": "https://scrapeme.live/shop/",
+    "query": "Extract products that have a cost greater than $86.",
+    "complexity": 2,
+    "output_format": {
+      "product": "product name"
+    },
+    "expected": [
+      {
+        "product": "Ivisaur"
+      },
+      {
+        "product": "Venusaur"
+      },
+      {
+        "product": "Charmeleon"
+      },
+      {
+        "product": "Charizard"
+      },
+      {
+        "product": "Squirtle"
+      },
+      {
+        "product": "Wartortle"
+      },
+      {
+        "product": "Metapod"
+      },
+      {
+        "product": "Butterfree"
+      },
+      {
+        "product": "Kakuna"
+      },
+      {
+        "product": "Beedrill"
+      },
+      {
+        "product": "Pidgey"
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "page": "scrapeme_live_shop",
+    "domain": "ecommerce",
+    "url": "https://scrapeme.live/shop/",
+    "query": "Extract products that have a cost greater than $86 and their price.",
+    "complexity": 2,
+    "output_format": {
+      "product": "product name",
+      "price": "product price"
+    },
+    "expected": [
+      {
+        "product": "Ivysaur",
+        "price": "87.00"
+      },
+      {
+        "product": "Venusaur",
+        "price": "105.00"
+      },
+      {
+        "product": "Charmeleon",
+        "price": "165.00"
+      },
+      {
+        "product": "Charizard",
+        "price": "156.00"
+      },
+      {
+        "product": "Squirtle",
+        "price": "130.00"
+      },
+      {
+        "product": "Wartortle",
+        "price": "123.00"
+      },
+      {
+        "product": "Metapod",
+        "price": "148.00"
+      },
+      {
+        "product": "Butterfree",
+        "price": "162.00"
+      },
+      {
+        "product": "Kakuna",
+        "price": "148.00"
+      },
+      {
+        "product": "Beedrill",
+        "price": "168.00"
+      },
+      {
+        "product": "Pidgey",
+        "price": "159.00"
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "page": "webscraper_io_test-sites_e-commerce_allinone_computers_laptops",
+    "domain": "ecommerce",
+    "url": "https://webscraper.io/test-sites/e-commerce/allinone/computers/laptops",
+    "query": "Extract the names of all products that are in stock.",
+    "complexity": 1,
+    "output_format": {
+      "product": "product name"
+    },
+    "expected": [
+      {
+        "product": "Asus VivoBook X441NA-GA190"
+      },
+      {
+        "product": "Prestigio SmartBook 133S"
+      },
+      {
+        "product": "Prestigio SmartBook 133S"
+      },
+      {
+        "product": "Aspire E1-510"
+      },
+      {
+        "product": "Lenovo V110-15IAP,"
+      },
+      {
+        "product": "Asus VivoBook 15 X540NA-GQ008T"
+      },
+      {
+        "product": "Hewlett Packard 250 G6"
+      },
+      {
+        "product": "Acer Aspire 3 A315-31"
+      },
+      {
+        "product": "Acer Aspire A315-31-C33J"
+      },
+      {
+        "product": "Acer Aspire ES1-572"
+      },
+      {
+        "product": "Acer Aspire 3 A315-31"
+      },
+      {
+        "product": "Acer Aspire 3 A315-21"
+      },
+      {
+        "product": "Asus VivoBook Max X541NA-GQ041"
+      },
+      {
+        "product": "Asus VivoBook E502NA-GO022T"
+      },
+      {
+        "product": "Lenovo ThinkPad E31-80"
+      },
+      {
+        "product": "Acer Aspire 3 A315-31"
+      },
+      {
+        "product": "Lenovo V110-15ISK"
+      },
+      {
+        "product": "Acer Aspire ES1-732"
+      },
+      {
+        "product": "Asus VivoBook 15 X540NA-GQ026T"
+      },
+      {
+        "product": "Packard 255 G2"
+      },
+      {
+        "product": "Asus EeeBook R416NA-FA014T"
+      },
+      {
+        "product": "Acer Aspire 3 A315-51"
+      },
+      {
+        "product": "Acer Aspire ES1-572 Black"
+      },
+      {
+        "product": "Acer Extensa 15 (2540)"
+      },
+      {
+        "product": "Acer Aspire ES1-572"
+      },
+      {
+        "product": "Lenovo V110-15ISK"
+      },
+      {
+        "product": "Acer Aspire A315-51-33TG"
+      },
+      {
+        "product": "Lenovo V110-15IKB"
+      },
+      {
+        "product": "Asus VivoBook 15 X540UA-DM260"
+      },
+      {
+        "product": "Acer Aspire ES1-572"
+      },
+      {
+        "product": "Lenovo V510"
+      },
+      {
+        "product": "Acer Aspire ES1-572"
+      },
+      {
+        "product": "Lenovo V510"
+      },
+      {
+        "product": "Acer Swift 1 SF113-31"
+      },
+      {
+        "product": "Dell Vostro 15 (3568)"
+      },
+      {
+        "product": "Acer Aspire 3 A315-51"
+      },
+      {
+        "product": "Dell Vostro 15 (3568)"
+      },
+      {
+        "product": "Lenovo V510 Black"
+      },
+      {
+        "product": "HP 250 G3"
+      },
+      {
+        "product": "Acer Spin 5 SP513-51"
+      },
+      {
+        "product": "HP 350 G1"
+      },
+      {
+        "product": "Aspire E1-572G"
+      },
+      {
+        "product": "Pavilion"
+      },
+      {
+        "product": "Acer Aspire A515-51-5654"
+      },
+      {
+        "product": "Dell Inspiron 15 (5567)"
+      },
+      {
+        "product": "Asus VivoBook S14 (S406UA-BV041T)"
+      },
+      {
+        "product": "ProBook"
+      },
+      {
+        "product": "Inspiron 15"
+      },
+      {
+        "product": "Asus ROG STRIX GL553VD-DM256"
+      },
+      {
+        "product": "Acer Nitro 5 AN515-51"
+      },
+      {
+        "product": "Asus ROG STRIX GL553VD-DM256"
+      },
+      {
+        "product": "Lenovo ThinkPad L570"
+      },
+      {
+        "product": "ThinkPad Yoga"
+      },
+      {
+        "product": "Lenovo ThinkPad L460"
+      },
+      {
+        "product": "Dell Inspiron 15 (7567)"
+      },
+      {
+        "product": "MSI GL72M 7RDX"
+      },
+      {
+        "product": "Asus ROG Strix GL553VD-DM535T"
+      },
+      {
+        "product": "Apple MacBook Air"
+      },
+      {
+        "product": "Dell Latitude 5280"
+      },
+      {
+        "product": "Dell Latitude 5480"
+      },
+      {
+        "product": "Lenovo Legion Y520-15IKBM"
+      },
+      {
+        "product": "Toshiba Portege Z30-C-16J"
+      },
+      {
+        "product": "Acer Predator Helios 300 (PH317-51)"
+      },
+      {
+        "product": "Acer Aspire 7 A715-71G"
+      },
+      {
+        "product": "Dell Inspiron 17 2in1 (7779)"
+      },
+      {
+        "product": "Dell Latitude 5480"
+      },
+      {
+        "product": "Lenovo Legion Y520"
+      },
+      {
+        "product": "Asus AsusPro Advanced BU401LA-FA271G"
+      },
+      {
+        "product": "Acer Nitro 5 AN515-51"
+      },
+      {
+        "product": "Dell Latitude 5480"
+      },
+      {
+        "product": "Dell Inspiron 15 (7567)"
+      },
+      {
+        "product": "Dell Latitude 5580"
+      },
+      {
+        "product": "Lenovo Legion Y520-15IKBM"
+      },
+      {
+        "product": "MSI GP62M 7RDX"
+      },
+      {
+        "product": "Lenovo Yoga 720"
+      },
+      {
+        "product": "Toshiba Portege Z30-C-16L"
+      },
+      {
+        "product": "Acer TravelMate P645-S-511A"
+      },
+      {
+        "product": "Dell Latitude 5580"
+      },
+      {
+        "product": "ThinkPad T540p"
+      },
+      {
+        "product": "MSI GS63 7RD Stealth"
+      },
+      {
+        "product": "Dell Latitude 5480"
+      },
+      {
+        "product": "Acer Predator Helios 300 (PH317-51)"
+      },
+      {
+        "product": "MSI GL62M 7REX"
+      },
+      {
+        "product": "MSI GL62M 7REX2"
+      },
+      {
+        "product": "Lenovo Yoga 910"
+      },
+      {
+        "product": "Toshiba Portege X30-D-10J"
+      },
+      {
+        "product": "Lenovo IdeaPad Miix 510"
+      },
+      {
+        "product": "Acer Predator Helios 300 (PH317-51)"
+      },
+      {
+        "product": "ThinkPad Yoga"
+      },
+      {
+        "product": "Asus VivoBook Pro 15 N580VN-FI006T"
+      },
+      {
+        "product": "Dell Latitude 5480"
+      },
+      {
+        "product": "Asus ZenBook UX530UX-FY040T"
+      },
+      {
+        "product": "ThinkPad X230"
+      },
+      {
+        "product": "Asus ROG Strix GL753VE-GC096T"
+      },
+      {
+        "product": "Apple MacBook Air"
+      },
+      {
+        "product": "Dell Latitude 5480"
+      },
+      {
+        "product": "Hewlett Packard Spectre 13-v106na"
+      },
+      {
+        "product": "Dell XPS 13"
+      },
+      {
+        "product": "Toshiba Portege Z30-C-16K"
+      },
+      {
+        "product": "MSI GL62VR 7RFX"
+      },
+      {
+        "product": "Dell Latitude 5480"
+      },
+      {
+        "product": "ThinkPad X240"
+      },
+      {
+        "product": "Hewlett Packard ProBook 640 G3"
+      },
+      {
+        "product": "Apple MacBook Pro"
+      },
+      {
+        "product": "Dell Latitude 5580"
+      },
+      {
+        "product": "Dell Latitude 5480"
+      },
+      {
+        "product": "Dell Latitude 5580"
+      },
+      {
+        "product": "Lenovo ThinkPad Yoga 370"
+      },
+      {
+        "product": "Lenovo ThinkPad T470"
+      },
+      {
+        "product": "Toshiba Portege X20W-D-10V"
+      },
+      {
+        "product": "Asus ASUSPRO B9440UA-GV0279R"
+      },
+      {
+        "product": "Lenovo Legion Y720"
+      },
+      {
+        "product": "Asus ROG Strix GL702VM-GC146T"
+      },
+      {
+        "product": "Asus ROG Strix GL702ZC-GC154T"
+      },
+      {
+        "product": "Asus ROG Strix GL702ZC-GC209T"
+      },
+      {
+        "product": "Asus ROG Strix SCAR Edition GL503VM-ED115T"
+      }
+    ]
+  },
+  {
+    "id": 5,
+    "page": "webscraper_io_test-sites_e-commerce_allinone_computers_laptops",
+    "domain": "ecommerce",
+    "url": "https://webscraper.io/test-sites/e-commerce/allinone/computers/laptops",
+    "query": "Extract all products that have a rating equal to 1 star.",
+    "complexity": 2,
+    "output_format": {
+      "product": "product name"
+    },
+    "expected": [
+      {
+        "product": "Hewlett Packard 250 G6"
+      },
+      {
+        "product": "Asus VivoBook Max X541NA-GQ041"
+      },
+      {
+        "product": "Lenovo ThinkPad E31-80"
+      },
+      {
+        "product": "Asus EeeBook R416NA-FA014T"
+      },
+      {
+        "product": "Acer Aspire 3 A315-51"
+      },
+      {
+        "product": "Acer Aspire ES1-572"
+      },
+      {
+        "product": "Acer Aspire ES1-572"
+      },
+      {
+        "product": "Lenovo V110-15IKB"
+      },
+      {
+        "product": "Asus VivoBook 15 X540UA-DM260"
+      },
+      {
+        "product": "Acer Aspire ES1-572 Black"
+      },
+      {
+        "product": "Dell Vostro 15 (3568)"
+      },
+      {
+        "product": "Aspire E1-572G"
+      },
+      {
+        "product": "Pavilion"
+      },
+      {
+        "product": "Asus VivoBook S14 (S406UA-BV041T)"
+      },
+      {
+        "product": "Acer Nitro 5 AN515-51"
+      },
+      {
+        "product": "Asus ROG STRIX GL553VD-DM256"
+      },
+      {
+        "product": "Dell Inspiron 15 (7567)"
+      },
+      {
+        "product": "Asus ROG Strix GL553VD-DM535T"
+      },
+      {
+        "product": "Dell Latitude 5280"
+      },
+      {
+        "product": "Toshiba Portege Z30-C-16J"
+      },
+      {
+        "product": "Lenovo Legion Y520"
+      },
+      {
+        "product": "Dell Inspiron 15 (7567)"
+      },
+      {
+        "product": "MSI GP62M 7RDX"
+      },
+      {
+        "product": "Acer TravelMate P645-S-511A"
+      },
+      {
+        "product": "Toshiba Portege Z30-C-16L"
+      },
+      {
+        "product": "ThinkPad T540p"
+      },
+      {
+        "product": "MSI GS63 7RD"
+      },
+      {
+        "product": "MSI GL62M 7REX"
+      },
+      {
+        "product": "Acer Predator Helios 300 (PH317-51)"
+      },
+      {
+        "product": "Asus ZenBook UX530UX-FY040T"
+      },
+      {
+        "product": "Dell Latitude 5480"
+      },
+      {
+        "product": "Toshiba Portege Z30-C-16K"
+      },
+      {
+        "product": "Hewlett Packard ProBook 640 G3"
+      },
+      {
+        "product": "Apple MacBook Pro"
+      },
+      {
+        "product": "Dell Latitude 5580"
+      },
+      {
+        "product": "Lenovo ThinkPad T470"
+      },
+      {
+        "product": "Toshiba Portege X20W-D-10V"
+      },
+      {
+        "product": "Asus ASUSPRO B9440UA-GV0279R"
+      },
+      {
+        "product": "Asus ROG Strix GL702ZC-GC209T"
+      }
+    ]
+  },
+  {
+    "id": 6,
+    "page": "webscraper_io_test-sites_e-commerce_allinone_computers_laptops",
+    "domain": "ecommerce",
+    "url": "https://webscraper.io/test-sites/e-commerce/allinone/computers/laptops",
+    "query": "Extract all products that have a price greater than $1200 and their prices.",
+    "complexity": 2,
+    "output_format": {
+      "product": "product name",
+      "price": "product price"
+    },
+    "expected": [
+      {
+        "product": "Toshiba Portege X30-D-10J",
+        "price": "1203.41"
+      },
+      {
+        "product": "Lenovo IdeaPad Miix 510",
+        "price": "1212.16"
+      },
+      {
+        "product": "Acer Predator Helios 300 (PH317-51)",
+        "price": "1221.58"
+      },
+      {
+        "product": "ThinkPad Yoga",
+        "price": "1223.99"
+      },
+      {
+        "product": "Asus VivoBook Pro 15 N580VN-FI006T",
+        "price": "1235.49"
+      },
+      {
+        "product": "Dell Latitude 5480",
+        "price": "1238.37"
+      },
+      {
+        "product": "Asus ZenBook UX530UX-FY040T",
+        "price": "1239.2"
+      },
+      {
+        "product": "ThinkPad X230",
+        "price": "1244.99"
+      },
+      {
+        "product": "Asus ROG Strix GL753VE-GC096T",
+        "price": "1259"
+      },
+      {
+        "product": "Apple MacBook Air",
+        "price": "1260.13"
+      },
+      {
+        "product": "Dell Latitude 5480",
+        "price": "1271.06"
+      },
+      {
+        "product": "Hewlett Packard Spectre 13-v106na",
+        "price": "1273.11"
+      },
+      {
+        "product": "Dell XPS 13",
+        "price": "1281.99"
+      },
+      {
+        "product": "oshiba Portege Z30-C-16K Grey\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D",
+        "price": "1294.74"
+      },
+      {
+        "product": "MSI GL62VR 7RFX",
+        "price": "1299"
+      }
+    ]
+  },
+  {
+    "id": 7,
+    "page": "webscraper_io_test-sites_e-commerce_allinone_computers_laptops",
+    "domain": "ecommerce",
+    "url": "https://webscraper.io/test-sites/e-commerce/allinone/computers/laptops",
+    "query": "Extract all products that have a price less than $ 200",
+    "complexity": 2,
+    "output_format": {
+      "product": "product name"
+    },
+    "expected": []
+  },
+  {
+    "id": 8,
+    "page": "webscraper_io_test-sites_e-commerce_allinone_computers_laptops",
+    "domain": "ecommerce",
+    "url": "https://webscraper.io/test-sites/e-commerce/allinone/computers/laptops",
+    "query": "Extract all products that have a price less than 400 and a rating of 4 stars or more and their prices.",
+    "complexity": 3,
+    "output_format": {
+      "product": "product name",
+      "price": "product price"
+    },
+    "expected": [
+      {
+        "product": "Asus VivoBook E502NA-GO022T",
+        "price": "399.99"
+      },
+      {
+        "product": "Asus VivoBook Max X541NA-GQ041",
+        "price": "399"
+      },
+      {
+        "product": "Acer Aspire 3 A315-31",
+        "price": "391.48"
+      },
+      {
+        "product": "Acer Aspire ES1-572",
+        "price": "379.95"
+      },
+      {
+        "product": "Prestigio SmartBook 133S",
+        "price": "299"
+      }
+    ]
+  },
+  {
+    "id": 9,
+    "page": "webscraper_io_test-sites_e-commerce_allinone_computers_laptops",
+    "domain": "ecommerce",
+    "url": "https://webscraper.io/test-sites/e-commerce/allinone/computers/laptops",
+    "query": "Extract all ASUS products",
+    "complexity": 1,
+    "output_format": {
+      "product": "product name"
+    },
+    "expected": [
+      {
+        "product": "Asus VivoBook X441NA-GA190"
+      },
+      {
+        "product": "Asus VivoBook 15 X540NA-GQ008T"
+      },
+      {
+        "product": "Asus VivoBook Max X541NA-GQ04"
+      },
+      {
+        "product": "Asus VivoBook E502NA-GO022T"
+      },
+      {
+        "product": "Asus VivoBook 15 X540NA-GQ026T"
+      },
+      {
+        "product": "Asus VivoBook 15 X540UA-DM260"
+      },
+      {
+        "product": "Asus VivoBook S14 (S406UA-BV041T)"
+      },
+      {
+        "product": "Asus ROG STRIX GL553VD-DM256"
+      },
+      {
+        "product": "Asus ROG STRIX GL553VD-DM256"
+      },
+      {
+        "product": "Asus ROG Strix GL553VD-DM535T"
+      },
+      {
+        "product": "Asus AsusPro Advanced BU401LA-FA271G"
+      },
+      {
+        "product": "Asus VivoBook Pro 15 N580VN-FI006T"
+      },
+      {
+        "product": "Asus ZenBook UX530UX-FY040T"
+      },
+      {
+        "product": "Asus ROG Strix GL753VE-GC096T"
+      },
+      {
+        "product": "Asus ASUSPRO B9440UA-GV0279R"
+      },
+      {
+        "product": "Asus ROG Strix GL702VM-GC146T"
+      },
+      {
+        "product": "Asus ROG Strix GL702ZC-GC154T"
+      },
+      {
+        "product": "Asus ROG Strix GL702ZC-GC209T"
+      },
+      {
+        "product": "Asus ROG Strix SCAR Edition GL503VM-ED115T"
+      }
+    ]
+  },
+  {
+    "id": 10,
+    "page": "newegg_com_p_pl",
+    "domain": "ecommerce",
+    "url": "https://www.newegg.com/p/pl?d=laptop",
+    "query": "Extract all laptop descriptions that have GPU AMD Radeon Graphics",
+    "complexity": 3,
+    "output_format": {
+      "product": "product description"
+    },
+    "expected": [
+      {
+        "product": "Lenovo Laptop V15 for Business, Home, Student, 15.6\" FHD Anti-Glare, AMD Ryzen 7 7730U, 16GB RAM, 512GB SSD, HDMI, Type-C, Numeric Keypad, Webcam w/ Shutter, Wi-Fi 6, Win 11 Pro w/ AI Copilot, Black"
+      },
+      {
+        "product": "Lenovo V15 Gen 4 15.6\" Laptop AMD Ryzen 7 7730U 16GB RAM 1TB SSD Windows 11 Home (83CR003UUS)"
+      },
+      {
+        "product": "Acer Aspire Go 15 15.6\" AMD Ryzen 7 5825U 32GB DDR4 Memory DDR4 3200 512GB PCIe Gen4 SSD Windows 11 Home AG15-42P-R6GZ"
+      },
+      {
+        "product": "Acer Aspire Go 15 Laptop - AMD Ryzen 7 5825U - 16GB DDR4 RAM - 512GB SSD (NX.JQJAA.002)"
+      },
+      {
+        "product": "Lenovo Laptop V15 for Business, Home, Student, 15.6\" FHD Anti-Glare, AMD Ryzen 7 7730U, 16GB RAM, 1TB SSD, HDMI, Type-C, Numeric Keypad, Webcam w/ Shutter, Wi-Fi 6, Win 11 Pro w/ AI Copilot, Black"
+      },
+      {
+        "product": "Auusda EXSURF 16\" Business Laptop, AMD Ryzen 5 7430U, 16GB Dual Channel RAM, 1TB SSD, Windows 11 Pro, 1200P FHD IPS, WiFi 6, Privacy Camera, Backlight, Fingerprint, Full Type-C, Gray"
+      }
+    ]
+  },
+  {
+    "id": 1,
+    "page": "docs_python_org_3_tutorial_classes.html",
+    "domain": "documentation",
+    "url": "https://docs.python.org/3/tutorial/classes.html",
+    "query": "Extract all section titles in the document.",
+    "complexity": 1,
+    "output_format": {
+      "section": "section title"
+    },
+    "expected": [
+      {
+        "section": "9. Classes"
+      },
+      {
+        "section": "9.1. A Word About Names and Objects"
+      },
+      {
+        "section": "9.2. Python Scopes and Namespaces"
+      },
+      {
+        "section": "9.2.1. Scopes and Namespaces Example"
+      },
+      {
+        "section": "9.3. A First Look at Classes"
+      },
+      {
+        "section": "9.3.1. Class Definition Syntax"
+      },
+      {
+        "section": "9.3.2. Class Objects"
+      },
+      {
+        "section": "9.3.3. Instance Objects"
+      },
+      {
+        "section": "9.3.4. Method Objects"
+      },
+      {
+        "section": "9.3.5. Class and Instance Variables"
+      },
+      {
+        "section": "9.4. Random Remarks"
+      },
+      {
+        "section": "9.5. Inheritance"
+      },
+      {
+        "section": "9.6. Private Variables¶"
+      },
+      {
+        "section": "9.7. Odds and Ends"
+      },
+      {
+        "section": "9.8. Iterators"
+      },
+      {
+        "section": "9.9. Generators"
+      },
+      {
+        "section": "9.10. Generator Expressions"
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "page": "docs_python_org_3_tutorial_classes.html",
+    "domain": "documentation",
+    "url": "https://docs.python.org/3/tutorial/classes.html",
+    "query": "Extract all document subsection titles that contains code examples.",
+    "complexity": 2,
+    "output_format": {
+      "section": "section title"
+    },
+    "expected": [
+      {
+        "section": "9.2.1. Scopes and Namespaces Example"
+      },
+      {
+        "section": "9.3.1. Class Definition Syntax"
+      },
+      {
+        "section": "9.3.2. Class Objects"
+      },
+      {
+        "section": "9.3.3. Instance Objects"
+      },
+      {
+        "section": "9.3.4. Method Objects"
+      },
+      {
+        "section": "9.3.5. Class and Instance Variables"
+      },
+      {
+        "section": "9.4. Random Remarks"
+      },
+      {
+        "section": "9.5. Inheritance"
+      },
+      {
+        "section": "9.5.1. Multiple Inheritance"
+      },
+      {
+        "section": "9.6. Private Variables"
+      },
+      {
+        "section": "9.7. Odds and Ends"
+      },
+      {
+        "section": "9.8. Iterators"
+      },
+      {
+        "section": "9.9. Generators"
+      },
+      {
+        "section": "9.10. Generator Expressions"
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "page": "docs_python_org_3_tutorial_classes.html",
+    "domain": "documentation",
+    "url": "https://docs.python.org/3/tutorial/classes.html",
+    "query": "Extract all programming languages mentioned in the document and the context in which they are compared to Python.",
+    "complexity": 2,
+    "output_format": {
+      "language": "language name",
+      "context": "comparison context"
+    },
+    "expected": [
+      {
+        "language": "C++",
+        "context": "Python"
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "page": "docs_langchain_com_oss_python_langchain_agents",
+    "domain": "documentation",
+    "url": "https://docs.langchain.com/oss/python/langchain/agents",
+    "query": "Extract all subsections that belong to the section titled Advanced Concepts.",
+    "complexity": 2,
+    "output_format": {
+      "section": "section title"
+    },
+    "expected": [
+      {
+        "section": "Structured output"
+      },
+      {
+        "section": "ToolStrategy"
+      },
+      {
+        "section": "ProviderStrategy"
+      },
+      {
+        "section": "Memory"
+      },
+      {
+        "section": "Defining state via middleware"
+      },
+      {
+        "section": "Defining state via state_schema"
+      },
+      {
+        "section": "Streaming"
+      },
+      {
+        "section": "Middleware"
+      }
+    ]
+  },
+  {
+    "id": 5,
+    "page": "docs_langchain_com_oss_python_langchain_agents",
+    "domain": "documentation",
+    "url": "https://docs.langchain.com/oss/python/langchain/agents",
+    "query": "Extract all section titles in the document.",
+    "complexity": 1,
+    "output_format": {
+      "section": "section title"
+    },
+    "expected": [
+      {
+        "section": "Agents"
+      },
+      {
+        "section": "Core components"
+      },
+      {
+        "section": "Model"
+      },
+      {
+        "section": "Static model"
+      },
+      {
+        "section": "Dynamic model"
+      },
+      {
+        "section": "Tools"
+      },
+      {
+        "section": "Static tools"
+      },
+      {
+        "section": "Dynamic tools"
+      },
+      {
+        "section": "Tool error handling"
+      },
+      {
+        "section": "Tool use in the ReAct loop"
+      },
+      {
+        "section": "System prompt"
+      },
+      {
+        "section": "Dynamic system prompt"
+      },
+      {
+        "section": "Name"
+      },
+      {
+        "section": "Invocation"
+      },
+      {
+        "section": "Advanced Concepts"
+      },
+      {
+        "section": "Structured output"
+      },
+      {
+        "section": "ToolStrategy"
+      },
+      {
+        "section": "ProviderStrategy"
+      },
+      {
+        "section": "Memory"
+      },
+      {
+        "section": "Defining state via middleware"
+      },
+      {
+        "section": "Defining state via state_schema"
+      },
+      {
+        "section": "Streaming"
+      },
+      {
+        "section": "Middleware"
+      }
+    ]
+  },
+  {
+    "id": 6,
+    "page": "docs_langchain_com_oss_python_langchain_agents",
+    "domain": "documentation",
+    "url": "https://docs.langchain.com/oss/python/langchain/agents",
+    "query": "Extract all sections with their corresponding subsections.",
+    "complexity": 3,
+    "output_format": {
+      "section": "section title",
+      "subsections": [
+        "list of subsection titles"
+      ]
+    },
+    "expected": [
+      {
+        "section": "Core components",
+        "subsections": ["Model","Static model","Dynamic model","Tools","Static tools","Dynamic tools","Tool error handling","Tool use in the ReAct loop","System prompt","Dynamic system prompt","Name","Invocation"]
+      },
+      {
+        "section": "Advanced Concepts",
+        "subsections": ["Structured output","ToolStrategy","ProviderStrategy","Memory","Defining state via middleware","Defining state via state_schema","Streaming","Middleware"]
+       }
+    ]
+  }
+]

@@ -1,0 +1,201 @@
+{
+    "news": [
+        {
+            "id": 1,
+            "query": "Extract the names of all people mentioned in the article.",
+            "output_format": {"person": "person name"},
+            "complexity": 1,
+            "url": "https://www.bbc.com/sport/football/articles/c0k28522472o"
+        },
+        {
+            "id": 2,
+            "query": "Extract all quotes said by Guardiola in the article.",
+            "output_format": {"quote": "exact quote text"},
+            "complexity": 1,
+            "url": "https://www.bbc.com/sport/football/articles/c0k28522472o"
+        },
+        {
+            "id": 3,
+            "query": "Extract the main events described in the article.",
+            "output_format": {"event": "event description"},
+            "complexity": 2,
+            "url": "https://www.bbc.com/sport/football/articles/c0k28522472o"
+        },
+        {
+            "id": 4,
+            "query": "Extract all trophies Guardiola won with Manchester City, indicating the competition name and the number of titles won in that competition.",
+            "output_format": {
+                "competition": "competition name",
+                "titles_won": "number of titles won in that competition"
+            },
+            "complexity": 2,
+            "url": "https://www.bbc.com/sport/football/articles/c0k28522472o"
+        },
+        {
+            "id": 5,
+            "query": "Extract all news headlines visible on the page.",
+            "output_format": {"headline": "headline text"},
+            "complexity": 1,
+            "url": "https://www.reuters.com"
+        },
+        {
+            "id": 6,
+            "query": "Extract all headlines from In Case you Missed It section.",
+            "output_format": {"headline": "headline text"},
+            "complexity": 2,
+            "url": "https://www.reuters.com"
+        },
+        {
+            "id": 7,
+            "query": "Extract all headlines from More Top Stories section and their associated image links.",
+            "output_format": {"headline": "headline text", "image_link": "image URL"},
+            "complexity": 2,
+            "url": "https://www.reuters.com"
+        },
+        {
+            "id": 8,
+            "query": "How many articles are about Russia or Ukraine?",
+            "output_format": {"count": "number of articles about Russia or Ukraine"},
+            "complexity": 3,
+            "url": "https://www.reuters.com"
+        },
+        {
+            "id": 9,
+            "query": "Extract the benchmark tools with their corresponding typical bias",
+            "output_format": {"benchmark_tool": "name of the benchmark tool", "bias": "typical bias associated with the tool"},
+            "complexity": 2,
+            "url": "https://dev.to/actiandev/how-to-evaluate-vector-databases-in-2026-213m"
+        },
+        {
+            
+            "id": 10,
+            "query": "Extract just the name of the five production tests that actually matter and that are mentioned in the article",
+            "output_format": {"test_name": "name of the production test"},
+            "complexity": 2,
+            "url": "https://dev.to/actiandev/how-to-evaluate-vector-databases-in-2026-213m"
+        },
+        {
+            "id": 11,
+            "query": "Extract the author's name and the date of publication of the article",
+            "output_format": {"author": "name of the author", "publication_date": "date of publication"},
+            "complexity": 1,
+            "url": "https://dev.to/actiandev/how-to-evaluate-vector-databases-in-2026-213m"
+        }
+    ],
+    "ecommerce": [
+        {
+            "id": 1,
+            "query": "Extract all product names and their prices.",
+            "output_format": {"product": "product name", "price": "product price"},
+            "complexity": 1,
+            "url": "https://scrapeme.live/shop/"
+        },
+        {
+            "id": 2,    
+            "query": "Extract products that have a cost greater than $86.",
+            "output_format": {"product": "product name"},
+            "complexity": 2,
+            "url": "https://scrapeme.live/shop/"
+        },
+        {
+            "id": 3,
+            "query": "Extract products that have a cost greater than $86 and their price.",
+            "output_format": {"product": "product name", "price": "product price"},
+            "complexity": 2,
+            "url": "https://scrapeme.live/shop/"
+        },
+        {
+            "id": 4,
+            "query": "Extract the names of all products that are in stock.",
+            "output_format": {"product": "product name"},
+            "complexity": 1,
+            "url": "https://webscraper.io/test-sites/e-commerce/allinone/computers/laptops"    
+        },
+        {
+            "id": 5,
+            "query": "Extract all products that have a rating equal to 1 star.",
+            "output_format": {"product": "product name"},
+            "complexity": 2,
+            "url": "https://webscraper.io/test-sites/e-commerce/allinone/computers/laptops"
+        },
+        {
+            "id": 6,
+            "query": "Extract all products that have a price greater than $1200 and their prices.",
+            "output_format": {"product": "product name", "price": "product price"},
+            "complexity": 2,
+            "url": "https://webscraper.io/test-sites/e-commerce/allinone/computers/laptops"
+        },
+        {
+            "id": 7,
+            "query": "Extract all products that have a price less than $ 200",
+            "output_format": {"product": "product name"},
+            "complexity": 2,
+            "url": "https://webscraper.io/test-sites/e-commerce/allinone/computers/laptops"
+        },
+        {
+            "id": 8,
+            "query": "Extract all products that have a price less than 400 and a rating of 4 stars or more and their prices.",
+            "output_format": {"product": "product name", "price": "product price"},
+            "complexity": 3,
+            "url": "https://webscraper.io/test-sites/e-commerce/allinone/computers/laptops"
+        },
+        {
+            "id": 9,
+            "query": "Extract all ASUS products",
+            "output_format": {"product": "product name"},
+            "complexity": 1,
+            "url": "https://webscraper.io/test-sites/e-commerce/allinone/computers/laptops"
+        },
+        {
+            "id": 10,
+            "query": "Extract all laptops that have GPU AMD Radeon Graphics",
+            "output_format": {"product": "product name"},
+            "complexity": 3,
+            "url": "https://www.newegg.com/p/pl?d=laptop"
+        }
+    ],
+    "documentation": [
+        {
+            "id": 1,
+            "query": "Extract all section titles in the document.",
+            "output_format": {"section": "section title"},
+            "complexity": 1,
+            "url": "https://docs.python.org/3/tutorial/classes.html"
+        },
+        {
+            "id": 2,
+            "query": "Extract all document subsection titles that contains code examples.",
+            "output_format": {"section": "section title"},
+            "complexity": 2,
+            "url": "https://docs.python.org/3/tutorial/classes.html"
+        },
+        {
+            "id": 3,
+            "query": "Extract all programming languages mentioned in the document and the context in which they are compared to Python.",
+            "output_format": {"language": "language name", "context": "comparison context"},
+            "complexity": 2,
+            "url": "https://docs.python.org/3/tutorial/classes.html"
+        },
+        {
+            "id": 4,
+            "query": "Extract all subsections that belong to the section titled Advanced Concepts.",
+            "output_format": {"section": "section title"},
+            "complexity": 2,
+            "url": "https://docs.langchain.com/oss/python/langchain/agents"
+        },
+        {
+            "id": 5,
+            "query": "Extract all section titles in the document.",
+            "output_format": {"section": "section title"},
+            "complexity": 1,
+            "url": "https://docs.langchain.com/oss/python/langchain/agents"
+        },
+        {
+            "id": 6,
+            "query": "Extract all sections with their corresponding subsections.",
+            "output_format": {"section": "section title", "subsections": ["list of subsection titles"]},
+            "complexity": 3,
+            "url": "https://docs.langchain.com/oss/python/langchain/agents"
+        }
+    ]
+}
