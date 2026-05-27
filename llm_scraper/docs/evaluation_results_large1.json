@@ -1,0 +1,2178 @@
+[
+  {
+    "id": 1,
+    "domain": "news",
+    "complexity": 1,
+    "query": "Extract the names of all people mentioned in the article.",
+    "config_name": "B_large_baseline",
+    "expected": [
+      {
+        "person": "Pep Guardiola"
+      },
+      {
+        "person": "Enzo Maresca"
+      },
+      {
+        "person": "Manuel Pellegrini"
+      },
+      {
+        "person": "Bernardo Silva"
+      },
+      {
+        "person": "John Stones"
+      },
+      {
+        "person": "Kevin de Bruyne"
+      },
+      {
+        "person": "Ederson"
+      },
+      {
+        "person": "Kyle Walker"
+      },
+      {
+        "person": "Andoni Iraola"
+      }
+    ],
+    "extracted": [
+      {
+        "person": "Pep Guardiola"
+      },
+      {
+        "person": "Enzo Maresca"
+      },
+      {
+        "person": "Andoni Iraola"
+      },
+      {
+        "person": "Manuel Pellegrini"
+      },
+      {
+        "person": "Bernardo Silva"
+      },
+      {
+        "person": "John Stones"
+      },
+      {
+        "person": "Kevin de Bruyne"
+      },
+      {
+        "person": "Ederson"
+      },
+      {
+        "person": "Kyle Walker"
+      }
+    ],
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "error": ""
+  },
+  {
+    "id": 2,
+    "domain": "news",
+    "complexity": 1,
+    "query": "Extract all quotes said by Guardiola in the article.",
+    "config_name": "B_large_baseline",
+    "expected": [
+      {
+        "quote": "No way,"
+      },
+      {
+        "quote": "one more year"
+      },
+      {
+        "quote": "Yeah"
+      },
+      {
+        "quote": "I am here, I have a contract."
+      },
+      {
+        "quote": "Next. So many times – I have one more year."
+      },
+      {
+        "quote": "No, no, no, no, no, no, I have no idea [about] that,"
+      },
+      {
+        "quote": "They don't have to do anything, honestly."
+      }
+    ],
+    "extracted": [
+      {
+        "quote": "No way"
+      },
+      {
+        "quote": "one more year"
+      },
+      {
+        "quote": "Yeah."
+      },
+      {
+        "quote": "I am here, I have a contract."
+      },
+      {
+        "quote": "Next. So many times â I have one more year."
+      },
+      {
+        "quote": "No, no, no, no, no, no, I have no idea [about] that,"
+      },
+      {
+        "quote": "They don't have to do anything, honestly."
+      },
+      {
+        "quote": "no way"
+      },
+      {
+        "quote": "one more year [on his contract]"
+      }
+    ],
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "error": ""
+  },
+  {
+    "id": 3,
+    "domain": "news",
+    "complexity": 2,
+    "query": "Extract the main events described in the article.",
+    "config_name": "B_large_baseline",
+    "expected": [
+      {
+        "event": "final game of the season against Villa"
+      },
+      {
+        "event": "FA Cup final"
+      },
+      {
+        "event": "1992 Barcelona Olympics"
+      },
+      {
+        "event": "La Liga"
+      },
+      {
+        "event": "Champions League"
+      },
+      {
+        "event": "Carabao Cup"
+      },
+      {
+        "event": "Bundesliga"
+      },
+      {
+        "event": "German Cup"
+      },
+      {
+        "event": "European Cup"
+      }
+    ],
+    "extracted": [
+      {
+        "event": "Manchester City are preparing for Pep Guardiola's departure at the end of the 2023-24 season."
+      },
+      {
+        "event": "The club is considering naming the newly expanded North Stand after Guardiola."
+      },
+      {
+        "event": "Former Chelsea manager Enzo Maresca is the frontrunner to replace Guardiola."
+      },
+      {
+        "event": "Guardiola has won 17 major trophies (20 overall) with City, including six Premier League titles, a Champions League, three FA Cups and five EFL Cups."
+      },
+      {
+        "event": "Guardiola repeatedly affirmed he has \"one more year\" on his contract despite speculation about his exit."
+      },
+      {
+        "event": "City achieved a record 100‑point Premier League season in 2017‑18 and completed a treble in 2022‑23."
+      },
+      {
+        "event": "Manchester City became the first English team to win four consecutive league titles with the 2023‑24 triumph."
+      },
+      {
+        "event": "Key players such as Bernardo Silva, John Stones, Kevin De Bruyne, Ederson and Kyle Walker are set to leave the club after the season."
+      },
+      {
+        "event": "The club faces 115 charges for alleged Premier League financial rule breaches."
+      },
+      {
+        "event": "Guardiola led City to a third FA Cup win under his tenure, celebrating with staff and hinting at a possible final appearance at Bournemouth, his 593rd match in charge."
+      }
+    ],
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1": 0.0,
+    "error": ""
+  },
+  {
+    "id": 4,
+    "domain": "news",
+    "complexity": 2,
+    "query": "Extract all trophies Guardiola won with Manchester City, indicating the competition name and the number of titles won in that competition.",
+    "config_name": "B_large_baseline",
+    "expected": [
+      {
+        "competition": "Premier League",
+        "titles_won": "6"
+      },
+      {
+        "competition": "Champions League",
+        "titles_won": "1"
+      },
+      {
+        "competition": "FA Cup",
+        "titles_won": "3"
+      },
+      {
+        "competition": "EFL Cup",
+        "titles_won": "5"
+      }
+    ],
+    "extracted": [
+      {
+        "competition": "Premier League",
+        "titles_won": "6"
+      },
+      {
+        "competition": "Champions League",
+        "titles_won": "1"
+      },
+      {
+        "competition": "FA Cup",
+        "titles_won": "3"
+      },
+      {
+        "competition": "EFL Cup",
+        "titles_won": "5"
+      }
+    ],
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "error": ""
+  },
+  {
+    "id": 5,
+    "domain": "news",
+    "complexity": 1,
+    "query": "Extract all news headlines from technology section.",
+    "config_name": "B_large_baseline",
+    "expected": [
+      {
+        "headline": "Samsung union says to embark on 48,000-strong strike after impasse on bonuses"
+      },
+      {
+        "headline": "Fears of unfettered hacking spurred by Anthropic's Mythos AI model overstated"
+      }
+    ],
+    "extracted": [],
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1": 0.0,
+    "error": ""
+  },
+  {
+    "id": 6,
+    "domain": "news",
+    "complexity": 2,
+    "query": "Extract all headlines from In Case you Missed It section.",
+    "config_name": "B_large_baseline",
+    "expected": [
+      {
+        "headline": "Trump drops IRS lawsuit in exchange for DOJ $1.8 billion 'weaponization' fund"
+      },
+      {
+        "headline": "How Trump’s crypto venture and Iran’s top exchange tapped into the same industry networks"
+      },
+      {
+        "headline": "Civil rights veterans see history repeating after high court guts Voting Rights Act"
+      }
+    ],
+    "extracted": [],
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1": 0.0,
+    "error": ""
+  },
+  {
+    "id": 9,
+    "domain": "news",
+    "complexity": 2,
+    "query": "Extract the benchmark tools with their corresponding typical bias",
+    "config_name": "B_large_baseline",
+    "expected": [
+      {
+        "benchmark_tool": "VectorDBBench",
+        "bias": "Favors massive clusters; penalizes single-node systems."
+      },
+      {
+        "benchmark_tool": "vector-db-benchmark",
+        "bias": "Favors RAM-heavy architectures; ignores TCO of memory."
+      },
+      {
+        "benchmark_tool": "ANN-Benchmarks",
+        "bias": "Uses outdated, low-dimensional datasets (SIFT/GIST)."
+      },
+      {
+        "benchmark_tool": "NeurIPS / VLDB",
+        "bias": "Focuses on math/theory; ignores operational/SLA reality."
+      }
+    ],
+    "extracted": [
+      {
+        "benchmark_tool": "VectorDBBench",
+        "bias": "Favors massive clusters; penalizes single-node systems."
+      },
+      {
+        "benchmark_tool": "vector-db-benchmark",
+        "bias": "Favors RAM-heavy architectures; ignores TCO of memory."
+      },
+      {
+        "benchmark_tool": "ANN-Benchmarks",
+        "bias": "Uses outdated, low-dimensional datasets (SIFT/GIST)."
+      },
+      {
+        "benchmark_tool": "NeurIPS / VLDB",
+        "bias": "Focuses on math/theory; ignores operational/SLA reality."
+      }
+    ],
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "error": ""
+  },
+  {
+    "id": 10,
+    "domain": "news",
+    "complexity": 2,
+    "query": "Extract just the name of the five production tests that actually matter and that are mentioned in the article",
+    "config_name": "B_large_baseline",
+    "expected": [
+      {
+        "test_name": "Filtering under concurrent load"
+      },
+      {
+        "test_name": "Performance degradation over time"
+      },
+      {
+        "test_name": "Tail latency under load (P95/P99)"
+      },
+      {
+        "test_name": "Total cost of ownership (TCO)"
+      },
+      {
+        "test_name": "Operational maturity"
+      }
+    ],
+    "extracted": [
+      {
+        "test_name": "Filtering under concurrent load"
+      },
+      {
+        "test_name": "Performance degradation over time"
+      },
+      {
+        "test_name": "Tail latency under load (P95/P99)"
+      },
+      {
+        "test_name": "Total cost of ownership (TCO)"
+      },
+      {
+        "test_name": "Operational maturity"
+      }
+    ],
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "error": ""
+  },
+  {
+    "id": 11,
+    "domain": "news",
+    "complexity": 1,
+    "query": "Extract the author's name and the date of publication of the article",
+    "config_name": "B_large_baseline",
+    "expected": [
+      {
+        "author": "Odewole Babatunde Samson",
+        "publication_date": "19 may"
+      }
+    ],
+    "extracted": [],
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1": 0.0,
+    "error": ""
+  },
+  {
+    "id": 1,
+    "domain": "ecommerce",
+    "complexity": 1,
+    "query": "Extract all product names and their prices.",
+    "config_name": "B_large_baseline",
+    "expected": [
+      {
+        "product": "Bulbasaur",
+        "price": "63.00"
+      },
+      {
+        "product": "Ivysaur",
+        "price": "87.00"
+      },
+      {
+        "product": "Venusaur",
+        "price": "105.00"
+      },
+      {
+        "product": "Charmander",
+        "price": "48.00"
+      },
+      {
+        "product": "Charmeleon",
+        "price": "165.00"
+      },
+      {
+        "product": "Charizard",
+        "price": "156.00"
+      },
+      {
+        "product": "Squirtle",
+        "price": "130.00"
+      },
+      {
+        "product": "Wartortle",
+        "price": "123.00"
+      },
+      {
+        "product": "Blastoise",
+        "price": "76.00"
+      },
+      {
+        "product": "Caterpie",
+        "price": "73.00"
+      },
+      {
+        "product": "Metapod",
+        "price": "148.00"
+      },
+      {
+        "product": "Butterfree",
+        "price": "162.00"
+      },
+      {
+        "product": "Weedle",
+        "price": "25.00"
+      },
+      {
+        "product": "Kakuna",
+        "price": "148.00"
+      },
+      {
+        "product": "Beedrill",
+        "price": "168.00"
+      },
+      {
+        "product": "Pidgey",
+        "price": "159.00"
+      }
+    ],
+    "extracted": [],
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1": 0.0,
+    "error": ""
+  },
+  {
+    "id": 2,
+    "domain": "ecommerce",
+    "complexity": 2,
+    "query": "Extract products that have a cost greater than $86.",
+    "config_name": "B_large_baseline",
+    "expected": [
+      {
+        "product": "Ivisaur"
+      },
+      {
+        "product": "Venusaur"
+      },
+      {
+        "product": "Charmeleon"
+      },
+      {
+        "product": "Charizard"
+      },
+      {
+        "product": "Squirtle"
+      },
+      {
+        "product": "Wartortle"
+      },
+      {
+        "product": "Metapod"
+      },
+      {
+        "product": "Butterfree"
+      },
+      {
+        "product": "Kakuna"
+      },
+      {
+        "product": "Beedrill"
+      },
+      {
+        "product": "Pidgey"
+      }
+    ],
+    "extracted": [
+      {
+        "product": "Ivysaur"
+      },
+      {
+        "product": "Venusaur"
+      },
+      {
+        "product": "Charmeleon"
+      },
+      {
+        "product": "Charizard"
+      },
+      {
+        "product": "Squirtle"
+      },
+      {
+        "product": "Wartortle"
+      },
+      {
+        "product": "Butterfree"
+      },
+      {
+        "product": "Kakuna"
+      },
+      {
+        "product": "Beedrill"
+      },
+      {
+        "product": "Pidgey"
+      }
+    ],
+    "precision": 1.0,
+    "recall": 0.909,
+    "f1": 0.952,
+    "error": ""
+  },
+  {
+    "id": 3,
+    "domain": "ecommerce",
+    "complexity": 2,
+    "query": "Extract products that have a cost greater than $86 and their price.",
+    "config_name": "B_large_baseline",
+    "expected": [
+      {
+        "product": "Ivysaur",
+        "price": "87.00"
+      },
+      {
+        "product": "Venusaur",
+        "price": "105.00"
+      },
+      {
+        "product": "Charmeleon",
+        "price": "165.00"
+      },
+      {
+        "product": "Charizard",
+        "price": "156.00"
+      },
+      {
+        "product": "Squirtle",
+        "price": "130.00"
+      },
+      {
+        "product": "Wartortle",
+        "price": "123.00"
+      },
+      {
+        "product": "Metapod",
+        "price": "148.00"
+      },
+      {
+        "product": "Butterfree",
+        "price": "162.00"
+      },
+      {
+        "product": "Kakuna",
+        "price": "148.00"
+      },
+      {
+        "product": "Beedrill",
+        "price": "168.00"
+      },
+      {
+        "product": "Pidgey",
+        "price": "159.00"
+      }
+    ],
+    "extracted": [
+      {
+        "product": "Ivysaur",
+        "price": "£87.00"
+      },
+      {
+        "product": "Venusaur",
+        "price": "£105.00"
+      },
+      {
+        "product": "Charmeleon",
+        "price": "£165.00"
+      },
+      {
+        "product": "Charizard",
+        "price": "£156.00"
+      },
+      {
+        "product": "Squirtle",
+        "price": "£130.00"
+      },
+      {
+        "product": "Wartortle",
+        "price": "£123.00"
+      },
+      {
+        "product": "Butterfree",
+        "price": "£162.00"
+      },
+      {
+        "product": "Kakuna",
+        "price": "£148.00"
+      },
+      {
+        "product": "Beedrill",
+        "price": "£168.00"
+      },
+      {
+        "product": "Pidgey",
+        "price": "£159.00"
+      }
+    ],
+    "precision": 1.0,
+    "recall": 0.909,
+    "f1": 0.952,
+    "error": ""
+  },
+  {
+    "id": 4,
+    "domain": "ecommerce",
+    "complexity": 1,
+    "query": "Extract the names of all products that are in stock.",
+    "config_name": "B_large_baseline",
+    "expected": [
+      {
+        "product": "Asus VivoBook X441NA-GA190"
+      },
+      {
+        "product": "Prestigio SmartBook 133S"
+      },
+      {
+        "product": "Prestigio SmartBook 133S"
+      },
+      {
+        "product": "Aspire E1-510"
+      },
+      {
+        "product": "Lenovo V110-15IAP,"
+      },
+      {
+        "product": "Asus VivoBook 15 X540NA-GQ008T"
+      },
+      {
+        "product": "Hewlett Packard 250 G6"
+      },
+      {
+        "product": "Acer Aspire 3 A315-31"
+      },
+      {
+        "product": "Acer Aspire A315-31-C33J"
+      },
+      {
+        "product": "Acer Aspire ES1-572"
+      },
+      {
+        "product": "Acer Aspire 3 A315-31"
+      },
+      {
+        "product": "Acer Aspire 3 A315-21"
+      },
+      {
+        "product": "Asus VivoBook Max X541NA-GQ041"
+      },
+      {
+        "product": "Asus VivoBook E502NA-GO022T"
+      },
+      {
+        "product": "Lenovo ThinkPad E31-80"
+      },
+      {
+        "product": "Acer Aspire 3 A315-31"
+      },
+      {
+        "product": "Lenovo V110-15ISK"
+      },
+      {
+        "product": "Acer Aspire ES1-732"
+      },
+      {
+        "product": "Asus VivoBook 15 X540NA-GQ026T"
+      },
+      {
+        "product": "Packard 255 G2"
+      },
+      {
+        "product": "Asus EeeBook R416NA-FA014T"
+      },
+      {
+        "product": "Acer Aspire 3 A315-51"
+      },
+      {
+        "product": "Acer Aspire ES1-572 Black"
+      },
+      {
+        "product": "Acer Extensa 15 (2540)"
+      },
+      {
+        "product": "Acer Aspire ES1-572"
+      },
+      {
+        "product": "Lenovo V110-15ISK"
+      },
+      {
+        "product": "Acer Aspire A315-51-33TG"
+      },
+      {
+        "product": "Lenovo V110-15IKB"
+      },
+      {
+        "product": "Asus VivoBook 15 X540UA-DM260"
+      },
+      {
+        "product": "Acer Aspire ES1-572"
+      },
+      {
+        "product": "Lenovo V510"
+      },
+      {
+        "product": "Acer Aspire ES1-572"
+      },
+      {
+        "product": "Lenovo V510"
+      },
+      {
+        "product": "Acer Swift 1 SF113-31"
+      },
+      {
+        "product": "Dell Vostro 15 (3568)"
+      },
+      {
+        "product": "Acer Aspire 3 A315-51"
+      },
+      {
+        "product": "Dell Vostro 15 (3568)"
+      },
+      {
+        "product": "Lenovo V510 Black"
+      },
+      {
+        "product": "HP 250 G3"
+      },
+      {
+        "product": "Acer Spin 5 SP513-51"
+      },
+      {
+        "product": "HP 350 G1"
+      },
+      {
+        "product": "Aspire E1-572G"
+      },
+      {
+        "product": "Pavilion"
+      },
+      {
+        "product": "Acer Aspire A515-51-5654"
+      },
+      {
+        "product": "Dell Inspiron 15 (5567)"
+      },
+      {
+        "product": "Asus VivoBook S14 (S406UA-BV041T)"
+      },
+      {
+        "product": "ProBook"
+      },
+      {
+        "product": "Inspiron 15"
+      },
+      {
+        "product": "Asus ROG STRIX GL553VD-DM256"
+      },
+      {
+        "product": "Acer Nitro 5 AN515-51"
+      },
+      {
+        "product": "Asus ROG STRIX GL553VD-DM256"
+      },
+      {
+        "product": "Lenovo ThinkPad L570"
+      },
+      {
+        "product": "ThinkPad Yoga"
+      },
+      {
+        "product": "Lenovo ThinkPad L460"
+      },
+      {
+        "product": "Dell Inspiron 15 (7567)"
+      },
+      {
+        "product": "MSI GL72M 7RDX"
+      },
+      {
+        "product": "Asus ROG Strix GL553VD-DM535T"
+      },
+      {
+        "product": "Apple MacBook Air"
+      },
+      {
+        "product": "Dell Latitude 5280"
+      },
+      {
+        "product": "Dell Latitude 5480"
+      },
+      {
+        "product": "Lenovo Legion Y520-15IKBM"
+      },
+      {
+        "product": "Toshiba Portege Z30-C-16J"
+      },
+      {
+        "product": "Acer Predator Helios 300 (PH317-51)"
+      },
+      {
+        "product": "Acer Aspire 7 A715-71G"
+      },
+      {
+        "product": "Dell Inspiron 17 2in1 (7779)"
+      },
+      {
+        "product": "Dell Latitude 5480"
+      },
+      {
+        "product": "Lenovo Legion Y520"
+      },
+      {
+        "product": "Asus AsusPro Advanced BU401LA-FA271G"
+      },
+      {
+        "product": "Acer Nitro 5 AN515-51"
+      },
+      {
+        "product": "Dell Latitude 5480"
+      },
+      {
+        "product": "Dell Inspiron 15 (7567)"
+      },
+      {
+        "product": "Dell Latitude 5580"
+      },
+      {
+        "product": "Lenovo Legion Y520-15IKBM"
+      },
+      {
+        "product": "MSI GP62M 7RDX"
+      },
+      {
+        "product": "Lenovo Yoga 720"
+      },
+      {
+        "product": "Toshiba Portege Z30-C-16L"
+      },
+      {
+        "product": "Acer TravelMate P645-S-511A"
+      },
+      {
+        "product": "Dell Latitude 5580"
+      },
+      {
+        "product": "ThinkPad T540p"
+      },
+      {
+        "product": "MSI GS63 7RD Stealth"
+      },
+      {
+        "product": "Dell Latitude 5480"
+      },
+      {
+        "product": "Acer Predator Helios 300 (PH317-51)"
+      },
+      {
+        "product": "MSI GL62M 7REX"
+      },
+      {
+        "product": "MSI GL62M 7REX2"
+      },
+      {
+        "product": "Lenovo Yoga 910"
+      },
+      {
+        "product": "Toshiba Portege X30-D-10J"
+      },
+      {
+        "product": "Lenovo IdeaPad Miix 510"
+      },
+      {
+        "product": "Acer Predator Helios 300 (PH317-51)"
+      },
+      {
+        "product": "ThinkPad Yoga"
+      },
+      {
+        "product": "Asus VivoBook Pro 15 N580VN-FI006T"
+      },
+      {
+        "product": "Dell Latitude 5480"
+      },
+      {
+        "product": "Asus ZenBook UX530UX-FY040T"
+      },
+      {
+        "product": "ThinkPad X230"
+      },
+      {
+        "product": "Asus ROG Strix GL753VE-GC096T"
+      },
+      {
+        "product": "Apple MacBook Air"
+      },
+      {
+        "product": "Dell Latitude 5480"
+      },
+      {
+        "product": "Hewlett Packard Spectre 13-v106na"
+      },
+      {
+        "product": "Dell XPS 13"
+      },
+      {
+        "product": "Toshiba Portege Z30-C-16K"
+      },
+      {
+        "product": "MSI GL62VR 7RFX"
+      },
+      {
+        "product": "Dell Latitude 5480"
+      },
+      {
+        "product": "ThinkPad X240"
+      },
+      {
+        "product": "Hewlett Packard ProBook 640 G3"
+      },
+      {
+        "product": "Apple MacBook Pro"
+      },
+      {
+        "product": "Dell Latitude 5580"
+      },
+      {
+        "product": "Dell Latitude 5480"
+      },
+      {
+        "product": "Dell Latitude 5580"
+      },
+      {
+        "product": "Lenovo ThinkPad Yoga 370"
+      },
+      {
+        "product": "Lenovo ThinkPad T470"
+      },
+      {
+        "product": "Toshiba Portege X20W-D-10V"
+      },
+      {
+        "product": "Asus ASUSPRO B9440UA-GV0279R"
+      },
+      {
+        "product": "Lenovo Legion Y720"
+      },
+      {
+        "product": "Asus ROG Strix GL702VM-GC146T"
+      },
+      {
+        "product": "Asus ROG Strix GL702ZC-GC154T"
+      },
+      {
+        "product": "Asus ROG Strix GL702ZC-GC209T"
+      },
+      {
+        "product": "Asus ROG Strix SCAR Edition GL503VM-ED115T"
+      }
+    ],
+    "extracted": [
+      {
+        "product": "Asus VivoBook X441NA-GA190 Chocolate Black"
+      },
+      {
+        "product": "Prestigio SmartBook 133S Dark Grey"
+      },
+      {
+        "product": "Prestigio SmartBook 133S Gold"
+      },
+      {
+        "product": "Lenovo V110-15IAP"
+      },
+      {
+        "product": "Asus VivoBook 15 X540NA-GQ008T Chocolate Black"
+      },
+      {
+        "product": "Hewlett Packard 250 G6 Dark Ash Silver"
+      },
+      {
+        "product": "Acer Aspire 3 A315-31 Black"
+      },
+      {
+        "product": "Acer Aspire A315-31-C33J Black"
+      },
+      {
+        "product": "Acer Aspire ES1-572 Black"
+      },
+      {
+        "product": "Acer Aspire 3 A315-31 Black"
+      },
+      {
+        "product": "Acer Aspire 3 A315-21"
+      },
+      {
+        "product": "Asus VivoBook Max X541NA-GQ041 Black Chocolate"
+      },
+      {
+        "product": "Asus VivoBook E502NA-GO022T Dark Blue"
+      },
+      {
+        "product": "Lenovo ThinkPad E31-80"
+      },
+      {
+        "product": "Lenovo V110-15ISK"
+      },
+      {
+        "product": "Acer Aspire ES1-732 Black"
+      },
+      {
+        "product": "Asus VivoBook 15 X540NA-GQ026T Chocolate Black"
+      },
+      {
+        "product": "Asus EeeBook R416NA-FA014T"
+      },
+      {
+        "product": "Acer Aspire 3 A315-51"
+      },
+      {
+        "product": "Acer Aspire ES1-572 Black"
+      },
+      {
+        "product": "Acer Extensa 15 (2540) Black"
+      },
+      {
+        "product": "Acer Aspire ES1-572 Black"
+      },
+      {
+        "product": "Lenovo V110-15ISK"
+      },
+      {
+        "product": "Acer Aspire A315-51-33TG"
+      },
+      {
+        "product": "Lenovo V110-15IKB"
+      },
+      {
+        "product": "Asus VivoBook 15 X540UA-DM260 Chocolate Black"
+      },
+      {
+        "product": "Acer Aspire ES1-572 Black"
+      },
+      {
+        "product": "Lenovo V510 Black"
+      },
+      {
+        "product": "Acer Aspire ES1-572 Black"
+      },
+      {
+        "product": "Lenovo V510 Black"
+      },
+      {
+        "product": "Acer Swift 1 SF113-31 Silver"
+      },
+      {
+        "product": "Dell Vostro 15 (3568) Black"
+      },
+      {
+        "product": "Acer Aspire 3 A315-51 Black"
+      },
+      {
+        "product": "Dell Vostro 15 (3568) Red"
+      },
+      {
+        "product": "Lenovo V510 Black"
+      },
+      {
+        "product": "Acer Spin 5 SP513-51 Black"
+      },
+      {
+        "product": "Acer Aspire A515-51-5654"
+      },
+      {
+        "product": "Dell Inspiron 15 (5567) Fog Gray"
+      },
+      {
+        "product": "Asus VivoBook S14 (S406UA-BV041T) Starry Grey"
+      },
+      {
+        "product": "Asus ROG STRIX GL553VD-DM256"
+      },
+      {
+        "product": "Acer Nitro 5 AN515-51"
+      },
+      {
+        "product": "Asus ROG STRIX GL553VD-DM256"
+      },
+      {
+        "product": "Lenovo ThinkPad L570"
+      },
+      {
+        "product": "Lenovo ThinkPad L460"
+      },
+      {
+        "product": "Dell Inspiron 15 (7567) Black"
+      },
+      {
+        "product": "MSI GL72M 7RDX"
+      },
+      {
+        "product": "Asus ROG Strix GL553VD-DM535T"
+      },
+      {
+        "product": "Apple MacBook Air 13.3\""
+      },
+      {
+        "product": "Dell Latitude 5280"
+      },
+      {
+        "product": "Dell Latitude 5480"
+      },
+      {
+        "product": "Lenovo Legion Y520-15IKBM"
+      },
+      {
+        "product": "Toshiba Portege Z30-C-16J Grey"
+      },
+      {
+        "product": "Acer Predator Helios 300 (PH317-51)"
+      },
+      {
+        "product": "Acer Aspire 7 A715-71G"
+      },
+      {
+        "product": "Dell Inspiron 17 2in1 (7779) Silver"
+      },
+      {
+        "product": "Lenovo Legion Y520"
+      },
+      {
+        "product": "Asus AsusPro Advanced BU401LA-FA271G Dark Grey"
+      },
+      {
+        "product": "Acer Nitro 5 AN515-51"
+      },
+      {
+        "product": "Dell Latitude 5580"
+      },
+      {
+        "product": "MSI GP62M 7RDX Leopard"
+      },
+      {
+        "product": "Lenovo Yoga 720 Grey"
+      },
+      {
+        "product": "Toshiba Portege Z30-C-16L Grey"
+      },
+      {
+        "product": "Acer TravelMate P645-S-511A Black"
+      },
+      {
+        "product": "MSI GS63 7RD Stealth"
+      },
+      {
+        "product": "Acer Predator Helios 300 (PH317-51)"
+      },
+      {
+        "product": "MSI GL62M 7REX"
+      },
+      {
+        "product": "MSI GL62M 7REX2"
+      },
+      {
+        "product": "Lenovo Yoga 910 Grey"
+      },
+      {
+        "product": "Toshiba Portege X30-D-10J Black/Blue"
+      },
+      {
+        "product": "Lenovo IdeaPad Miix 510 Platinum Silver"
+      },
+      {
+        "product": "Asus VivoBook Pro 15 N580VN-FI006T Gold Metal"
+      },
+      {
+        "product": "Asus ZenBook UX530UX-FY040T Blue"
+      },
+      {
+        "product": "Asus ROG Strix GL753VE-GC096T"
+      },
+      {
+        "product": "Apple MacBook Air 13\""
+      },
+      {
+        "product": "Hewlett Packard Spectre 13-v106na Dark Ash Silver"
+      },
+      {
+        "product": "Toshiba Portege Z30-C-16K Grey"
+      },
+      {
+        "product": "MSI GL62VR 7RFX"
+      },
+      {
+        "product": "Hewlett Packard ProBook 640 G3"
+      },
+      {
+        "product": "Apple MacBook Pro 13\" Space Gray"
+      },
+      {
+        "product": "Lenovo ThinkPad T470"
+      },
+      {
+        "product": "Lenovo ThinkPad Yoga 370 Black"
+      },
+      {
+        "product": "Toshiba Portege X20W-D-10V Black/Blue"
+      },
+      {
+        "product": "Asus ASUSPRO B9440UA-GV0279R Gray"
+      },
+      {
+        "product": "Lenovo Legion Y720"
+      },
+      {
+        "product": "Asus ROG Strix GL702VM-GC146T"
+      },
+      {
+        "product": "Asus ROG Strix GL702ZC-GC154T"
+      },
+      {
+        "product": "Asus ROG Strix GL702ZC-GC209T"
+      },
+      {
+        "product": "Asus ROG Strix SCAR Edition GL503VM-ED115T"
+      }
+    ],
+    "precision": 1.0,
+    "recall": 0.983,
+    "f1": 0.991,
+    "error": ""
+  },
+  {
+    "id": 5,
+    "domain": "ecommerce",
+    "complexity": 2,
+    "query": "Extract all products that have a rating equal to 1 star.",
+    "config_name": "B_large_baseline",
+    "expected": [
+      {
+        "product": "Hewlett Packard 250 G6"
+      },
+      {
+        "product": "Asus VivoBook Max X541NA-GQ041"
+      },
+      {
+        "product": "Lenovo ThinkPad E31-80"
+      },
+      {
+        "product": "Asus EeeBook R416NA-FA014T"
+      },
+      {
+        "product": "Acer Aspire 3 A315-51"
+      },
+      {
+        "product": "Acer Aspire ES1-572"
+      },
+      {
+        "product": "Acer Aspire ES1-572"
+      },
+      {
+        "product": "Lenovo V110-15IKB"
+      },
+      {
+        "product": "Asus VivoBook 15 X540UA-DM260"
+      },
+      {
+        "product": "Acer Aspire ES1-572 Black"
+      },
+      {
+        "product": "Dell Vostro 15 (3568)"
+      },
+      {
+        "product": "Aspire E1-572G"
+      },
+      {
+        "product": "Pavilion"
+      },
+      {
+        "product": "Asus VivoBook S14 (S406UA-BV041T)"
+      },
+      {
+        "product": "Acer Nitro 5 AN515-51"
+      },
+      {
+        "product": "Asus ROG STRIX GL553VD-DM256"
+      },
+      {
+        "product": "Dell Inspiron 15 (7567)"
+      },
+      {
+        "product": "Asus ROG Strix GL553VD-DM535T"
+      },
+      {
+        "product": "Dell Latitude 5280"
+      },
+      {
+        "product": "Toshiba Portege Z30-C-16J"
+      },
+      {
+        "product": "Lenovo Legion Y520"
+      },
+      {
+        "product": "Dell Inspiron 15 (7567)"
+      },
+      {
+        "product": "MSI GP62M 7RDX"
+      },
+      {
+        "product": "Acer TravelMate P645-S-511A"
+      },
+      {
+        "product": "Toshiba Portege Z30-C-16L"
+      },
+      {
+        "product": "ThinkPad T540p"
+      },
+      {
+        "product": "MSI GS63 7RD"
+      },
+      {
+        "product": "MSI GL62M 7REX"
+      },
+      {
+        "product": "Acer Predator Helios 300 (PH317-51)"
+      },
+      {
+        "product": "Asus ZenBook UX530UX-FY040T"
+      },
+      {
+        "product": "Dell Latitude 5480"
+      },
+      {
+        "product": "Toshiba Portege Z30-C-16K"
+      },
+      {
+        "product": "Hewlett Packard ProBook 640 G3"
+      },
+      {
+        "product": "Apple MacBook Pro"
+      },
+      {
+        "product": "Dell Latitude 5580"
+      },
+      {
+        "product": "Lenovo ThinkPad T470"
+      },
+      {
+        "product": "Toshiba Portege X20W-D-10V"
+      },
+      {
+        "product": "Asus ASUSPRO B9440UA-GV0279R"
+      },
+      {
+        "product": "Asus ROG Strix GL702ZC-GC209T"
+      }
+    ],
+    "extracted": [
+      {
+        "product": "Asus EeeBook R416NA-FA014T, 14\" FHD, Pentium N4200, 4GB, 128GB eMMC, Windows 10 Home, Eng kbd"
+      }
+    ],
+    "precision": 1.0,
+    "recall": 0.308,
+    "f1": 0.471,
+    "error": ""
+  },
+  {
+    "id": 6,
+    "domain": "ecommerce",
+    "complexity": 2,
+    "query": "Extract all products that have a price greater than $1200 and their prices.",
+    "config_name": "B_large_baseline",
+    "expected": [
+      {
+        "product": "Toshiba Portege X30-D-10J",
+        "price": "1203.41"
+      },
+      {
+        "product": "Lenovo IdeaPad Miix 510",
+        "price": "1212.16"
+      },
+      {
+        "product": "Acer Predator Helios 300 (PH317-51)",
+        "price": "1221.58"
+      },
+      {
+        "product": "ThinkPad Yoga",
+        "price": "1223.99"
+      },
+      {
+        "product": "Asus VivoBook Pro 15 N580VN-FI006T",
+        "price": "1235.49"
+      },
+      {
+        "product": "Dell Latitude 5480",
+        "price": "1238.37"
+      },
+      {
+        "product": "Asus ZenBook UX530UX-FY040T",
+        "price": "1239.2"
+      },
+      {
+        "product": "ThinkPad X230",
+        "price": "1244.99"
+      },
+      {
+        "product": "Asus ROG Strix GL753VE-GC096T",
+        "price": "1259"
+      },
+      {
+        "product": "Apple MacBook Air",
+        "price": "1260.13"
+      },
+      {
+        "product": "Dell Latitude 5480",
+        "price": "1271.06"
+      },
+      {
+        "product": "Hewlett Packard Spectre 13-v106na",
+        "price": "1273.11"
+      },
+      {
+        "product": "Dell XPS 13",
+        "price": "1281.99"
+      },
+      {
+        "product": "oshiba Portege Z30-C-16K Grey\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D",
+        "price": "1294.74"
+      },
+      {
+        "product": "MSI GL62VR 7RFX",
+        "price": "1299"
+      }
+    ],
+    "extracted": [],
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1": 0.0,
+    "error": ""
+  },
+  {
+    "id": 7,
+    "domain": "ecommerce",
+    "complexity": 2,
+    "query": "Extract all products that have a price less than $ 200",
+    "config_name": "B_large_baseline",
+    "expected": [],
+    "extracted": [],
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "error": ""
+  },
+  {
+    "id": 8,
+    "domain": "ecommerce",
+    "complexity": 3,
+    "query": "Extract all products that have a price less than 400 and a rating of 4 stars or more and their prices.",
+    "config_name": "B_large_baseline",
+    "expected": [
+      {
+        "product": "Asus VivoBook E502NA-GO022T",
+        "price": "399.99"
+      },
+      {
+        "product": "Asus VivoBook Max X541NA-GQ041",
+        "price": "399"
+      },
+      {
+        "product": "Acer Aspire 3 A315-31",
+        "price": "391.48"
+      },
+      {
+        "product": "Acer Aspire ES1-572",
+        "price": "379.95"
+      },
+      {
+        "product": "Prestigio SmartBook 133S",
+        "price": "299"
+      }
+    ],
+    "extracted": [],
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1": 0.0,
+    "error": ""
+  },
+  {
+    "id": 9,
+    "domain": "ecommerce",
+    "complexity": 1,
+    "query": "Extract all ASUS products",
+    "config_name": "B_large_baseline",
+    "expected": [
+      {
+        "product": "Asus VivoBook X441NA-GA190"
+      },
+      {
+        "product": "Asus VivoBook 15 X540NA-GQ008T"
+      },
+      {
+        "product": "Asus VivoBook Max X541NA-GQ04"
+      },
+      {
+        "product": "Asus VivoBook E502NA-GO022T"
+      },
+      {
+        "product": "Asus VivoBook 15 X540NA-GQ026T"
+      },
+      {
+        "product": "Asus VivoBook 15 X540UA-DM260"
+      },
+      {
+        "product": "Asus VivoBook S14 (S406UA-BV041T)"
+      },
+      {
+        "product": "Asus ROG STRIX GL553VD-DM256"
+      },
+      {
+        "product": "Asus ROG STRIX GL553VD-DM256"
+      },
+      {
+        "product": "Asus ROG Strix GL553VD-DM535T"
+      },
+      {
+        "product": "Asus AsusPro Advanced BU401LA-FA271G"
+      },
+      {
+        "product": "Asus VivoBook Pro 15 N580VN-FI006T"
+      },
+      {
+        "product": "Asus ZenBook UX530UX-FY040T"
+      },
+      {
+        "product": "Asus ROG Strix GL753VE-GC096T"
+      },
+      {
+        "product": "Asus ASUSPRO B9440UA-GV0279R"
+      },
+      {
+        "product": "Asus ROG Strix GL702VM-GC146T"
+      },
+      {
+        "product": "Asus ROG Strix GL702ZC-GC154T"
+      },
+      {
+        "product": "Asus ROG Strix GL702ZC-GC209T"
+      },
+      {
+        "product": "Asus ROG Strix SCAR Edition GL503VM-ED115T"
+      }
+    ],
+    "extracted": [],
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1": 0.0,
+    "error": ""
+  },
+  {
+    "id": 1,
+    "domain": "documentation",
+    "complexity": 1,
+    "query": "Extract all section titles in the document.",
+    "config_name": "B_large_baseline",
+    "expected": [
+      {
+        "section": "9. Classes"
+      },
+      {
+        "section": "9.1. A Word About Names and Objects"
+      },
+      {
+        "section": "9.2. Python Scopes and Namespaces"
+      },
+      {
+        "section": "9.2.1. Scopes and Namespaces Example"
+      },
+      {
+        "section": "9.3. A First Look at Classes"
+      },
+      {
+        "section": "9.3.1. Class Definition Syntax"
+      },
+      {
+        "section": "9.3.2. Class Objects"
+      },
+      {
+        "section": "9.3.3. Instance Objects"
+      },
+      {
+        "section": "9.3.4. Method Objects"
+      },
+      {
+        "section": "9.3.5. Class and Instance Variables"
+      },
+      {
+        "section": "9.4. Random Remarks"
+      },
+      {
+        "section": "9.5. Inheritance"
+      },
+      {
+        "section": "9.6. Private Variables¶"
+      },
+      {
+        "section": "9.7. Odds and Ends"
+      },
+      {
+        "section": "9.8. Iterators"
+      },
+      {
+        "section": "9.9. Generators"
+      },
+      {
+        "section": "9.10. Generator Expressions"
+      }
+    ],
+    "extracted": [
+      {
+        "section": "9. Classes"
+      },
+      {
+        "section": "9.1. A Word About Names and Objects"
+      },
+      {
+        "section": "9.2. Python Scopes and Namespaces"
+      },
+      {
+        "section": "9.2.1. Scopes and Namespaces Example"
+      },
+      {
+        "section": "9.3. A First Look at Classes"
+      },
+      {
+        "section": "9.3.1. Class Definition Syntax"
+      },
+      {
+        "section": "9.3.2. Class Objects"
+      },
+      {
+        "section": "9.3.3. Instance Objects"
+      },
+      {
+        "section": "9.3.4. Method Objects"
+      },
+      {
+        "section": "9.3.5. Class and Instance Variables"
+      },
+      {
+        "section": "9.4. Random Remarks"
+      },
+      {
+        "section": "9.5. Inheritance"
+      },
+      {
+        "section": "9.5.1. Multiple Inheritance"
+      },
+      {
+        "section": "9.6. Private Variables"
+      },
+      {
+        "section": "9.7. Odds and Ends"
+      },
+      {
+        "section": "9.8. Iterators"
+      },
+      {
+        "section": "9.9. Generators"
+      },
+      {
+        "section": "9.10. Generator Expressions"
+      }
+    ],
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "error": ""
+  },
+  {
+    "id": 2,
+    "domain": "documentation",
+    "complexity": 2,
+    "query": "Extract all document subsection titles that contains code examples.",
+    "config_name": "B_large_baseline",
+    "expected": [
+      {
+        "section": "9.2.1. Scopes and Namespaces Example"
+      },
+      {
+        "section": "9.3.1. Class Definition Syntax"
+      },
+      {
+        "section": "9.3.2. Class Objects"
+      },
+      {
+        "section": "9.3.3. Instance Objects"
+      },
+      {
+        "section": "9.3.4. Method Objects"
+      },
+      {
+        "section": "9.3.5. Class and Instance Variables"
+      },
+      {
+        "section": "9.4. Random Remarks"
+      },
+      {
+        "section": "9.5. Inheritance"
+      },
+      {
+        "section": "9.5.1. Multiple Inheritance"
+      },
+      {
+        "section": "9.6. Private Variables"
+      },
+      {
+        "section": "9.7. Odds and Ends"
+      },
+      {
+        "section": "9.8. Iterators"
+      },
+      {
+        "section": "9.9. Generators"
+      },
+      {
+        "section": "9.10. Generator Expressions"
+      }
+    ],
+    "extracted": [
+      {
+        "section": "9.2.1. Scopes and Namespaces Example"
+      },
+      {
+        "section": "9.3.1. Class Definition Syntax"
+      },
+      {
+        "section": "9.3.2. Class Objects"
+      },
+      {
+        "section": "9.3.3. Instance Objects"
+      },
+      {
+        "section": "9.3.4. Method Objects"
+      },
+      {
+        "section": "9.3.5. Class and Instance Variables"
+      },
+      {
+        "section": "9.4. Random Remarks"
+      },
+      {
+        "section": "9.5. Inheritance"
+      },
+      {
+        "section": "9.5.1. Multiple Inheritance"
+      },
+      {
+        "section": "9.6. Private Variables"
+      },
+      {
+        "section": "9.7. Odds and Ends"
+      },
+      {
+        "section": "9.8. Iterators"
+      },
+      {
+        "section": "9.9. Generators"
+      },
+      {
+        "section": "9.10. Generator Expressions"
+      }
+    ],
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "error": ""
+  },
+  {
+    "id": 3,
+    "domain": "documentation",
+    "complexity": 2,
+    "query": "Extract all programming languages mentioned in the document and the context in which they are compared to Python.",
+    "config_name": "B_large_baseline",
+    "expected": [
+      {
+        "language": "C++",
+        "context": "Python"
+      }
+    ],
+    "extracted": [
+      {
+        "language": "C++",
+        "context": "Python’s class mechanism is a mixture of the class mechanisms found in C++; unlike C++, built‑in types can be used as base classes for extension by the user."
+      },
+      {
+        "language": "Modula-3",
+        "context": "Python’s class mechanism is a mixture of the class mechanisms found in Modula‑3; as in Modula‑3, there are no shorthands for referencing an object’s members from its methods."
+      },
+      {
+        "language": "Smalltalk",
+        "context": "As in Smalltalk, classes themselves are objects."
+      },
+      {
+        "language": "Pascal",
+        "context": "Python eliminates the need for two different argument‑passing mechanisms as in Pascal."
+      },
+      {
+        "language": "C",
+        "context": "The Python implementation, written in C, can completely hide implementation details and control access to an object."
+      }
+    ],
+    "precision": 0.2,
+    "recall": 1.0,
+    "f1": 0.333,
+    "error": ""
+  },
+  {
+    "id": 4,
+    "domain": "documentation",
+    "complexity": 2,
+    "query": "Extract all subsections that belong to the section titled Advanced Concepts.",
+    "config_name": "B_large_baseline",
+    "expected": [
+      {
+        "section": "Structured output"
+      },
+      {
+        "section": "ToolStrategy"
+      },
+      {
+        "section": "ProviderStrategy"
+      },
+      {
+        "section": "Memory"
+      },
+      {
+        "section": "Defining state via middleware"
+      },
+      {
+        "section": "Defining state via state_schema"
+      },
+      {
+        "section": "Streaming"
+      },
+      {
+        "section": "Middleware"
+      }
+    ],
+    "extracted": [],
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1": 0.0,
+    "error": ""
+  },
+  {
+    "id": 5,
+    "domain": "documentation",
+    "complexity": 1,
+    "query": "Extract all section titles in the document.",
+    "config_name": "B_large_baseline",
+    "expected": [
+      {
+        "section": "Agents"
+      },
+      {
+        "section": "Core components"
+      },
+      {
+        "section": "Model"
+      },
+      {
+        "section": "Static model"
+      },
+      {
+        "section": "Dynamic model"
+      },
+      {
+        "section": "Tools"
+      },
+      {
+        "section": "Static tools"
+      },
+      {
+        "section": "Dynamic tools"
+      },
+      {
+        "section": "Tool error handling"
+      },
+      {
+        "section": "Tool use in the ReAct loop"
+      },
+      {
+        "section": "System prompt"
+      },
+      {
+        "section": "Dynamic system prompt"
+      },
+      {
+        "section": "Name"
+      },
+      {
+        "section": "Invocation"
+      },
+      {
+        "section": "Advanced Concepts"
+      },
+      {
+        "section": "Structured output"
+      },
+      {
+        "section": "ToolStrategy"
+      },
+      {
+        "section": "ProviderStrategy"
+      },
+      {
+        "section": "Memory"
+      },
+      {
+        "section": "Defining state via middleware"
+      },
+      {
+        "section": "Defining state via state_schema"
+      },
+      {
+        "section": "Streaming"
+      },
+      {
+        "section": "Middleware"
+      }
+    ],
+    "extracted": [
+      {
+        "section": "Agents combine language models with tools to create systems that can reason about tasks, decide which tools to use, and iteratively work towards solutions."
+      },
+      {
+        "section": "Documentation Index"
+      },
+      {
+        "section": "create_agent"
+      },
+      {
+        "section": "Core components"
+      },
+      {
+        "section": "Model"
+      },
+      {
+        "section": "Static model"
+      },
+      {
+        "section": "Dynamic model"
+      },
+      {
+        "section": "Tools"
+      },
+      {
+        "section": "Static tools"
+      },
+      {
+        "section": "Dynamic tools"
+      },
+      {
+        "section": "Tool error handling"
+      },
+      {
+        "section": "ToolMessage"
+      },
+      {
+        "section": "Tool use in the ReAct loop"
+      },
+      {
+        "section": "Example of ReAct loop"
+      },
+      {
+        "section": "System prompt"
+      },
+      {
+        "section": "Dynamic system prompt"
+      },
+      {
+        "section": "Name"
+      },
+      {
+        "section": "Invocation"
+      },
+      {
+        "section": "Advanced concepts"
+      },
+      {
+        "section": "Structured output"
+      },
+      {
+        "section": "ToolStrategy"
+      },
+      {
+        "section": "ProviderStrategy"
+      },
+      {
+        "section": "Memory"
+      },
+      {
+        "section": "Streaming"
+      },
+      {
+        "section": "Middleware"
+      }
+    ],
+    "precision": 0.88,
+    "recall": 0.913,
+    "f1": 0.896,
+    "error": ""
+  },
+  {
+    "id": 6,
+    "domain": "documentation",
+    "complexity": 3,
+    "query": "Extract all sections with their corresponding subsections.",
+    "config_name": "B_large_baseline",
+    "expected": [
+      {
+        "section": "Core components",
+        "subsections": [
+          "Model",
+          "Static model",
+          "Dynamic model",
+          "Tools",
+          "Static tools",
+          "Dynamic tools",
+          "Tool error handling",
+          "Tool use in the ReAct loop",
+          "System prompt",
+          "Dynamic system prompt",
+          "Name",
+          "Invocation"
+        ]
+      },
+      {
+        "section": "Advanced Concepts",
+        "subsections": [
+          "Structured output",
+          "ToolStrategy",
+          "ProviderStrategy",
+          "Memory",
+          "Defining state via middleware",
+          "Defining state via state_schema",
+          "Streaming",
+          "Middleware"
+        ]
+      }
+    ],
+    "extracted": [
+      {
+        "section": "Core components",
+        "subsections": [
+          "Model",
+          "Tools"
+        ]
+      },
+      {
+        "section": "Model",
+        "subsections": [
+          "Static model",
+          "Dynamic model"
+        ]
+      },
+      {
+        "section": "Tools",
+        "subsections": [
+          "Static tools",
+          "Dynamic tools",
+          "Tool error handling",
+          "Tool use in the ReAct loop"
+        ]
+      },
+      {
+        "section": "System prompt",
+        "subsections": [
+          "Dynamic system prompt"
+        ]
+      },
+      {
+        "section": "Name",
+        "subsections": []
+      },
+      {
+        "section": "Invocation",
+        "subsections": []
+      },
+      {
+        "section": "Advanced concepts",
+        "subsections": [
+          "Structured output",
+          "Memory"
+        ]
+      },
+      {
+        "section": "Structured output",
+        "subsections": [
+          "ToolStrategy",
+          "ProviderStrategy"
+        ]
+      },
+      {
+        "section": "Memory",
+        "subsections": []
+      },
+      {
+        "section": "Streaming",
+        "subsections": []
+      },
+      {
+        "section": "Middleware",
+        "subsections": []
+      }
+    ],
+    "precision": 0.364,
+    "recall": 1.0,
+    "f1": 0.534,
+    "error": ""
+  }
+]

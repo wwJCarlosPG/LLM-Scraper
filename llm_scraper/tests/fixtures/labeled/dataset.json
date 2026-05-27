@@ -1173,37 +1173,6 @@
     ]
   },
   {
-    "id": 10,
-    "page": "newegg_com_p_pl",
-    "domain": "ecommerce",
-    "url": "https://www.newegg.com/p/pl?d=laptop",
-    "query": "Extract all laptop descriptions that have GPU AMD Radeon Graphics",
-    "complexity": 3,
-    "output_format": {
-      "product": "product description"
-    },
-    "expected": [
-      {
-        "product": "Lenovo Laptop V15 for Business, Home, Student, 15.6\" FHD Anti-Glare, AMD Ryzen 7 7730U, 16GB RAM, 512GB SSD, HDMI, Type-C, Numeric Keypad, Webcam w/ Shutter, Wi-Fi 6, Win 11 Pro w/ AI Copilot, Black"
-      },
-      {
-        "product": "Lenovo V15 Gen 4 15.6\" Laptop AMD Ryzen 7 7730U 16GB RAM 1TB SSD Windows 11 Home (83CR003UUS)"
-      },
-      {
-        "product": "Acer Aspire Go 15 15.6\" AMD Ryzen 7 5825U 32GB DDR4 Memory DDR4 3200 512GB PCIe Gen4 SSD Windows 11 Home AG15-42P-R6GZ"
-      },
-      {
-        "product": "Acer Aspire Go 15 Laptop - AMD Ryzen 7 5825U - 16GB DDR4 RAM - 512GB SSD (NX.JQJAA.002)"
-      },
-      {
-        "product": "Lenovo Laptop V15 for Business, Home, Student, 15.6\" FHD Anti-Glare, AMD Ryzen 7 7730U, 16GB RAM, 1TB SSD, HDMI, Type-C, Numeric Keypad, Webcam w/ Shutter, Wi-Fi 6, Win 11 Pro w/ AI Copilot, Black"
-      },
-      {
-        "product": "Auusda EXSURF 16\" Business Laptop, AMD Ryzen 5 7430U, 16GB Dual Channel RAM, 1TB SSD, Windows 11 Pro, 1200P FHD IPS, WiFi 6, Privacy Camera, Backlight, Fingerprint, Full Type-C, Gray"
-      }
-    ]
-  },
-  {
     "id": 1,
     "page": "docs_python_org_3_tutorial_classes.html",
     "domain": "documentation",

@@ -37,7 +37,7 @@ class EmbeddingConfig(BaseModel):
 class PipelineConfig(BaseModel):
     provider: ProviderConfig
     embedding: EmbeddingConfig = Field(default_factory=EmbeddingConfig)
-    max_retries: int = Field(default=3, ge=1, le=10)
+    max_retries: int = Field(default=3, ge=0, le=10)
     context_length: int = Field(default=32000, ge=1000)
     temperature: float = Field(default=0.5, ge=0.0, le=1.0)
     max_tokens: int = Field(default=10000, ge=100)

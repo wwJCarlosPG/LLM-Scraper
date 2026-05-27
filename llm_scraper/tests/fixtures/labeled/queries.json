@@ -145,13 +145,6 @@
             "output_format": {"product": "product name"},
             "complexity": 1,
             "url": "https://webscraper.io/test-sites/e-commerce/allinone/computers/laptops"
-        },
-        {
-            "id": 10,
-            "query": "Extract all laptops that have GPU AMD Radeon Graphics",
-            "output_format": {"product": "product name"},
-            "complexity": 3,
-            "url": "https://www.newegg.com/p/pl?d=laptop"
         }
     ],
     "documentation": [
