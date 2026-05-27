@@ -73,7 +73,9 @@ def _parse_response(raw: str, self_consistency: bool) -> ScrapedResponse:
 
     return ScrapedResponse(
         explanation=data.get("explanation", "No explanation"),
-        scraped_data=data.get("scraped_data", []),
+        scraped_data=[
+            item for item in data.get("scraped_data", []) if isinstance(item, dict)
+        ],
         is_valid=True,
     )
 
@@ -83,7 +85,12 @@ def _merge_self_consistency(data: dict) -> ScrapedResponse:
     if not responses:
         return ScrapedResponse(scraped_data=[], is_valid=False)
 
-    all_items = [item for r in responses for item in r.get("scraped_data", [])]
+    all_items = [
+        item
+        for r in responses
+        for item in r.get("scraped_data", [])
+        if isinstance(item, dict)
+    ]
     explanations = [r.get("explanation", "") for r in responses]
 
     from collections import Counter
