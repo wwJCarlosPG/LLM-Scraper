@@ -12,8 +12,8 @@ logger = logging.getLogger(__name__)
 class GeminiProvider(BaseProvider):
     BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models"
 
-    def __init__(self, config: ProviderConfig, max_tokens: int = 4096):
-        super().__init__(config, max_tokens)
+    def __init__(self, config: ProviderConfig):
+        super().__init__(config)
         self.endpoint = f"{self.BASE_URL}/{self.model_name}:generateContent"
 
     @traceable(name="GeminiProvider.invoke", run_type="llm")
@@ -33,6 +33,7 @@ class GeminiProvider(BaseProvider):
             "generationConfig": {
                 "responseMimeType": "application/json",
                 "maxOutputTokens": self.max_tokens,
+                "temperature": self.temperature,
             },
         }
 

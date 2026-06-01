@@ -1,11 +1,14 @@
 # Graph nodes
 NODE_CLEANER = "cleaner"
 NODE_CHUNKER = "chunker"
+NODE_SCORER = "scorer"
 NODE_EXTRACTOR = "extractor"
 NODE_MERGER = "merger"
 NODE_VALIDATOR = "validator"
 
 # Graph edges
+EDGE_SCORE = "score"
+EDGE_SKIP_SCORE = "skip_score"
 EDGE_REFINE = "refine"
 EDGE_END = "end"
 

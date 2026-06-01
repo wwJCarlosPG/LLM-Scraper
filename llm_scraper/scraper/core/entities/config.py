@@ -7,6 +7,7 @@ ProviderName = Literal[
     "gemini", "openai", "anthropic", "fireworks", "openai_compatible"
 ]
 EmbeddingProviderName = Literal["local", "openai"]
+DomainType = Literal["web", "ecommerce", "news", "documentation"]
 
 
 class ProviderConfig(BaseModel):
@@ -15,6 +16,8 @@ class ProviderConfig(BaseModel):
     api_key: str | None = None
     endpoint: str | None = None
     env_alias: str | None = None
+    max_tokens: int = Field(default=2000, ge=100)
+    temperature: float = Field(default=0.5, ge=0.0, le=1.0)
 
 
 class EmbeddingConfig(BaseModel):
@@ -36,11 +39,10 @@ class EmbeddingConfig(BaseModel):
 
 class PipelineConfig(BaseModel):
     provider: ProviderConfig
+    hyde_provider: ProviderConfig | None = None  # Optional separate provider for HyDE
     embedding: EmbeddingConfig = Field(default_factory=EmbeddingConfig)
     max_retries: int = Field(default=3, ge=0, le=10)
     context_length: int = Field(default=32000, ge=1000)
-    temperature: float = Field(default=0.5, ge=0.0, le=1.0)
-    max_tokens: int = Field(default=10000, ge=100)
     top_k_chunks: int = Field(default=5, ge=1)
 
     # Prompting strategy
@@ -54,6 +56,8 @@ class PipelineConfig(BaseModel):
     # HTML processing
     use_markdown_conversion: bool = True
     markdown_converter: Literal["trafilatura", "markdownify"] = "trafilatura"
+    # Domain for HyDE ranking (optional, can improve relevance)
+    domain: DomainType = "web"
 
     @model_validator(mode="after")
     def warn_expensive_config(self) -> "PipelineConfig":

@@ -10,12 +10,12 @@ logger = logging.getLogger(__name__)
 
 
 class OpenAICompatibleProvider(BaseProvider):
-    def __init__(self, config: ProviderConfig, max_tokens: int = 4096):
+    def __init__(self, config: ProviderConfig):
         if not config.endpoint:
             raise ValueError(
                 "OpenAICompatibleProvider requires an endpoint in ProviderConfig."
             )
-        super().__init__(config, max_tokens)
+        super().__init__(config)
         self.endpoint = config.endpoint
 
     @traceable(name="OpenAICompatibleProvider.invoke", run_type="llm")
@@ -32,11 +32,12 @@ class OpenAICompatibleProvider(BaseProvider):
         return {
             "model": self.model_name,
             "max_tokens": self.max_tokens,
+            "temperature": self.temperature,
             "messages": [
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt},
             ],
-            "response_format": {"type": "json_object"},
+            # "response_format": {"type": "json_object"},
         }
 
     def _parse_response(self, data: dict) -> str:
@@ -58,7 +59,7 @@ class OpenAICompatibleProvider(BaseProvider):
             self.endpoint,
             headers=self._build_headers(),
             json=self._build_payload(user_prompt, system_prompt),
-            timeout=60.0,
+            timeout=180.0,
         )
         if response.status_code != 200:
             raise ValueError(f"Provider error {response.status_code}: {response.text}")
@@ -71,7 +72,7 @@ class OpenAICompatibleProvider(BaseProvider):
             self.endpoint,
             headers=self._build_headers(),
             json=self._build_payload(user_prompt, system_prompt),
-            timeout=60.0,
+            timeout=180.0,
         )
         if response.status_code != 200:
             raise ValueError(f"Provider error {response.status_code}: {response.text}")

@@ -52,7 +52,7 @@ async def validator_node(state: PipelineState) -> dict:
             "retry_count": retry_count,
         }
 
-    llm = get_provider(config)
+    llm = get_provider(config.provider)
     system_prompt = get_validator_prompt()
     user_prompt = build_validator_user_prompt(
         query=query,

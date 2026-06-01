@@ -10,8 +10,8 @@ logger = logging.getLogger(__name__)
 
 
 class OpenAIProvider(BaseProvider):
-    def __init__(self, config: ProviderConfig, max_tokens: int = 4096):
-        super().__init__(config, max_tokens)
+    def __init__(self, config: ProviderConfig):
+        super().__init__(config)
         self._client = OpenAI(api_key=self.api_key)
         self._async_client = AsyncOpenAI(api_key=self.api_key)
 
@@ -25,6 +25,7 @@ class OpenAIProvider(BaseProvider):
                 {"role": "user", "content": user_prompt},
             ],
             response_format={"type": "json_object"},
+            temperature=self.temperature,
         )
         return response.choices[0].message.content
 

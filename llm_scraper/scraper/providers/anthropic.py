@@ -10,8 +10,8 @@ logger = logging.getLogger(__name__)
 
 
 class AnthropicProvider(BaseProvider):
-    def __init__(self, config: ProviderConfig, max_tokens: int = 4096):
-        super().__init__(config, max_tokens)
+    def __init__(self, config: ProviderConfig):
+        super().__init__(config)
         self._client = anthropic.Anthropic(api_key=self.api_key)
         self._async_client = anthropic.AsyncAnthropic(api_key=self.api_key)
 
@@ -20,6 +20,7 @@ class AnthropicProvider(BaseProvider):
         message = self._client.messages.create(
             model=self.model_name,
             max_tokens=self.max_tokens,
+            temperature=self.temperature,
             system=system_prompt,
             messages=[{"role": "user", "content": user_prompt}],
         )
@@ -30,6 +31,7 @@ class AnthropicProvider(BaseProvider):
         message = await self._async_client.messages.create(
             model=self.model_name,
             max_tokens=self.max_tokens,
+            temperature=self.temperature,
             system=system_prompt,
             messages=[{"role": "user", "content": user_prompt}],
         )
