@@ -18,16 +18,17 @@ from langchain_text_splitters import (
 from sentence_transformers import util
 
 from scraper.adapters.html.cleaner import DefaultHTMLCleaner
+from scraper.adapters.html.hyde_scorer import HyDEScorer
 from scraper.adapters.html.markdown_converter import MarkdownConverter
-from scraper.adapters.html.relevance_scorer import RelevanceScorer
 from scraper.adapters.html.semantic_chunker import SemanticChunker
-from scraper.core.entities.config import EmbeddingConfig
+from scraper.core.entities.config import EmbeddingConfig, PipelineConfig, ProviderConfig
 from scraper.providers.embeddings.factory import get_embedding_provider
+from scraper.providers.factory import get_provider
 
 load_dotenv()
 
 DATASET_PATH = "tests/fixtures/labeled/dataset.json"
-RESULTS_PATH = "docs/chunking_coverage_results_3.json"
+RESULTS_PATH = "docs/chunking_coverage_results_hyde_with_domains.json"
 
 CHUNK_SIZES = {
     "small_8k": 1600,
@@ -36,7 +37,7 @@ CHUNK_SIZES = {
 MAX_K = 15
 OVERLAP_RATIO = 0.1  # overlap = 10% of chunk size
 SIMILARITY_THRESHOLD = 0.75
-STRATEGIES = ["trafilatura", "markdownify", "semantic_light", "recursive_light"]
+STRATEGIES = ["trafilatura", "semantic_light"]
 
 cleaner = DefaultHTMLCleaner()
 converter = MarkdownConverter()
@@ -74,27 +75,11 @@ def chunk_with_strategy(html: str, strategy: str, chunk_size: int) -> list[str]:
         splitter = MarkdownTextSplitter(chunk_size=chunk_size, chunk_overlap=overlap)
         return splitter.split_text(text)
 
-    elif strategy == "markdownify":
-        text = converter.convert(html, strategy="markdownify")
-        if len(text) < chunk_size:
-            return [text]
-        splitter = MarkdownTextSplitter(chunk_size=chunk_size, chunk_overlap=overlap)
-        return splitter.split_text(text)
-
     elif strategy == "semantic_light":
         light = cleaner.light_clean(html)
         if len(light) < chunk_size:
             return [light]
         return semantic_chunker.chunk(light, chunk_size, overlap)
-
-    elif strategy == "recursive_light":
-        light = cleaner.light_clean(html)
-        if len(light) < chunk_size:
-            return [light]
-        splitter = RecursiveCharacterTextSplitter(
-            chunk_size=chunk_size, chunk_overlap=overlap
-        )
-        return splitter.split_text(light)
 
     return []
 
@@ -146,9 +131,13 @@ def find_best_chunk_per_expected(
     return results
 
 
-def analyze_entry(entry: dict, scorer: RelevanceScorer) -> dict:
+def analyze_entry(entry: dict, llm, provider) -> dict:
     print(f"  [{entry['domain']}] id={entry['id']} — {entry['query'][:55]}...")
-
+    scorer = HyDEScorer(
+        llm=llm,
+        embedding_provider=provider,
+        domain=entry["domain"],
+    )
     try:
         html = get_html(entry)
     except Exception as e:
@@ -485,8 +474,16 @@ def main():
         provider="openai",
         env_alias="OPENAI_API_KEY",
     )
+    llm_config = ProviderConfig(
+        provider="openai_compatible",
+        model_name="Qwen/Qwen2.5-7B-Instruct-Turbo",
+        endpoint="https://api.together.xyz/v1/chat/completions",
+        env_alias="TOGETHER_API_KEY",
+        max_tokens=1000,
+    )
+    llm = get_provider(PipelineConfig(provider=llm_config))
     provider = get_embedding_provider(embedding_config)
-    scorer = RelevanceScorer(provider)
+    # scorer = HyDEScorer(llm=llm, embedding_provider=provider)
 
     os.makedirs("docs", exist_ok=True)
 
@@ -509,7 +506,7 @@ def main():
             if (entry["id"], entry["domain"]) in processed_ids:
                 print(f"  [skip] [{entry['domain']}] id={entry['id']}")
                 continue
-            result = analyze_entry(entry, scorer)
+            result = analyze_entry(entry, llm, provider)
             results.append(result)
             with open(RESULTS_PATH, "w") as f:
                 json.dump(results, f, indent=2, ensure_ascii=False)

@@ -26,7 +26,7 @@ from scraper.providers.embeddings.factory import get_embedding_provider
 load_dotenv()
 
 DATASET_PATH = "tests/fixtures/labeled/dataset.json"
-RESULTS_PATH = "docs/evaluation_results_A.json"
+RESULTS_PATH = "docs/evaluation_results_small_SL_refinement.json"
 
 SIMILARITY_THRESHOLD_C1_C2 = 0.85
 # SIMILARITY_THRESHOLD_C3 = 0.75
@@ -38,6 +38,7 @@ SMALL_MODEL = ProviderConfig(
     model_name="google/gemma-3n-E4B-it",
     endpoint="https://api.together.xyz/v1/chat/completions",
     env_alias="TOGETHER_API_KEY",
+    context_length=32000,
 )
 
 LARGE_MODEL = ProviderConfig(
@@ -45,38 +46,46 @@ LARGE_MODEL = ProviderConfig(
     model_name="openai/gpt-oss-120b",
     endpoint="https://api.together.xyz/v1/chat/completions",
     env_alias="TOGETHER_API_KEY",
+    context_length=128000,
+)
+
+HYDE_MODEL = ProviderConfig(
+    provider="openai_compatible",
+    model_name="Qwen/Qwen2.5-7B-Instruct-Turbo",
+    endpoint="https://api.together.xyz/v1/chat/completions",
+    env_alias="TOGETHER_API_KEY",
 )
 
 CONFIGS = {
     # "A_small_baseline": PipelineConfig(
     #     provider=SMALL_MODEL,
+    #     hyde_provider=HYDE_MODEL,
     #     cot=False,
     #     refinement=False,
     #     max_retries=0,
-    #     use_markdown_conversion=True,
-    #     markdown_converter="trafilatura",
-    #     context_length=32000,
-    #     top_k_chunks=9999,
+    #     use_markdown_conversion=False,
+    #     # markdown_converter="trafilatura",
+    #     top_k_chunks=10,
     # ),
     # "B_large_baseline": PipelineConfig(
     #     provider=LARGE_MODEL,
+    #     hyde_provider=HYDE_MODEL,
     #     cot=False,
     #     refinement=False,
     #     max_retries=0,
     #     use_markdown_conversion=True,
     #     markdown_converter="trafilatura",
-    #     context_length=128000,
     #     top_k_chunks=9999,
     # ),
     "C_small_pipeline": PipelineConfig(
         provider=SMALL_MODEL,
+        hyde_provider=HYDE_MODEL,
         cot=False,
         refinement=True,
         max_retries=3,
-        use_markdown_conversion=True,
+        use_markdown_conversion=False,
         markdown_converter="trafilatura",
-        context_length=32000,
-        top_k_chunks=9999,
+        top_k_chunks=10,
     ),
     # "D_large_pipeline": PipelineConfig(
     #     provider=LARGE_MODEL,
@@ -85,7 +94,6 @@ CONFIGS = {
     #     max_retries=2,
     #     use_markdown_conversion=True,
     #     markdown_converter="trafilatura",
-    #     context_length=132000,
     #     top_k_chunks=9999,
     # ),
 }
@@ -172,6 +180,7 @@ async def evaluate_entry(
 ) -> EntryResult:
     threshold = SIMILARITY_THRESHOLD_C1_C2
 
+    config.domain = entry["domain"]
     try:
         result = await run(
             query=entry["query"],

@@ -21,7 +21,7 @@ async def extractor_node(state: PipelineState) -> dict:
     logger.info(f"[extractor] iteration {retry_count + 1}")
     if feedback:
         logger.info(f"[extractor] feedback received: {feedback[:100]}...")
-    llm = get_provider(config)
+    llm = get_provider(config.provider)
 
     system_prompt = get_extractor_prompt(
         output_format=output_format,
@@ -31,9 +31,10 @@ async def extractor_node(state: PipelineState) -> dict:
     in_chunks = len(chunks) > 0
 
     full_query = (
-        query
-        if (in_chunks or not feedback)
-        else f"{query}\n\nFeedback from previous attempt:\n{feedback}"
+        f"{query}\n\nFeedback from previous attempt (apply only if relevant "
+        f"to this content):\n{feedback}"
+        if feedback
+        else query
     )
 
     if in_chunks:
