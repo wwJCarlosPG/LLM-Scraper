@@ -15,6 +15,7 @@ class PipelineState(TypedDict):
     # Processing
     cleaned_html: str | None
     chunks: list[str]
+    bad_chunks: list[tuple[str, str, list[dict]]]
     current_response: ScrapedResponse | None
     feedback: str | None
     retry_count: int

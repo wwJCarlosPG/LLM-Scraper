@@ -1,3 +1,6 @@
+import json
+
+
 def get_extractor_prompt(output_format: dict, cot: bool, self_consistency: bool) -> str:
     if self_consistency:
         return _self_consistency_prompt(output_format)
@@ -90,6 +93,24 @@ def _self_consistency_prompt(output_format: dict) -> str:
     - If a value is missing, return "NotFound".
     - If no matching information is found, return an empty array: "scraped_data": []
     """
+
+
+def build_refinement_user_prompt(
+    query: str,
+    content: str,
+    feedback: str,
+    previous_extraction: list[dict],
+) -> str:
+    return f"""Query: {query}
+    Previous extraction (incorrect):
+    {json.dumps(previous_extraction, indent=2)}
+
+    Validator feedback:
+    {feedback}
+
+    Extract again from the content below, addressing the feedback above:
+
+    {content}"""
 
 
 def build_user_prompt(query: str, content: str) -> str:

@@ -23,6 +23,7 @@ async def run(
         "config": config,
         "cleaned_html": None,
         "chunks": [],
+        "bad_chunks": [],
         "partial_responses": [],
         "current_response": None,
         "feedback": None,

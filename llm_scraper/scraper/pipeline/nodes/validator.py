@@ -16,14 +16,78 @@ async def validator_node(state: PipelineState) -> dict:
     config = state["config"]
     query = state["query"]
     retry_count = state["retry_count"]
+    chunks = state["chunks"]
+    partial_responses = state.get("partial_responses") or []
     cleaned_html = state["cleaned_html"]
 
-    # pick the response to validate
-    # if in chunks mode, validate the merged response
-    # if single pass, validate current_response
-    response_to_validate: ScrapedResponse = state["current_response"]
-
     logger.info(f"[validator] validating iteration {retry_count + 1}")
+
+    if chunks and partial_responses:
+        return await _validate_chunks(
+            state, query, chunks, partial_responses, retry_count, config
+        )
+    else:
+        return await _validate_full(state, query, cleaned_html, retry_count, config)
+
+
+async def _validate_chunks(
+    state, query, chunks, partial_responses, retry_count, config
+) -> dict:
+    """Validates each partial_response against its corresponding chunk."""
+    llm = get_provider(config.provider)
+    system_prompt = get_validator_prompt()
+
+    good_partial_responses = []
+    bad_chunks = []
+
+    # zip stops at shortest — partial_responses and chunks should be same length
+    for partial_response, chunk in zip(partial_responses, chunks, strict=True):
+        if not partial_response.is_valid or not partial_response.scraped_data:
+            # already invalid at parsing or empty — mark as bad
+            bad_chunks.append(
+                (
+                    chunk,
+                    partial_response.explanation or "Empty or invalid extraction",
+                    partial_response.scraped_data,
+                )
+            )
+            continue
+
+        user_prompt = build_validator_user_prompt(
+            query=query,
+            scraped_data=partial_response.scraped_data,
+            content=chunk,
+        )
+        raw = await llm.ainvoke(user_prompt=user_prompt, system_prompt=system_prompt)
+        validator_response = _parse_validator_response(raw)
+
+        if validator_response.is_valid:
+            good_partial_responses.append(partial_response)
+        else:
+            logger.info(
+                f"[validator] chunk failed: {validator_response.explanation[:80]}..."
+            )
+            bad_chunks.append(
+                (chunk, validator_response.explanation, partial_response.scraped_data)
+            )
+
+    is_valid = len(bad_chunks) == 0
+    logger.info(
+        f"[validator] {len(good_partial_responses)} good, {len(bad_chunks)} bad chunks"
+    )
+
+    return {
+        "partial_responses": good_partial_responses,
+        "bad_chunks": bad_chunks,
+        "is_valid": is_valid,
+        "feedback": None,
+        "retry_count": retry_count + 1,
+    }
+
+
+async def _validate_full(state, query, cleaned_html, retry_count, config) -> dict:
+    """Validates current_response against full cleaned_html (no chunks mode)."""
+    response_to_validate: ScrapedResponse = state["current_response"]
 
     if response_to_validate is None:
         logger.warning("[validator] no response to validate")
@@ -33,7 +97,6 @@ async def validator_node(state: PipelineState) -> dict:
             "retry_count": retry_count + 1,
         }
 
-    # if extraction already failed at parsing, no point in validating
     if not response_to_validate.is_valid:
         logger.warning("[validator] response already marked invalid at parsing")
         return {
@@ -42,26 +105,15 @@ async def validator_node(state: PipelineState) -> dict:
             "retry_count": retry_count + 1,
         }
 
-    # if refinement is disabled, skip validation and accept the response
-    if not config.refinement:
-        logger.info("[validator] refinement disabled, accepting response")
-        return {
-            "is_valid": True,
-            "feedback": None,
-            "final_response": response_to_validate,
-            "retry_count": retry_count,
-        }
-
     llm = get_provider(config.provider)
     system_prompt = get_validator_prompt()
     user_prompt = build_validator_user_prompt(
         query=query,
         scraped_data=response_to_validate.scraped_data,
-        content=cleaned_html,
+        content=cleaned_html or "",
     )
 
     raw = await llm.ainvoke(user_prompt=user_prompt, system_prompt=system_prompt)
-
     validator_response = _parse_validator_response(raw)
 
     logger.info(f"[validator] is_valid={validator_response.is_valid}")
