@@ -132,7 +132,7 @@ async def _validate_full(state, query, cleaned_html, retry_count, config) -> dic
         update={
             "is_valid": validator_response.is_valid,
             "feedback": validator_response.explanation,
-            "refinement_count": retry_count + 1,
+            "refinement_count": (retry_count + 1) // 2,
         }
     )
 

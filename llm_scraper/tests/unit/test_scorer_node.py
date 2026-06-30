@@ -5,7 +5,13 @@ from scraper.pipeline.graph import _should_score
 
 def make_state(chunks: list[str], top_k_chunks: int) -> dict:
     config = PipelineConfig(
-        provider=ProviderConfig(
+        extractor_provider=ProviderConfig(
+            provider="openai_compatible",
+            model_name="test-model",
+            endpoint="http://localhost",
+            env_alias="TEST_KEY",
+        ),
+        validator_provider=ProviderConfig(
             provider="openai_compatible",
             model_name="test-model",
             endpoint="http://localhost",
