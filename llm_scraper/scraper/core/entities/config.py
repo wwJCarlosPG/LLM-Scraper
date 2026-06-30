@@ -16,8 +16,10 @@ class ProviderConfig(BaseModel):
     api_key: str | None = None
     endpoint: str | None = None
     env_alias: str | None = None
-    max_tokens: int = Field(default=2000, ge=100)
-    temperature: float = Field(default=0.5, ge=0.0, le=1.0)
+    max_tokens: int = Field(default=15000, ge=100)
+    temperature: float = Field(default=0.1, ge=0.0, le=1.0)
+    # none: return raw text, json_object: parse response as JSON object, json_schema: validate response against a JSON schema
+    json_mode: Literal["none", "json_object", "json_schema"] = "json_object"
 
 
 class EmbeddingConfig(BaseModel):
@@ -38,10 +40,15 @@ class EmbeddingConfig(BaseModel):
 
 
 class PipelineConfig(BaseModel):
-    provider: ProviderConfig
-    hyde_provider: ProviderConfig | None = None  # Optional separate provider for HyDE
+    extractor_provider: ProviderConfig
+    validator_provider: ProviderConfig | None = (
+        None  # Optional separate provider for validation (can be same as extractor)
+    )
+    hyde_provider: ProviderConfig | None = (
+        None  # Optional separate provider for HyDE (can be same as extractor)
+    )
     embedding: EmbeddingConfig = Field(default_factory=EmbeddingConfig)
-    max_retries: int = Field(default=3, ge=0, le=10)
+    max_retries: int = Field(default=1, ge=0, le=10)
     context_length: int = Field(default=32000, ge=1000)
     top_k_chunks: int = Field(default=5, ge=1)
 

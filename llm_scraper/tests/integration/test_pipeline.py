@@ -3,6 +3,7 @@ from unittest.mock import AsyncMock, patch
 import pytest
 
 from scraper.core.entities.config import PipelineConfig, ProviderConfig
+from scraper.core.entities.token_usage import TokenUsage
 from scraper.pipeline.runner import run
 
 FIXTURE_PATH = "tests/fixtures/article.html"
@@ -13,7 +14,10 @@ with open(FIXTURE_PATH) as f:
 
 def make_config() -> PipelineConfig:
     return PipelineConfig(
-        provider=ProviderConfig(
+        extractor_provider=ProviderConfig(
+            provider="gemini", model_name="gemini-2.0-flash", api_key="test-key"
+        ),
+        validator_provider=ProviderConfig(
             provider="gemini", model_name="gemini-2.0-flash", api_key="test-key"
         ),
         cot=True,
@@ -24,34 +28,48 @@ def make_config() -> PipelineConfig:
     )
 
 
-EXTRACTOR_VALID_RESPONSE = """
+_USAGE = TokenUsage(input_tokens=10, output_tokens=20)
+
+EXTRACTOR_VALID_RESPONSE = (
+    """
 {
     "explanation": "Found the author and title in the article.",
     "scraped_data": [
         {"title": "Scientists discover new species in Amazon", "author": "John Doe"}
     ]
 }
-"""
-VALIDATOR_VALID_RESPONSE = """
+""",
+    _USAGE,
+)
+VALIDATOR_VALID_RESPONSE = (
+    """
 {
     "explanation": "The extracted title and author match the content in the article.",
     "is_valid": true
 }
-"""
+""",
+    _USAGE,
+)
 
-EXTRACTOR_INVALID_RESPONSE = """
+EXTRACTOR_INVALID_RESPONSE = (
+    """
 {
     "explanation": "Could not find the data.",
     "scraped_data": []
 }
-"""
+""",
+    _USAGE,
+)
 
-VALIDATOR_INVALID_RESPONSE = """
+VALIDATOR_INVALID_RESPONSE = (
+    """
 {
     "explanation": "The extracted data is empty, the title and author are missing.",
     "is_valid": false
 }
-"""
+""",
+    _USAGE,
+)
 
 
 @pytest.mark.asyncio
@@ -69,7 +87,7 @@ async def test_happy_path():
             ]
         ),
     ):
-        result = await run(
+        result, _ = await run(
             query="Extract the title and author of the article.",
             output_format={"title": "article title", "author": "author name"},
             config=make_config(),
@@ -103,7 +121,7 @@ async def test_refinement_path():
             ]
         ),
     ):
-        result = await run(
+        result, _ = await run(
             query="Extract the title and author of the article.",
             output_format={"title": "article title", "author": "author name"},
             config=make_config(),
@@ -137,7 +155,7 @@ async def test_max_retries_reached():
     ):
         config = make_config()
         config = config.model_copy(update={"max_retries": 3})
-        result = await run(
+        result, _ = await run(
             query="Extract the title and author of the article.",
             output_format={"title": "article title", "author": "author name"},
             config=config,
@@ -164,7 +182,7 @@ async def test_refinement_disabled():
     ):
         config = make_config()
         config = config.model_copy(update={"refinement": False})
-        result = await run(
+        result, _ = await run(
             query="Extract the title and author of the article.",
             output_format={"title": "article title", "author": "author name"},
             config=config,

@@ -9,8 +9,11 @@ NODE_VALIDATOR = "validator"
 # Graph edges
 EDGE_SCORE = "score"
 EDGE_SKIP_SCORE = "skip_score"
+EDGE_VALIDATE = "validate"
+EDGE_SKIP_VALIDATE = "skip_validate"
 EDGE_REFINE = "refine"
 EDGE_END = "end"
+EDGE_MERGE = "merge"
 
 # Semantic tags for chunking
 SEMANTIC_TAGS = [

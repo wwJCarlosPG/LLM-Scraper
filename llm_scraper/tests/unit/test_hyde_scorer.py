@@ -53,7 +53,7 @@ def test_relevant_chunk_ranked_first(scorer):
         "Follow us on Twitter Facebook Instagram LinkedIn YouTube",
     ]
 
-    ranked, _ = scorer.rank(query=query, chunks=chunks, top_k=1)
+    ranked, _, _ = scorer.rank(query=query, chunks=chunks, top_k=1)
 
     assert len(ranked) == 1
     assert "MacBook Pro" in ranked[0]
@@ -68,7 +68,7 @@ def test_top_k_respected(scorer):
         "Cookie policy: we use cookies to improve your experience.",
     ]
 
-    ranked, _ = scorer.rank(query=query, chunks=chunks, top_k=2)
+    ranked, _, _ = scorer.rank(query=query, chunks=chunks, top_k=2)
 
     assert len(ranked) == 2
 
@@ -77,7 +77,7 @@ def test_no_ranking_when_chunks_lte_top_k(scorer):
     query = "anything"
     chunks = ["chunk 1", "chunk 2"]
 
-    result, scores = scorer.rank(query=query, chunks=chunks, top_k=3)
+    result, scores, _ = scorer.rank(query=query, chunks=chunks, top_k=3)
 
     assert result == chunks
     assert scores == [1.0, 1.0]
@@ -91,7 +91,7 @@ def test_compute_scores_sorts_when_chunks_lte_top_k(scorer):
         "MacBook Pro 14-inch starts at $1999.",
     ]
 
-    ranked, scores = scorer.rank(
+    ranked, scores, _ = scorer.rank(
         query=query, chunks=chunks, top_k=5, compute_scores=True
     )
 
@@ -132,7 +132,7 @@ def test_fallback_to_query_when_llm_fails(embedder):
         "Newsletter signup",
     ]
 
-    ranked, scores = scorer.rank(query="laptop prices", chunks=chunks, top_k=2)
+    ranked, scores, _ = scorer.rank(query="laptop prices", chunks=chunks, top_k=2)
 
     assert len(ranked) == 2
     assert len(scores) == 2
@@ -157,6 +157,6 @@ def test_domain_instruction_used(embedder):
         "Contact support at help@mycompany.com",
     ]
 
-    ranked, _ = scorer.rank(query=query, chunks=chunks, top_k=1)
+    ranked, _, _ = scorer.rank(query=query, chunks=chunks, top_k=1)
 
     assert "pip install" in ranked[0] or "API_KEY" in ranked[0]

@@ -1,0 +1,1430 @@
+[
+  {
+    "id": 1,
+    "domain": "news",
+    "complexity": 1,
+    "query": "Extract the names of all people mentioned in the article.",
+    "config_name": "E_small_baseline",
+    "expected": [
+      {
+        "person": "Pep Guardiola"
+      },
+      {
+        "person": "Enzo Maresca"
+      },
+      {
+        "person": "Manuel Pellegrini"
+      },
+      {
+        "person": "Bernardo Silva"
+      },
+      {
+        "person": "John Stones"
+      },
+      {
+        "person": "Kevin de Bruyne"
+      },
+      {
+        "person": "Ederson"
+      },
+      {
+        "person": "Kyle Walker"
+      },
+      {
+        "person": "Andoni Iraola"
+      }
+    ],
+    "extracted": [
+      {
+        "person": "Pep Guardiola"
+      },
+      {
+        "person": "Enzo Maresca"
+      },
+      {
+        "person": "Manuel Pellegrini"
+      },
+      {
+        "person": "Andoni Iraola"
+      },
+      {
+        "person": "Bernardo Silva"
+      },
+      {
+        "person": "John Stones"
+      },
+      {
+        "person": "Kevin de Bruyne"
+      },
+      {
+        "person": "Ederson"
+      },
+      {
+        "person": "Kyle Walker"
+      }
+    ],
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "latency_ms": 0.0,
+    "scorer_input_tokens": 0,
+    "scorer_output_tokens": 0,
+    "extractor_input_tokens": 1709,
+    "extractor_output_tokens": 159,
+    "validator_input_tokens": 1733,
+    "validator_output_tokens": 71,
+    "refinement_used": true,
+    "error": ""
+  },
+  {
+    "id": 2,
+    "domain": "news",
+    "complexity": 1,
+    "query": "Extract all quotes said by Guardiola in the article.",
+    "config_name": "E_small_baseline",
+    "expected": [
+      {
+        "quote": "No way,"
+      },
+      {
+        "quote": "one more year"
+      },
+      {
+        "quote": "Yeah"
+      },
+      {
+        "quote": "I am here, I have a contract."
+      },
+      {
+        "quote": "Next. So many times – I have one more year."
+      },
+      {
+        "quote": "No, no, no, no, no, no, I have no idea [about] that,"
+      },
+      {
+        "quote": "They don't have to do anything, honestly."
+      }
+    ],
+    "extracted": [
+      {
+        "quote": "No way, he said, reminding reporters he had \"one more year\" on his contract."
+      },
+      {
+        "quote": "Yeah. I am here, I have a contract."
+      },
+      {
+        "quote": "Next. So many times â I have one more year."
+      },
+      {
+        "quote": "No, no, no, no, no, no, I have no idea [about] that,"
+      },
+      {
+        "quote": "They don't have to do anything, honestly."
+      }
+    ],
+    "precision": 0.8,
+    "recall": 0.571,
+    "f1": 0.666,
+    "latency_ms": 0.0,
+    "scorer_input_tokens": 0,
+    "scorer_output_tokens": 0,
+    "extractor_input_tokens": 1709,
+    "extractor_output_tokens": 150,
+    "validator_input_tokens": 1752,
+    "validator_output_tokens": 45,
+    "refinement_used": true,
+    "error": ""
+  },
+  {
+    "id": 3,
+    "domain": "news",
+    "complexity": 2,
+    "query": "Extract the main competitions or sport events described in the article.",
+    "config_name": "E_small_baseline",
+    "expected": [
+      {
+        "event": "final game of the season against Villa"
+      },
+      {
+        "event": "FA Cup final"
+      },
+      {
+        "event": "1992 Barcelona Olympics"
+      },
+      {
+        "event": "La Liga"
+      },
+      {
+        "event": "Champions League"
+      },
+      {
+        "event": "Carabao Cup"
+      },
+      {
+        "event": "Bundesliga"
+      },
+      {
+        "event": "German Cup"
+      },
+      {
+        "event": "European Cup"
+      }
+    ],
+    "extracted": [
+      {
+        "event": "Premier League"
+      },
+      {
+        "event": "Champions League"
+      },
+      {
+        "event": "FA Cup"
+      },
+      {
+        "event": "EFL Cups"
+      }
+    ],
+    "precision": 0.5,
+    "recall": 0.222,
+    "f1": 0.307,
+    "latency_ms": 0.0,
+    "scorer_input_tokens": 0,
+    "scorer_output_tokens": 0,
+    "extractor_input_tokens": 1710,
+    "extractor_output_tokens": 37,
+    "validator_input_tokens": 1687,
+    "validator_output_tokens": 84,
+    "refinement_used": true,
+    "error": ""
+  },
+  {
+    "id": 4,
+    "domain": "news",
+    "complexity": 2,
+    "query": "Extract all trophies Guardiola won with Manchester City, indicating the competition name and the number of titles won in that competition.",
+    "config_name": "E_small_baseline",
+    "expected": [
+      {
+        "competition": "Premier League",
+        "titles_won": "6"
+      },
+      {
+        "competition": "Champions League",
+        "titles_won": "1"
+      },
+      {
+        "competition": "FA Cup",
+        "titles_won": "3"
+      },
+      {
+        "competition": "EFL Cup",
+        "titles_won": "5"
+      }
+    ],
+    "extracted": [
+      {
+        "competition": "Premier League",
+        "titles_won": "six"
+      },
+      {
+        "competition": "Champions League",
+        "titles_won": "one"
+      },
+      {
+        "competition": "FA Cup",
+        "titles_won": "three"
+      },
+      {
+        "competition": "EFL Cups",
+        "titles_won": "five"
+      }
+    ],
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "latency_ms": 0.0,
+    "scorer_input_tokens": 0,
+    "scorer_output_tokens": 0,
+    "extractor_input_tokens": 1735,
+    "extractor_output_tokens": 69,
+    "validator_input_tokens": 1731,
+    "validator_output_tokens": 46,
+    "refinement_used": true,
+    "error": ""
+  },
+  {
+    "id": 5,
+    "domain": "news",
+    "complexity": 1,
+    "query": "Extract all news headlines from technology section.",
+    "config_name": "E_small_baseline",
+    "expected": [
+      {
+        "headline": "Samsung union says to embark on 48,000-strong strike after impasse on bonuses"
+      },
+      {
+        "headline": "Fears of unfettered hacking spurred by Anthropic's Mythos AI model overstated"
+      }
+    ],
+    "extracted": [
+      {
+        "headline": "The debut flight of the Starship V3, outfitted with new features designed to support future missions to the moon and Mars, poses a key test for both the vehicle itself and investor confidence.",
+        "link": "NotFound"
+      }
+    ],
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1": 0.0,
+    "latency_ms": 0.0,
+    "scorer_input_tokens": 0,
+    "scorer_output_tokens": 0,
+    "extractor_input_tokens": 755,
+    "extractor_output_tokens": 74,
+    "validator_input_tokens": 757,
+    "validator_output_tokens": 95,
+    "refinement_used": true,
+    "error": ""
+  },
+  {
+    "id": 6,
+    "domain": "news",
+    "complexity": 2,
+    "query": "Extract all headlines from In Case you Missed It section.",
+    "config_name": "E_small_baseline",
+    "expected": [
+      {
+        "headline": "Trump drops IRS lawsuit in exchange for DOJ $1.8 billion 'weaponization' fund"
+      },
+      {
+        "headline": "How Trump’s crypto venture and Iran’s top exchange tapped into the same industry networks"
+      },
+      {
+        "headline": "Civil rights veterans see history repeating after high court guts Voting Rights Act"
+      }
+    ],
+    "extracted": [
+      {
+        "headline": "Iran threatened to spread war beyond the Middle East if the United States attacks again, after President Donald Trump said he had come within an hour of restarting the military campaign."
+      },
+      {
+        "headline": "Xi and Putin jointly condemn Trump's Golden Dome missile defence shield plans, a week after Xi hosted Trump in Beijing."
+      },
+      {
+        "headline": "China's armed forces secretly trained about 200 Russian military personnel in China late last year."
+      },
+      {
+        "headline": "The U.S. president scored another victory in his campaign to punish disloyal Republicans as Representative Thomas Massie of Kentucky lost his primary race, underscoring the risks for lawmakers who defy Trump."
+      },
+      {
+        "headline": "The debut flight of the Starship V3, outfitted with new features designed to support future missions to the moon and Mars, poses a key test for both the vehicle itself and investor confidence."
+      },
+      {
+        "headline": "The security guard sacrificed his life to keep 140 school children inside the mosque safe by engaging two gunmen in a shootout that helped thwart their attack."
+      },
+      {
+        "headline": "Arsenal were confirmed as champions following second-placed Manchester City's 1-1 draw at Bournemouth. Sunday's clash at Crystal Palace will now be a coronation."
+      },
+      {
+        "headline": "A rare strain of Ebola has prompted the World Health Organization to declare a public health emergency of international concern."
+      },
+      {
+        "headline": "Raising $75 bln would make Elon Musk’s rockets-to-AI venture the world’s biggest IPO, but public in name only. Ordinary shareholders won’t be able to fire the billionaire and legal action is harder. Genuflecting investors are ceding any remaining protection for the risky ride."
+      }
+    ],
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1": 0.0,
+    "latency_ms": 0.0,
+    "scorer_input_tokens": 0,
+    "scorer_output_tokens": 0,
+    "extractor_input_tokens": 750,
+    "extractor_output_tokens": 430,
+    "validator_input_tokens": 1060,
+    "validator_output_tokens": 57,
+    "refinement_used": true,
+    "error": ""
+  },
+  {
+    "id": 7,
+    "domain": "news",
+    "complexity": 2,
+    "query": "Extract the benchmark tools with their corresponding typical bias",
+    "config_name": "E_small_baseline",
+    "expected": [
+      {
+        "benchmark_tool": "VectorDBBench",
+        "bias": "Favors massive clusters; penalizes single-node systems."
+      },
+      {
+        "benchmark_tool": "vector-db-benchmark",
+        "bias": "Favors RAM-heavy architectures; ignores TCO of memory."
+      },
+      {
+        "benchmark_tool": "ANN-Benchmarks",
+        "bias": "Uses outdated, low-dimensional datasets (SIFT/GIST)."
+      },
+      {
+        "benchmark_tool": "NeurIPS / VLDB",
+        "bias": "Focuses on math/theory; ignores operational/SLA reality."
+      }
+    ],
+    "extracted": [
+      {
+        "benchmark_tool": "VectorDBBench",
+        "bias": "Favors massive clusters; penalizes single-node systems."
+      },
+      {
+        "benchmark_tool": "vector-db-benchmark",
+        "bias": "Favors RAM-heavy architectures; ignores TCO of memory."
+      },
+      {
+        "benchmark_tool": "ANN-Benchmarks",
+        "bias": "Uses outdated, low-dimensional datasets (SIFT/GIST)."
+      },
+      {
+        "benchmark_tool": "NeurIPS / VLDB",
+        "bias": "Focuses on math/theory; ignores operational/SLA reality."
+      }
+    ],
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "latency_ms": 0.0,
+    "scorer_input_tokens": 0,
+    "scorer_output_tokens": 0,
+    "extractor_input_tokens": 3819,
+    "extractor_output_tokens": 169,
+    "validator_input_tokens": 3828,
+    "validator_output_tokens": 47,
+    "refinement_used": true,
+    "error": ""
+  },
+  {
+    "id": 10,
+    "domain": "news",
+    "complexity": 2,
+    "query": "Extract just the name of the five production tests that actually matter and that are mentioned in the article",
+    "config_name": "E_small_baseline",
+    "expected": [
+      {
+        "test_name": "Filtering under concurrent load"
+      },
+      {
+        "test_name": "Performance degradation over time"
+      },
+      {
+        "test_name": "Tail latency under load (P95/P99)"
+      },
+      {
+        "test_name": "Total cost of ownership (TCO)"
+      },
+      {
+        "test_name": "Operational maturity"
+      }
+    ],
+    "extracted": [
+      {
+        "name": "Filtering under concurrent load"
+      },
+      {
+        "name": "Performance degradation over time"
+      },
+      {
+        "name": "Tail latency under load (P95/P99)"
+      },
+      {
+        "name": "Total cost of ownership (TCO)"
+      },
+      {
+        "name": "Operational maturity"
+      }
+    ],
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "latency_ms": 0.0,
+    "scorer_input_tokens": 0,
+    "scorer_output_tokens": 0,
+    "extractor_input_tokens": 3818,
+    "extractor_output_tokens": 110,
+    "validator_input_tokens": 3785,
+    "validator_output_tokens": 56,
+    "refinement_used": true,
+    "error": ""
+  },
+  {
+    "id": 11,
+    "domain": "news",
+    "complexity": 1,
+    "query": "Extract the author's name and the date of publication of the article",
+    "config_name": "E_small_baseline",
+    "expected": [
+      {
+        "author": "Odewole Babatunde Samson",
+        "publication_date": "19 may"
+      }
+    ],
+    "extracted": [
+      {
+        "author": "Simon Frey",
+        "publication_date": "2026"
+      }
+    ],
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1": 0.0,
+    "latency_ms": 0.0,
+    "scorer_input_tokens": 0,
+    "scorer_output_tokens": 0,
+    "extractor_input_tokens": 3820,
+    "extractor_output_tokens": 44,
+    "validator_input_tokens": 3740,
+    "validator_output_tokens": 107,
+    "refinement_used": true,
+    "error": ""
+  },
+  {
+    "id": 1,
+    "domain": "ecommerce",
+    "complexity": 1,
+    "query": "Extract all product names and their prices.",
+    "config_name": "E_small_baseline",
+    "expected": [
+      {
+        "product": "Bulbasaur",
+        "price": "63.00"
+      },
+      {
+        "product": "Ivysaur",
+        "price": "87.00"
+      },
+      {
+        "product": "Venusaur",
+        "price": "105.00"
+      },
+      {
+        "product": "Charmander",
+        "price": "48.00"
+      },
+      {
+        "product": "Charmeleon",
+        "price": "165.00"
+      },
+      {
+        "product": "Charizard",
+        "price": "156.00"
+      },
+      {
+        "product": "Squirtle",
+        "price": "130.00"
+      },
+      {
+        "product": "Wartortle",
+        "price": "123.00"
+      },
+      {
+        "product": "Blastoise",
+        "price": "76.00"
+      },
+      {
+        "product": "Caterpie",
+        "price": "73.00"
+      },
+      {
+        "product": "Metapod",
+        "price": "148.00"
+      },
+      {
+        "product": "Butterfree",
+        "price": "162.00"
+      },
+      {
+        "product": "Weedle",
+        "price": "25.00"
+      },
+      {
+        "product": "Kakuna",
+        "price": "148.00"
+      },
+      {
+        "product": "Beedrill",
+        "price": "168.00"
+      },
+      {
+        "product": "Pidgey",
+        "price": "159.00"
+      }
+    ],
+    "extracted": [
+      {
+        "product": "Bulbasaur",
+        "price": "£63.00"
+      },
+      {
+        "product": "Ivysaur",
+        "price": "£87.00"
+      },
+      {
+        "product": "Venusaur",
+        "price": "£105.00"
+      },
+      {
+        "product": "Charizard",
+        "price": "£165.00"
+      },
+      {
+        "product": "Squirtle",
+        "price": "£168.00"
+      },
+      {
+        "product": "Charmeleon",
+        "price": "£156.00"
+      },
+      {
+        "product": "Metapod",
+        "price": "£25.00"
+      },
+      {
+        "product": "Weedle",
+        "price": "£168.00"
+      },
+      {
+        "product": "Pidgey",
+        "price": "£159.00"
+      }
+    ],
+    "precision": 0.444,
+    "recall": 0.25,
+    "f1": 0.32,
+    "latency_ms": 0.0,
+    "scorer_input_tokens": 0,
+    "scorer_output_tokens": 0,
+    "extractor_input_tokens": 11816,
+    "extractor_output_tokens": 280,
+    "validator_input_tokens": 10840,
+    "validator_output_tokens": 69,
+    "refinement_used": true,
+    "error": ""
+  },
+  {
+    "id": 2,
+    "domain": "ecommerce",
+    "complexity": 2,
+    "query": "Extract products that have a cost greater than $86.",
+    "config_name": "E_small_baseline",
+    "expected": [
+      {
+        "product": "Ivisaur"
+      },
+      {
+        "product": "Venusaur"
+      },
+      {
+        "product": "Charmeleon"
+      },
+      {
+        "product": "Charizard"
+      },
+      {
+        "product": "Squirtle"
+      },
+      {
+        "product": "Wartortle"
+      },
+      {
+        "product": "Metapod"
+      },
+      {
+        "product": "Butterfree"
+      },
+      {
+        "product": "Kakuna"
+      },
+      {
+        "product": "Beedrill"
+      },
+      {
+        "product": "Pidgey"
+      }
+    ],
+    "extracted": [
+      {
+        "product": "Bulbasaur"
+      },
+      {
+        "product": "Ivysaur"
+      },
+      {
+        "product": "Venusaur"
+      },
+      {
+        "product": "Charizard"
+      },
+      {
+        "product": "Squirtle"
+      },
+      {
+        "product": "Charmeleon"
+      },
+      {
+        "product": "Metapod"
+      },
+      {
+        "product": "Weedle"
+      },
+      {
+        "product": "Pidgey"
+      }
+    ],
+    "precision": 0.778,
+    "recall": 0.636,
+    "f1": 0.7,
+    "latency_ms": 0.0,
+    "scorer_input_tokens": 0,
+    "scorer_output_tokens": 0,
+    "extractor_input_tokens": 11813,
+    "extractor_output_tokens": 157,
+    "validator_input_tokens": 10739,
+    "validator_output_tokens": 64,
+    "refinement_used": true,
+    "error": ""
+  },
+  {
+    "id": 3,
+    "domain": "ecommerce",
+    "complexity": 2,
+    "query": "Extract products that have a cost greater than $86 and their price.",
+    "config_name": "E_small_baseline",
+    "expected": [
+      {
+        "product": "Ivysaur",
+        "price": "87.00"
+      },
+      {
+        "product": "Venusaur",
+        "price": "105.00"
+      },
+      {
+        "product": "Charmeleon",
+        "price": "165.00"
+      },
+      {
+        "product": "Charizard",
+        "price": "156.00"
+      },
+      {
+        "product": "Squirtle",
+        "price": "130.00"
+      },
+      {
+        "product": "Wartortle",
+        "price": "123.00"
+      },
+      {
+        "product": "Metapod",
+        "price": "148.00"
+      },
+      {
+        "product": "Butterfree",
+        "price": "162.00"
+      },
+      {
+        "product": "Kakuna",
+        "price": "148.00"
+      },
+      {
+        "product": "Beedrill",
+        "price": "168.00"
+      },
+      {
+        "product": "Pidgey",
+        "price": "159.00"
+      }
+    ],
+    "extracted": [
+      {
+        "product": "Bulbasaur",
+        "price": "63.00"
+      },
+      {
+        "product": "Ivysaur",
+        "price": "87.00"
+      },
+      {
+        "product": "Venusaur",
+        "price": "105.00"
+      },
+      {
+        "product": "Charizard",
+        "price": "165.00"
+      },
+      {
+        "product": "Squirtle",
+        "price": "125.00"
+      },
+      {
+        "product": "Charmeleon",
+        "price": "156.00"
+      },
+      {
+        "product": "Metapod",
+        "price": "25.00"
+      },
+      {
+        "product": "Butterfree",
+        "price": "168.00"
+      },
+      {
+        "product": "Beedrill",
+        "price": "168.00"
+      },
+      {
+        "product": "Pidgey",
+        "price": "159.00"
+      }
+    ],
+    "precision": 0.8,
+    "recall": 0.727,
+    "f1": 0.762,
+    "latency_ms": 0.0,
+    "scorer_input_tokens": 0,
+    "scorer_output_tokens": 0,
+    "extractor_input_tokens": 11823,
+    "extractor_output_tokens": 257,
+    "validator_input_tokens": 10858,
+    "validator_output_tokens": 97,
+    "refinement_used": true,
+    "error": ""
+  },
+  {
+    "id": 1,
+    "domain": "documentation",
+    "complexity": 1,
+    "query": "Extract all section titles in the document.",
+    "config_name": "E_small_baseline",
+    "expected": [
+      {
+        "section": "9. Classes"
+      },
+      {
+        "section": "9.1. A Word About Names and Objects"
+      },
+      {
+        "section": "9.2. Python Scopes and Namespaces"
+      },
+      {
+        "section": "9.2.1. Scopes and Namespaces Example"
+      },
+      {
+        "section": "9.3. A First Look at Classes"
+      },
+      {
+        "section": "9.3.1. Class Definition Syntax"
+      },
+      {
+        "section": "9.3.2. Class Objects"
+      },
+      {
+        "section": "9.3.3. Instance Objects"
+      },
+      {
+        "section": "9.3.4. Method Objects"
+      },
+      {
+        "section": "9.3.5. Class and Instance Variables"
+      },
+      {
+        "section": "9.4. Random Remarks"
+      },
+      {
+        "section": "9.5. Inheritance"
+      },
+      {
+        "section": "9.6. Private Variables¶"
+      },
+      {
+        "section": "9.7. Odds and Ends"
+      },
+      {
+        "section": "9.8. Iterators"
+      },
+      {
+        "section": "9.9. Generators"
+      },
+      {
+        "section": "9.10. Generator Expressions"
+      }
+    ],
+    "extracted": [],
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1": 0.0,
+    "latency_ms": 0.0,
+    "scorer_input_tokens": 0,
+    "scorer_output_tokens": 0,
+    "extractor_input_tokens": 0,
+    "extractor_output_tokens": 0,
+    "validator_input_tokens": 0,
+    "validator_output_tokens": 0,
+    "refinement_used": false,
+    "error": ""
+  },
+  {
+    "id": 2,
+    "domain": "documentation",
+    "complexity": 2,
+    "query": "Extract all document subsection titles that contains code examples.",
+    "config_name": "E_small_baseline",
+    "expected": [
+      {
+        "section": "9.2.1. Scopes and Namespaces Example"
+      },
+      {
+        "section": "9.3.1. Class Definition Syntax"
+      },
+      {
+        "section": "9.3.2. Class Objects"
+      },
+      {
+        "section": "9.3.3. Instance Objects"
+      },
+      {
+        "section": "9.3.4. Method Objects"
+      },
+      {
+        "section": "9.3.5. Class and Instance Variables"
+      },
+      {
+        "section": "9.4. Random Remarks"
+      },
+      {
+        "section": "9.5. Inheritance"
+      },
+      {
+        "section": "9.5.1. Multiple Inheritance"
+      },
+      {
+        "section": "9.6. Private Variables"
+      },
+      {
+        "section": "9.7. Odds and Ends"
+      },
+      {
+        "section": "9.8. Iterators"
+      },
+      {
+        "section": "9.9. Generators"
+      },
+      {
+        "section": "9.10. Generator Expressions"
+      }
+    ],
+    "extracted": [
+      {
+        "section": "9. Classes"
+      },
+      {
+        "section": "9.1. A Word About Names and Objects"
+      },
+      {
+        "section": "9.2. Python Scopes and Namespaces"
+      },
+      {
+        "section": "9.3. A First Look at Classes"
+      },
+      {
+        "section": "9.4. Namespaces are created at different moments and have different lifetimes."
+      },
+      {
+        "section": "9.5. Multiple Inheritance"
+      },
+      {
+        "section": "9.6. Name mangling"
+      },
+      {
+        "section": "9.7. Iterators"
+      },
+      {
+        "section": "9.8. Generators"
+      }
+    ],
+    "precision": 0.333,
+    "recall": 0.214,
+    "f1": 0.261,
+    "latency_ms": 0.0,
+    "scorer_input_tokens": 0,
+    "scorer_output_tokens": 0,
+    "extractor_input_tokens": 8851,
+    "extractor_output_tokens": 249,
+    "validator_input_tokens": 7913,
+    "validator_output_tokens": 95,
+    "refinement_used": true,
+    "error": ""
+  },
+  {
+    "id": 3,
+    "domain": "documentation",
+    "complexity": 2,
+    "query": "Extract all programming languages mentioned in the document.",
+    "config_name": "E_small_baseline",
+    "expected": [
+      {
+        "language": "Python"
+      },
+      {
+        "language": "C++"
+      },
+      {
+        "language": "Modula-3"
+      },
+      {
+        "language": "Smalltalk"
+      },
+      {
+        "language": "Pascal"
+      },
+      {
+        "language": "C"
+      }
+    ],
+    "extracted": [
+      {
+        "language": "Python"
+      }
+    ],
+    "precision": 1.0,
+    "recall": 0.167,
+    "f1": 0.286,
+    "latency_ms": 0.0,
+    "scorer_input_tokens": 0,
+    "scorer_output_tokens": 0,
+    "extractor_input_tokens": 16627,
+    "extractor_output_tokens": 99,
+    "validator_input_tokens": 7790,
+    "validator_output_tokens": 138,
+    "refinement_used": true,
+    "error": ""
+  },
+  {
+    "id": 4,
+    "domain": "documentation",
+    "complexity": 2,
+    "query": "Extract all subsections that belong to the section titled Advanced Concepts.",
+    "config_name": "E_small_baseline",
+    "expected": [
+      {
+        "section": "Structured output"
+      },
+      {
+        "section": "ToolStrategy"
+      },
+      {
+        "section": "ProviderStrategy"
+      },
+      {
+        "section": "Memory"
+      },
+      {
+        "section": "Defining state via middleware"
+      },
+      {
+        "section": "Defining state via state_schema"
+      },
+      {
+        "section": "Streaming"
+      },
+      {
+        "section": "Middleware"
+      }
+    ],
+    "extracted": [
+      {
+        "section": "Advanced Concepts."
+      }
+    ],
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1": 0.0,
+    "latency_ms": 0.0,
+    "scorer_input_tokens": 0,
+    "scorer_output_tokens": 0,
+    "extractor_input_tokens": 2358,
+    "extractor_output_tokens": 31,
+    "validator_input_tokens": 2218,
+    "validator_output_tokens": 60,
+    "refinement_used": true,
+    "error": ""
+  },
+  {
+    "id": 5,
+    "domain": "documentation",
+    "complexity": 1,
+    "query": "Extract all section titles in the document.",
+    "config_name": "E_small_baseline",
+    "expected": [
+      {
+        "section": "Agents"
+      },
+      {
+        "section": "Core components"
+      },
+      {
+        "section": "Model"
+      },
+      {
+        "section": "Static model"
+      },
+      {
+        "section": "Dynamic model"
+      },
+      {
+        "section": "Tools"
+      },
+      {
+        "section": "Static tools"
+      },
+      {
+        "section": "Dynamic tools"
+      },
+      {
+        "section": "Tool error handling"
+      },
+      {
+        "section": "Tool use in the ReAct loop"
+      },
+      {
+        "section": "System prompt"
+      },
+      {
+        "section": "Dynamic system prompt"
+      },
+      {
+        "section": "Name"
+      },
+      {
+        "section": "Invocation"
+      },
+      {
+        "section": "Advanced Concepts"
+      },
+      {
+        "section": "Structured output"
+      },
+      {
+        "section": "ToolStrategy"
+      },
+      {
+        "section": "ProviderStrategy"
+      },
+      {
+        "section": "Memory"
+      },
+      {
+        "section": "Defining state via middleware"
+      },
+      {
+        "section": "Defining state via state_schema"
+      },
+      {
+        "section": "Streaming"
+      },
+      {
+        "section": "Middleware"
+      }
+    ],
+    "extracted": [
+      {
+        "section title": "Agent"
+      },
+      {
+        "section title": "Harness"
+      },
+      {
+        "section title": "create_agent"
+      },
+      {
+        "section title": "Building on that"
+      },
+      {
+        "section title": "Pass a model identifier string"
+      },
+      {
+        "section title": "To provide the agent with tools"
+      },
+      {
+        "section title": "Trace each step of this loop"
+      },
+      {
+        "section title": "Persisting conversation history"
+      },
+      {
+        "section title": "If you also need to pass per-run configuration"
+      },
+      {
+        "section title": "invoke returns the final response"
+      },
+      {
+        "section title": "create_agent is highly extensible"
+      },
+      {
+        "section title": "Common patterns are prebuilt"
+      },
+      {
+        "section title": "Agents are especially useful"
+      },
+      {
+        "section title": "Middleware ecosystem provides"
+      },
+      {
+        "section title": "create_deep_agent"
+      },
+      {
+        "section title": "Agents are especially useful"
+      },
+      {
+        "section title": "Complex tasks often exceed"
+      },
+      {
+        "section title": "Every model call has a fixed context window"
+      },
+      {
+        "section title": "Complex tasks often exceed"
+      },
+      {
+        "section title": "Fault tolerance"
+      },
+      {
+        "section title": "Guardrails"
+      },
+      {
+        "section title": "Steering"
+      }
+    ],
+    "precision": 0.045,
+    "recall": 0.043,
+    "f1": 0.044,
+    "latency_ms": 0.0,
+    "scorer_input_tokens": 0,
+    "scorer_output_tokens": 0,
+    "extractor_input_tokens": 2354,
+    "extractor_output_tokens": 418,
+    "validator_input_tokens": 2427,
+    "validator_output_tokens": 63,
+    "refinement_used": true,
+    "error": ""
+  },
+  {
+    "id": 6,
+    "domain": "documentation",
+    "complexity": 3,
+    "query": "Extract all sections with their corresponding subsections.",
+    "config_name": "E_small_baseline",
+    "expected": [
+      {
+        "section": "Core components",
+        "subsections": [
+          "Model",
+          "Static model",
+          "Dynamic model",
+          "Tools",
+          "Static tools",
+          "Dynamic tools",
+          "Tool error handling",
+          "Tool use in the ReAct loop",
+          "System prompt",
+          "Dynamic system prompt",
+          "Name",
+          "Invocation"
+        ]
+      },
+      {
+        "section": "Advanced Concepts",
+        "subsections": [
+          "Structured output",
+          "ToolStrategy",
+          "ProviderStrategy",
+          "Memory",
+          "Defining state via middleware",
+          "Defining state via state_schema",
+          "Streaming",
+          "Middleware"
+        ]
+      }
+    ],
+    "extracted": [
+      {
+        "section": "Agent",
+        "subsections": [
+          "Model + Harness"
+        ]
+      },
+      {
+        "section": "Harness",
+        "subsections": [
+          "get the model the right context at the right time for the given task"
+        ]
+      },
+      {
+        "section": "create_agent",
+        "subsections": [
+          "from langchain.agents import create_agent",
+          "agent = create_agent(model=\"google_genai:gemini-3.5-flash\", tools=tools)"
+        ]
+      },
+      {
+        "section": "Tools",
+        "subsections": [
+          "Python callable",
+          "LangChain tool",
+          "tool dict"
+        ]
+      },
+      {
+        "section": "Trace each step",
+        "subsections": [
+          "LangSmith"
+        ]
+      },
+      {
+        "section": "invoke",
+        "subsections": [
+          "messages",
+          "thread_id"
+        ]
+      },
+      {
+        "section": "checkpointer",
+        "subsections": [
+          "InMemorySaver()"
+        ]
+      },
+      {
+        "section": "context_schema",
+        "subsections": [
+          "Context"
+        ]
+      },
+      {
+        "section": "context",
+        "subsections": [
+          "user_id"
+        ]
+      },
+      {
+        "section": "streaming",
+        "subsections": [
+          "agent.stream_events"
+        ]
+      },
+      {
+        "section": "Middleware",
+        "subsections": [
+          "Execution environment",
+          "Tools, filesystem, sandboxes, and code execution",
+          "Context management",
+          "Summarization, memory, skills, and prompt caching",
+          "Planning and delegation",
+          "Todo lists and subagents for parallel, isolated work",
+          "Fault tolerance",
+          "Retries, fallbacks, and call limits",
+          "Guardrails",
+          "PII detection and content controls",
+          "Steering"
+        ]
+      },
+      {
+        "section": "create_deep_agent",
+        "subsections": [
+          "filesystem",
+          "summarization",
+          "subagents",
+          "prompt caching"
+        ]
+      },
+      {
+        "section": "execution environment",
+        "subsections": [
+          "tools",
+          "filesystem",
+          "code execution"
+        ]
+      },
+      {
+        "section": "context window",
+        "subsections": [
+          "Summarization",
+          "memory",
+          "skills"
+        ]
+      },
+      {
+        "section": "Delegation",
+        "subsections": [
+          "subagents"
+        ]
+      },
+      {
+        "section": "Fault tolerance",
+        "subsections": [
+          "ModelRetryMiddleware",
+          "ToolRetryMiddleware"
+        ]
+      },
+      {
+        "section": "Guardrails",
+        "subsections": [
+          "PIIMiddleware"
+        ]
+      },
+      {
+        "section": "Steering",
+        "subsections": [
+          "HumanInTheLoopMiddleware"
+        ]
+      },
+      {
+        "section": "model",
+        "subsections": [
+          "google_genai:gemini-3.5-flash"
+        ]
+      },
+      {
+        "section": "tools",
+        "subsections": [
+          "search"
+        ]
+      },
+      {
+        "section": "middleware",
+        "subsections": [
+          "FilesystemMiddleware",
+          "TodoListMiddleware",
+          "SubAgentMiddleware"
+        ]
+      },
+      {
+        "section": "search tool",
+        "subsections": [
+          "Search results for: {query}"
+        ],
+        "tool": "search"
+      },
+      {
+        "section": "StateBackend",
+        "subsections": []
+      }
+    ],
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1": 0.0,
+    "latency_ms": 0.0,
+    "scorer_input_tokens": 0,
+    "scorer_output_tokens": 0,
+    "extractor_input_tokens": 2364,
+    "extractor_output_tokens": 552,
+    "validator_input_tokens": 2762,
+    "validator_output_tokens": 56,
+    "refinement_used": true,
+    "error": ""
+  }
+]

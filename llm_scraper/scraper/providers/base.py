@@ -11,6 +11,9 @@ class BaseProvider(LLMPort):
         self.model_name = config.model_name
         self.max_tokens = config.max_tokens
         self.temperature = config.temperature
+        self.json_mode = (
+            config.json_mode if config.json_mode else "json_object"
+        )  # default to json_object if not specified
 
     def _resolve_api_key(self) -> str:
         if self.config.api_key:

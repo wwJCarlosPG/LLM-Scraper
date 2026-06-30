@@ -2,6 +2,7 @@ import logging
 
 from sentence_transformers import util
 
+from scraper.core.entities.token_usage import TokenUsage
 from scraper.core.ports.embedding_port import EmbeddingPort
 from scraper.core.ports.llm_port import LLMPort
 from scraper.core.ports.scorer_port import ScorerPort
@@ -39,6 +40,7 @@ class HyDEScorer(ScorerPort):
         self.embedding_provider = embedding_provider
         self.domain = domain
         self._cache: dict[str, list[float]] = {}
+        self._last_usage: TokenUsage = TokenUsage(role="scorer")
 
     def _get_hypothetical_embedding(self, query: str) -> list[float]:
         """
@@ -48,12 +50,18 @@ class HyDEScorer(ScorerPort):
         """
         if query in self._cache:
             logger.info("[hyde] using cached hypothetical embedding")
+            self._last_usage = TokenUsage(role="scorer")
             return self._cache[query]
 
         try:
-            hypothetical_doc = self.llm.invoke(
+            hypothetical_doc, usage = self.llm.invoke(
                 user_prompt=build_hyde_user_prompt(query, self.domain),
                 system_prompt=get_hyde_system_prompt(),
+            )
+            self._last_usage = TokenUsage(
+                input_tokens=usage.input_tokens,
+                output_tokens=usage.output_tokens,
+                role="scorer",
             )
             logger.info(
                 f"[hyde] hypothetical doc generated: {hypothetical_doc[:100]}..."
@@ -63,6 +71,7 @@ class HyDEScorer(ScorerPort):
                 f"[hyde] LLM generation failed ({e}), falling back to raw query"
             )
             hypothetical_doc = query
+            self._last_usage = TokenUsage(role="scorer")
 
         embedding = self.embedding_provider.embed([hypothetical_doc])[0]
         self._cache[query] = embedding
@@ -74,7 +83,7 @@ class HyDEScorer(ScorerPort):
         chunks: list[str],
         top_k: int,
         compute_scores: bool = False,
-    ) -> tuple[list[str], list[float]]:
+    ) -> tuple[list[str], list[float], TokenUsage]:
         if len(chunks) <= top_k:
             logger.info(
                 f"[hyde] {len(chunks)} chunks <= top_k {top_k}, skipping ranking"
@@ -86,8 +95,12 @@ class HyDEScorer(ScorerPort):
                 ranked = sorted(
                     zip(scores, chunks, strict=True), key=lambda x: x[0], reverse=True
                 )
-                return [c for _, c in ranked], [round(s, 3) for s, _ in ranked]
-            return chunks, [1.0] * len(chunks)
+                return (
+                    [c for _, c in ranked],
+                    [round(s, 3) for s, _ in ranked],
+                    self._last_usage,
+                )
+            return chunks, [1.0] * len(chunks), TokenUsage(role="scorer")
 
         logger.info(
             f"[hyde] ranking {len(chunks)} chunks with HyDE, "
@@ -108,4 +121,4 @@ class HyDEScorer(ScorerPort):
         top_chunks = [c for _, c in ranked[:top_k]]
 
         logger.info(f"[hyde] top scores: {top_scores}")
-        return top_chunks, top_scores
+        return top_chunks, top_scores, self._last_usage
