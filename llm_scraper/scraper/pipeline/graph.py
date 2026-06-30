@@ -47,7 +47,6 @@ def build_graph() -> StateGraph:
     )
 
     graph.add_edge(NODE_SCORER, NODE_EXTRACTOR)
-    graph.add_edge(NODE_EXTRACTOR, NODE_MERGER)
     graph.add_edge(NODE_MERGER, END)
 
     graph.add_conditional_edges(
@@ -66,7 +65,8 @@ def build_graph() -> StateGraph:
 
 def _should_validate(state: PipelineState) -> str:
     config = state.get("config")
-    if not config.refinement:
+    retries = state.get("retry_count", 0)
+    if not config.refinement or retries > config.max_retries:
         return EDGE_SKIP_VALIDATE
     return EDGE_VALIDATE
 
@@ -137,7 +137,7 @@ def _should_refine(state: PipelineState) -> str:
         return EDGE_MERGE
     if not config.refinement:
         return EDGE_MERGE
-    if retry_count >= config.max_retries:
+    if retry_count > config.max_retries:
         return EDGE_MERGE
 
     return EDGE_REFINE

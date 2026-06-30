@@ -22,11 +22,11 @@ async def scorer_node(state: PipelineState) -> dict:
         embedding_provider=get_embedding_provider(config.embedding),
         domain=config.domain,
     )
-    ranked_chunks, _ = scorer.rank(
+    ranked_chunks, _, usage = scorer.rank(
         query=state["query"],
         chunks=chunks,
         top_k=config.top_k_chunks,
     )
 
     logger.info(f"[scorer] reduced to {len(ranked_chunks)} chunks")
-    return {"chunks": ranked_chunks}
+    return {"chunks": ranked_chunks, "token_usage": [usage]}

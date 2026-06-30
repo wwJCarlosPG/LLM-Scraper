@@ -3,8 +3,10 @@ from logging import getLogger
 
 from scraper.core.entities.responses import ScrapedResponse, ValidatorResponse
 from scraper.core.entities.state import PipelineState
+from scraper.core.entities.token_usage import TokenUsage
 from scraper.pipeline.prompts.validator import (
     build_validator_user_prompt,
+    get_chunk_validator_prompt,
     get_validator_prompt,
 )
 from scraper.providers.factory import get_provider
@@ -34,16 +36,17 @@ async def _validate_chunks(
     state, query, chunks, partial_responses, retry_count, config
 ) -> dict:
     """Validates each partial_response against its corresponding chunk."""
-    llm = get_provider(config.provider)
-    system_prompt = get_validator_prompt()
+    llm = get_provider(config.validator_provider or config.extractor_provider)
+    system_prompt = get_chunk_validator_prompt()
 
     good_partial_responses = []
     bad_chunks = []
+    usages: list[TokenUsage] = []
 
     # zip stops at shortest — partial_responses and chunks should be same length
     for partial_response, chunk in zip(partial_responses, chunks, strict=True):
-        if not partial_response.is_valid or not partial_response.scraped_data:
-            # already invalid at parsing or empty — mark as bad
+        if not partial_response.is_valid:
+            # already invalid at parsing — mark as bad
             bad_chunks.append(
                 (
                     chunk,
@@ -58,7 +61,11 @@ async def _validate_chunks(
             scraped_data=partial_response.scraped_data,
             content=chunk,
         )
-        raw = await llm.ainvoke(user_prompt=user_prompt, system_prompt=system_prompt)
+        raw, usage = await llm.ainvoke(
+            user_prompt=user_prompt, system_prompt=system_prompt
+        )
+        usage.role = "validator"
+        usages.append(usage)
         validator_response = _parse_validator_response(raw)
 
         if validator_response.is_valid:
@@ -81,7 +88,7 @@ async def _validate_chunks(
         "bad_chunks": bad_chunks,
         "is_valid": is_valid,
         "feedback": None,
-        "retry_count": retry_count + 1,
+        "token_usage": usages,
     }
 
 
@@ -105,7 +112,7 @@ async def _validate_full(state, query, cleaned_html, retry_count, config) -> dic
             "retry_count": retry_count + 1,
         }
 
-    llm = get_provider(config.provider)
+    llm = get_provider(config.validator_provider or config.extractor_provider)
     system_prompt = get_validator_prompt()
     user_prompt = build_validator_user_prompt(
         query=query,
@@ -113,7 +120,8 @@ async def _validate_full(state, query, cleaned_html, retry_count, config) -> dic
         content=cleaned_html or "",
     )
 
-    raw = await llm.ainvoke(user_prompt=user_prompt, system_prompt=system_prompt)
+    raw, usage = await llm.ainvoke(user_prompt=user_prompt, system_prompt=system_prompt)
+    usage.role = "validator"
     validator_response = _parse_validator_response(raw)
 
     logger.info(f"[validator] is_valid={validator_response.is_valid}")
@@ -136,6 +144,7 @@ async def _validate_full(state, query, cleaned_html, retry_count, config) -> dic
         else None,
         "final_response": updated_response if validator_response.is_valid else None,
         "retry_count": retry_count + 1,
+        "token_usage": [usage],
     }
 
 
@@ -144,13 +153,15 @@ def _parse_validator_response(raw: str) -> ValidatorResponse:
     try:
         data = json.loads(raw)
         return ValidatorResponse(
-            explanation=data.get("explanation", "No explanation"),
+            explanation=data.get("explanation")
+            or "Extracted items do not match source content.",
             is_valid=data.get("is_valid", False),
         )
     except json.JSONDecodeError:
-        logger.error(f"[validator] failed to parse validator response: {raw[:100]}")
+        logger.error(f"[validator] failed to parse response: {raw[:100]}")
         return ValidatorResponse(
-            explanation=f"Failed to parse validator response: {raw}", is_valid=False
+            explanation="Retry extraction. Focus only on items explicitly present in the content.",
+            is_valid=False,
         )
 
 
@@ -162,4 +173,11 @@ def _clean_json_string(raw: str) -> str:
         raw = raw[len("```") :]
     if raw.endswith("```"):
         raw = raw[:-3]
+    raw = raw.strip()
+    first = raw.find("{")
+    last = raw.rfind("}")
+    if first != -1 and last != -1 and last > first:
+        raw = raw[first : last + 1]
+    elif first != -1:
+        raw = raw[first:]
     return raw.strip()

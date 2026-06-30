@@ -24,7 +24,7 @@ class DefaultHTMLCleaner(CleanerPort):
         return response.text
 
     def clean(self, html: str, context_length: int = 0) -> str:
-        soup = BeautifulSoup(html, "html.parser")
+        soup = BeautifulSoup(html, "lxml")
 
         # Level 1: remove noise tags
         for tag in NOISE_TAGS:
@@ -121,7 +121,7 @@ class DefaultHTMLCleaner(CleanerPort):
         Removes only noise tags (scripts, styles, meta) while preserving
         the full semantic structure including headers. Used for chunking.
         """
-        soup = BeautifulSoup(html, "html.parser")
+        soup = BeautifulSoup(html, "lxml")
 
         for tag in NOISE_TAGS:
             for el in soup.find_all(tag):

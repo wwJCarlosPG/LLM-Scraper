@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
 
+from scraper.core.entities.token_usage import TokenUsage
+
 
 class ScorerPort(ABC):
     """
@@ -14,7 +16,7 @@ class ScorerPort(ABC):
         chunks: list[str],
         top_k: int,
         compute_scores: bool = False,
-    ) -> tuple[list[str], list[float]]:
+    ) -> tuple[list[str], list[float], TokenUsage]:
         """
         Rank chunks by relevance to the query and return top-k.
 
@@ -26,6 +28,6 @@ class ScorerPort(ABC):
                             even when len(chunks) <= top_k.
 
         Returns:
-            tuple of (top-k chunks sorted by relevance, their scores).
+            tuple of (top-k chunks sorted by relevance, their scores, token usage).
         """
         ...

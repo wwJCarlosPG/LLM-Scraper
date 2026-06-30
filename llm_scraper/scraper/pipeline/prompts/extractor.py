@@ -26,6 +26,7 @@ def _simple_prompt(output_format: dict) -> str:
     - Only include the attributes the user asks for.
     - Your response must be a valid JSON object starting with {{ and ending with }}.
     - No text outside "scraped_data".
+    - Do not include any text, explanation, or formatting outside the JSON object.
     - Close all brackets and avoid trailing commas.
     - If a value is missing, return "NotFound".
     - If no matching information is found, return an empty array: "scraped_data": []

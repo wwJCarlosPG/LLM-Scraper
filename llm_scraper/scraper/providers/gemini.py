@@ -4,6 +4,7 @@ import httpx
 from langsmith import traceable
 
 from scraper.core.entities.config import ProviderConfig
+from scraper.core.entities.token_usage import TokenUsage
 from scraper.providers.base import BaseProvider
 
 logger = logging.getLogger(__name__)
@@ -17,12 +18,14 @@ class GeminiProvider(BaseProvider):
         self.endpoint = f"{self.BASE_URL}/{self.model_name}:generateContent"
 
     @traceable(name="GeminiProvider.invoke", run_type="llm")
-    def invoke(self, user_prompt: str, system_prompt: str) -> str:
+    def invoke(self, user_prompt: str, system_prompt: str) -> tuple[str, TokenUsage]:
         with httpx.Client() as client:
             return self._request(client, user_prompt, system_prompt)
 
     @traceable(name="GeminiProvider.ainvoke", run_type="llm")
-    async def ainvoke(self, user_prompt: str, system_prompt: str) -> str:
+    async def ainvoke(
+        self, user_prompt: str, system_prompt: str
+    ) -> tuple[str, TokenUsage]:
         async with httpx.AsyncClient() as client:
             return await self._arequest(client, user_prompt, system_prompt)
 
@@ -37,15 +40,21 @@ class GeminiProvider(BaseProvider):
             },
         }
 
-    def _parse_response(self, data: dict) -> str:
+    def _parse_response(self, data: dict) -> tuple[str, TokenUsage]:
         try:
-            return data["candidates"][0]["content"]["parts"][0]["text"]
+            text = data["candidates"][0]["content"]["parts"][0]["text"]
         except (KeyError, IndexError) as e:
             raise ValueError(f"Unexpected Gemini response format: {data}") from e
+        meta = data.get("usageMetadata", {})
+        usage = TokenUsage(
+            input_tokens=meta.get("promptTokenCount", 0),
+            output_tokens=meta.get("candidatesTokenCount", 0),
+        )
+        return text, usage
 
     def _request(
         self, client: httpx.Client, user_prompt: str, system_prompt: str
-    ) -> str:
+    ) -> tuple[str, TokenUsage]:
         response = client.post(
             self.endpoint,
             params={"key": self.api_key},
@@ -58,7 +67,7 @@ class GeminiProvider(BaseProvider):
 
     async def _arequest(
         self, client: httpx.AsyncClient, user_prompt: str, system_prompt: str
-    ) -> str:
+    ) -> tuple[str, TokenUsage]:
         response = await client.post(
             self.endpoint,
             params={"key": self.api_key},
